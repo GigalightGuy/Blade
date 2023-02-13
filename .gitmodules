@@ -1,0 +1,6 @@
+[submodule "BladeEngine/vendor/GLFW"]
+	path = BladeEngine/vendor/GLFW
+	url = https://github.com/GigalightGuy/glfw.git
+[submodule "BladeEngine/vendor/spdlog"]
+	path = BladeEngine/vendor/spdlog
+	url = https://github.com/gabime/spdlog.git

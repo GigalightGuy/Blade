@@ -2,7 +2,7 @@ include "Dependencies.lua"
 
 workspace "Blade"
 	architecture "x86_64"
-	configurations { "Debug", "Release", "Dist" }
+	configurations { "Debug", "Release" }
 	startproject "Sandbox"
 
 	flags

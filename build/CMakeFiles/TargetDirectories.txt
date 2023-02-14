@@ -1,0 +1,13 @@
+C:/dev/Blade/build/CMakeFiles/INSTALL.dir
+C:/dev/Blade/build/CMakeFiles/ALL_BUILD.dir
+C:/dev/Blade/build/CMakeFiles/ZERO_CHECK.dir
+C:/dev/Blade/build/BladeEngine/vendor/GLFW/CMakeFiles/uninstall.dir
+C:/dev/Blade/build/BladeEngine/vendor/GLFW/CMakeFiles/INSTALL.dir
+C:/dev/Blade/build/BladeEngine/vendor/GLFW/CMakeFiles/ALL_BUILD.dir
+C:/dev/Blade/build/BladeEngine/vendor/GLFW/src/CMakeFiles/glfw.dir
+C:/dev/Blade/build/BladeEngine/vendor/GLFW/src/CMakeFiles/update_mappings.dir
+C:/dev/Blade/build/BladeEngine/vendor/GLFW/src/CMakeFiles/INSTALL.dir
+C:/dev/Blade/build/BladeEngine/CMakeFiles/BladeEngine.dir
+C:/dev/Blade/build/BladeEngine/CMakeFiles/INSTALL.dir
+C:/dev/Blade/build/Sandbox/CMakeFiles/Sandbox.dir
+C:/dev/Blade/build/Sandbox/CMakeFiles/INSTALL.dir

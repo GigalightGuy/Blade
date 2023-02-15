@@ -4,36 +4,34 @@
 
 extern int main();
 
-namespace BladeEngine
-{
-    class World;
+namespace BladeEngine {
+class World;
 
-    class Game
-    {
-    public:
-        Game();
-        ~Game();
+class Game {
+public:
+  Game();
+  ~Game();
 
-        static void Exit();
+  static void Exit();
 
-    private:
-        virtual void Update() = 0;
+private:
+  virtual void Update() = 0;
 
-        void Run();
-        void CleanUp();
+  void Run();
+  void CleanUp();
 
-        void UpdateInput();
+  void UpdateInput();
 
-    private:
-        bool m_ShouldExit = false;
+private:
+  bool m_ShouldExit = false;
 
-        Window* m_Window;
+  Window *m_Window;
 
-        static Game* s_Instance;
+  static Game *s_Instance;
 
-        friend int ::main();
-    };
+  friend int ::main();
+};
 
-    extern Game* CreateGameInstance();
-    
-}
+extern Game *CreateGameInstance();
+
+} // namespace BladeEngine

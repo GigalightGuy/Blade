@@ -1,0 +1,1 @@
+/usr/bin/g++ -g CMakeFiles/Sandbox.dir/src/TestGame.cpp.o -o Sandbox  ../BladeEngine/libBladeEngine.a ../BladeEngine/vendor/GLFW/src/libglfw3.a -lpthread /usr/lib/x86_64-linux-gnu/librt.so -lm -ldl 

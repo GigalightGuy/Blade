@@ -272,6 +272,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\dev\Blade\BladeEngine\src\Core\EntryPoint.cpp" />
     <ClInclude Include="C:\dev\Blade\BladeEngine\src\Core\Game.hpp" />
     <ClCompile Include="C:\dev\Blade\BladeEngine\src\Core\Game.cpp" />
+    <ClInclude Include="C:\dev\Blade\BladeEngine\src\Core\World.hpp" />
+    <ClCompile Include="C:\dev\Blade\BladeEngine\src\Core\World.cpp" />
+    <ClInclude Include="C:\dev\Blade\BladeEngine\src\Core\Window.hpp" />
+    <ClCompile Include="C:\dev\Blade\BladeEngine\src\Core\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\dev\Blade\build\ZERO_CHECK.vcxproj">

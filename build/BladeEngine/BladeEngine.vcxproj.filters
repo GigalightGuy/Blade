@@ -7,9 +7,21 @@
     <ClCompile Include="C:\dev\Blade\BladeEngine\src\Core\Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\dev\Blade\BladeEngine\src\Core\World.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\dev\Blade\BladeEngine\src\Core\Window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\dev\Blade\BladeEngine\src\Core\Game.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\dev\Blade\BladeEngine\src\Core\World.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\dev\Blade\BladeEngine\src\Core\Window.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

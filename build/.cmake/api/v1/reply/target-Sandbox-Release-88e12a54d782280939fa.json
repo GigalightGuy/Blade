@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "Sandbox/Debug/Sandbox.exe"
+			"path" : "Sandbox/Release/Sandbox.exe"
 		},
 		{
-			"path" : "Sandbox/Debug/Sandbox.pdb"
+			"path" : "Sandbox/Release/Sandbox.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -45,7 +45,7 @@
 			{
 				"command" : 1,
 				"file" : 1,
-				"line" : 3,
+				"line" : 7,
 				"parent" : 3
 			},
 			{
@@ -62,7 +62,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MP /MDd /Zi /Ob0 /Od /RTC1"
+					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MP /MD /O2 /Ob2 /DNDEBUG"
 				}
 			],
 			"includes" : 
@@ -99,21 +99,21 @@
 		"commandFragments" : 
 		[
 			{
-				"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MP /MDd /Zi /Ob0 /Od /RTC1",
+				"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MP /MD /O2 /Ob2 /DNDEBUG",
 				"role" : "flags"
 			},
 			{
-				"fragment" : "/machine:x64 /debug /INCREMENTAL /subsystem:console",
+				"fragment" : "/machine:x64 /INCREMENTAL:NO /subsystem:console",
 				"role" : "flags"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "..\\BladeEngine\\Debug\\BladeEngine.lib",
+				"fragment" : "..\\BladeEngine\\Release\\BladeEngine.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "..\\BladeEngine\\vendor\\GLFW\\src\\Debug\\glfw3.lib",
+				"fragment" : "..\\BladeEngine\\vendor\\GLFW\\src\\Release\\glfw3.lib",
 				"role" : "libraries"
 			},
 			{

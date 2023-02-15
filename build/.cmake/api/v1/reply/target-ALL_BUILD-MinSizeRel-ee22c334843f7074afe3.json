@@ -17,13 +17,13 @@
 	"dependencies" : 
 	[
 		{
+			"id" : "Sandbox::@df4fa095c2a3dbacf8fe"
+		},
+		{
 			"id" : "glfw::@11b7d623c00afd89acef"
 		},
 		{
 			"id" : "BladeEngine::@17f5315d0d54c23f49aa"
-		},
-		{
-			"id" : "Sandbox::@df4fa095c2a3dbacf8fe"
 		},
 		{
 			"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df"

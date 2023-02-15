@@ -22,6 +22,8 @@ namespace BladeEngine
 
         glfwMakeContextCurrent(m_WindowHandle);
 
+        glfwSetWindowUserPointer(m_WindowHandle, &m_WindowData);
+
         SetupCallbacks();
     }
     
@@ -32,21 +34,62 @@ namespace BladeEngine
         glfwTerminate();
     }
 
+    void Window::PollEvents()
+    {
+        glfwPollEvents();
+    }
+
+    void Window::InputTick()
+    {
+        UpdateKeyStates();
+        PollEvents();
+    }
+
     void Window::SetupCallbacks()
     {
+        glfwSetFramebufferSizeCallback(m_WindowHandle, [](GLFWwindow* window, int width, int height)
+        {
+            WindowData* data = (WindowData*)window;
+
+            data->Width = width;
+            data->Height = height;
+        });
+
         glfwSetKeyCallback(m_WindowHandle, [](GLFWwindow* window, int key, int scancode, int action, int mods)
         {
+            switch (action)
+			{
+			case GLFW_PRESS:
+				SetKeyState((KeyCode)key, KeyState::Down);
+				break;
 
+			case GLFW_RELEASE:
+				SetKeyState((KeyCode)key, KeyState::Up);
+				break;
+
+			default:
+				break;
+			}
         });
 
         glfwSetMouseButtonCallback(m_WindowHandle, [](GLFWwindow* window, int button, int action, int mods)
         {
-
+            switch (action)
+			{
+			case GLFW_PRESS:
+				SetMouseButtonState((MouseButton)button, KeyState::Down);
+				break;
+			case GLFW_RELEASE:
+				SetMouseButtonState((MouseButton)button, KeyState::Up);
+				break;
+			default:
+				break;
+			}
         });
 
         glfwSetCursorPosCallback(m_WindowHandle, [](GLFWwindow* window, double xpos, double ypos)
         {
-
+            SetCursorPos(xpos, ypos);
         });
 
         glfwSetWindowCloseCallback(m_WindowHandle, [](GLFWwindow* window)
@@ -54,16 +97,58 @@ namespace BladeEngine
             Game::Exit();
         });
     }
-
-    void Window::PollEvents()
+    
+    void Window::UpdateKeyStates()
     {
-        glfwPollEvents();
+        for (auto key : Input::s_KeyStatesToUpdate)
+		{
+			if (Input::s_KeyStates.find(key) != Input::s_KeyStates.end())
+			{
+				if (Input::s_KeyStates[key] == KeyState::Down)
+				{
+					Input::s_KeyStates[key] = KeyState::Held;
+				}
+				else if (Input::s_KeyStates[key] == KeyState::Up)
+				{
+					Input::s_KeyStates[key] = KeyState::Released;
+				}
+			}
+		}
+		Input::s_KeyStatesToUpdate.clear();
+
+		for (auto key : Input::s_MouseButtonStatesToUpdate)
+		{
+			if (Input::s_MouseButtonStates.find(key) != Input::s_MouseButtonStates.end())
+			{
+				if (Input::s_MouseButtonStates[key] == KeyState::Down)
+				{
+					Input::s_MouseButtonStates[key] = KeyState::Held;
+				}
+				else if (Input::s_MouseButtonStates[key] == KeyState::Up)
+				{
+					Input::s_MouseButtonStates[key] = KeyState::Released;
+				}
+			}
+		}
+		Input::s_MouseButtonStatesToUpdate.clear();
     }
     
-    void Window::Update()
+    void Window::SetKeyState(KeyCode key, KeyState state)
     {
-        
+        Input::s_KeyStates[key] = state;
+		Input::s_KeyStatesToUpdate.push_back(key);
     }
-
+    
+    void Window::SetMouseButtonState(MouseButton button, KeyState state)
+    {
+        Input::s_MouseButtonStates[button] = state;
+		Input::s_MouseButtonStatesToUpdate.push_back(button);
+    }
+    
+    void Window::SetCursorPos(float x, float y)
+    {
+        Input::s_CursorX = x;
+        Input::s_CursorY = y;
+    }
 
 }

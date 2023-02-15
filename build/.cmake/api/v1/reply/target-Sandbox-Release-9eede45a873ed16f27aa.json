@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "Sandbox/MinSizeRel/Sandbox.exe"
+			"path" : "Sandbox/Release/Sandbox.exe"
 		},
 		{
-			"path" : "Sandbox/MinSizeRel/Sandbox.pdb"
+			"path" : "Sandbox/Release/Sandbox.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -45,7 +45,7 @@
 			{
 				"command" : 1,
 				"file" : 1,
-				"line" : 7,
+				"line" : 10,
 				"parent" : 3
 			},
 			{
@@ -62,7 +62,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MP /MD /O1 /Ob1 /DNDEBUG"
+					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MP /MD /O2 /Ob2 /DNDEBUG"
 				}
 			],
 			"includes" : 
@@ -99,7 +99,7 @@
 		"commandFragments" : 
 		[
 			{
-				"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MP /MD /O1 /Ob1 /DNDEBUG",
+				"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MP /MD /O2 /Ob2 /DNDEBUG",
 				"role" : "flags"
 			},
 			{
@@ -108,12 +108,12 @@
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "..\\BladeEngine\\MinSizeRel\\BladeEngine.lib",
+				"fragment" : "..\\BladeEngine\\Release\\BladeEngine.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "..\\BladeEngine\\vendor\\GLFW\\src\\MinSizeRel\\glfw3.lib",
+				"fragment" : "..\\BladeEngine\\vendor\\GLFW\\src\\Release\\glfw3.lib",
 				"role" : "libraries"
 			},
 			{

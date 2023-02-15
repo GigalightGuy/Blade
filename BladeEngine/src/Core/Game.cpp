@@ -38,7 +38,7 @@ namespace BladeEngine
     {
         while (!m_ShouldExit)
         {
-            m_Window->PollEvents();
+            m_Window->InputTick();
             //Input::Update();
             
             World::Tick();

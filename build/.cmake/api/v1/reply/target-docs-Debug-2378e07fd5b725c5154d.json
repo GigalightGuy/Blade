@@ -1,0 +1,69 @@
+{
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_custom_target"
+		],
+		"files" : 
+		[
+			"BladeEngine/vendor/GLFW/docs/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 44,
+				"parent" : 0
+			}
+		]
+	},
+	"folder" : 
+	{
+		"name" : "GLFW3"
+	},
+	"id" : "docs::@79fcd78631dae8d2a2e4",
+	"name" : "docs",
+	"paths" : 
+	{
+		"build" : "BladeEngine/vendor/GLFW/docs",
+		"source" : "BladeEngine/vendor/GLFW/docs"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				1
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"isGenerated" : true,
+			"path" : "build/BladeEngine/vendor/GLFW/docs/html/index.html",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"path" : "BladeEngine/vendor/GLFW/docs/Doxyfile.in",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "UTILITY"
+}

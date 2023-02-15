@@ -1,2 +1,0 @@
-/usr/bin/ar qc libBladeEngine.a CMakeFiles/BladeEngine.dir/src/Core/EntryPoint.cpp.o CMakeFiles/BladeEngine.dir/src/Core/Game.cpp.o CMakeFiles/BladeEngine.dir/src/Core/World.cpp.o CMakeFiles/BladeEngine.dir/src/Core/Window.cpp.o
-/usr/bin/ranlib libBladeEngine.a

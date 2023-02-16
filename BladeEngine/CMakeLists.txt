@@ -13,3 +13,9 @@ target_link_libraries(BladeEngine PRIVATE glfw)
 target_include_directories(BladeEngine PRIVATE "vendor/GLFW/include" "vendor/spdlog/include")
 
 set_target_properties(BladeEngine PROPERTIES LINKER_LANGUAGE CXX)
+
+target_compile_definitions(BladeEngine PRIVATE 
+$<$<CONFIG:Debug>:BLADE_DEBUG>
+$<$<CONFIG:Release>:BLADE_RELEASE>
+$<$<CONFIG:RelWithDebInfo>:BLADE_DEBUG>
+$<$<CONFIG:MinSizeRel>:BLADE_RELEASE>)

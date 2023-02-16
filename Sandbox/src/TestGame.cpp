@@ -10,22 +10,22 @@ namespace BladeEngine
     {
         if (Input::GetKeyDown(KeyCode::A))
         {
-            std::cout << "Key A pressed!"  << std::endl;
+            BLD_DEBUG("Key A pressed!");
         }
 
         if (Input::GetKey(KeyCode::Space))
         {
-            std::cout << "Key Space pressed!"  << std::endl;
+            BLD_DEBUG("Key Space is held!");
         }
 
         if (Input::GetKeyUp(KeyCode::W))
         {
-            std::cout << "Key W pressed" << std::endl;
+            BLD_DEBUG("Key W released!");
         }
 
         if (Input::GetKey(KeyCode::Q))
         {
-            std::cout << "Cursor pos -> x: " << Input::GetCursorX() << ", y: " << Input::GetCursorY() << std::endl;
+            BLD_DEBUG("Cursor pos -> x: {}, y: {}", Input::GetCursorX(), Input::GetCursorY());
         }
     }
 

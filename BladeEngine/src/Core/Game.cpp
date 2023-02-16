@@ -1,6 +1,7 @@
 #include "Game.hpp"
 
 #include "World.hpp"
+#include "Log.hpp"
 
 namespace BladeEngine
 {
@@ -36,6 +37,8 @@ namespace BladeEngine
 
     void Game::Run()
     {
+        BLD_CORE_DEBUG("Game started Running!!");
+
         while (!m_ShouldExit)
         {
             m_Window->InputTick();

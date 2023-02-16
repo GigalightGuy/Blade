@@ -21,7 +21,7 @@ namespace BladeEngine
 	};
 }
 
-#ifdef SKR_BUILD_DEBUG
+#ifdef BLADE_DEBUG
 
 #define BLD_CORE_TRACE(...)       BladeEngine::Log::GetCoreLogger()->trace(__VA_ARGS__)
 #define BLD_CORE_DEBUG(...)       BladeEngine::Log::GetCoreLogger()->debug(__VA_ARGS__)
@@ -53,4 +53,4 @@ namespace BladeEngine
 #define BLD_ERROR(...)
 #define BLD_CRITICAL(...)
 
-#endif // BLD_BUILD_DEBUG
+#endif // BLADE_DEBUG

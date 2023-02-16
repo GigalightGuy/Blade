@@ -59,16 +59,16 @@ namespace BladeEngine
         {
             switch (action)
 			{
-			case GLFW_PRESS:
-				SetKeyState((KeyCode)key, KeyState::Down);
-				break;
-
-			case GLFW_RELEASE:
-				SetKeyState((KeyCode)key, KeyState::Up);
-				break;
-
-			default:
-				break;
+			    case GLFW_PRESS:
+			    	SetKeyState((KeyCode)key, KeyState::Down);
+			    	break;
+    
+			    case GLFW_RELEASE:
+			    	SetKeyState((KeyCode)key, KeyState::Up);
+			    	break;
+    
+			    default:
+			    	break;
 			}
         });
 
@@ -76,20 +76,20 @@ namespace BladeEngine
         {
             switch (action)
 			{
-			case GLFW_PRESS:
-				SetMouseButtonState((MouseButton)button, KeyState::Down);
-				break;
-			case GLFW_RELEASE:
-				SetMouseButtonState((MouseButton)button, KeyState::Up);
-				break;
-			default:
-				break;
+			    case GLFW_PRESS:
+			    	SetMouseButtonState((MouseButton)button, KeyState::Down);
+			    	break;
+			    case GLFW_RELEASE:
+			    	SetMouseButtonState((MouseButton)button, KeyState::Up);
+			    	break;
+			    default:
+			    	break;
 			}
         });
 
         glfwSetCursorPosCallback(m_WindowHandle, [](GLFWwindow* window, double xpos, double ypos)
         {
-            SetCursorPos(xpos, ypos);
+            SetCursorPos((float)xpos, (float)ypos);
         });
 
         glfwSetWindowCloseCallback(m_WindowHandle, [](GLFWwindow* window)

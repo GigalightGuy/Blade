@@ -9,18 +9,25 @@ add_library(BladeEngine STATIC
     src/Core/KeyCodes.hpp
     src/Renderer/Renderer2D.hpp src/Renderer/Renderer2D.cpp
     src/Renderer/Texture.hpp
-    src/Renderer/Swapchain.hpp)
+    src/Renderer/Swapchain.hpp
+    src/Renderer/Camera.cpp
+    src/Platform/Vulkan/Init.cpp
+    src/Platform/Vulkan/QueueFamily.cpp
+    src/Platform/Vulkan/Swapchain.cpp
+    )
 
 if(WIN32)
     target_sources(BladeEngine PRIVATE
-        src/Platform/Vulkan/VulkanTexture.cpp
-        src/Platform/Vulkan/VulkanSwapchain.cpp)
+        #src/Platform/Vulkan/VulkanTexture.cpp
+        src/Platform/Vulkan/Swapchain.cpp
+        )
 endif(WIN32)
 
 if(UNIX)
     target_sources(BladeEngine PRIVATE
-        src/Platform/Vulkan/VulkanTexture.cpp
-        src/Platform/Vulkan/VulkanSwapchain.cpp)
+        #src/Platform/Vulkan/VulkanTexture.cpp
+        src/Platform/Vulkan/Swapchain.cpp
+        )
 endif(UNIX)
 
 target_link_libraries(BladeEngine PRIVATE 

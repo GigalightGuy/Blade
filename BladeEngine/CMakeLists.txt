@@ -7,20 +7,18 @@ add_library(BladeEngine STATIC
     src/Core/Log.hpp src/Core/Log.cpp
     src/Core/Input.hpp src/Core/Input.cpp
     src/Core/KeyCodes.hpp
-    src/Renderer/Renderer2D.hpp
+    src/Renderer/Renderer2D.hpp src/Renderer/Renderer2D.cpp
     src/Renderer/Texture.hpp
     src/Renderer/Swapchain.hpp)
 
 if(WIN32)
     target_sources(BladeEngine PRIVATE
-        src/Platform/Vulkan/VulkanRenderer2D.cpp
         src/Platform/Vulkan/VulkanTexture.cpp
         src/Platform/Vulkan/VulkanSwapchain.cpp)
 endif(WIN32)
 
 if(UNIX)
     target_sources(BladeEngine PRIVATE
-        src/Platform/Vulkan/VulkanRenderer2D.cpp
         src/Platform/Vulkan/VulkanTexture.cpp
         src/Platform/Vulkan/VulkanSwapchain.cpp)
 endif(UNIX)

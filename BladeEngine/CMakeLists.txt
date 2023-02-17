@@ -24,14 +24,17 @@ if(UNIX)
 endif(UNIX)
 
 target_link_libraries(BladeEngine PRIVATE 
-    glfw 
-    "$ENV{VULKAN_SDK}/Lib/vulkan-1.lib")
+    glfw)
 
-target_include_directories(BladeEngine PRIVATE 
-    "$ENV{VULKAN_SDK}/Include"
+target_include_directories(BladeEngine PRIVATE
     "vendor/GLFW/include" 
     "vendor/spdlog/include" 
     "vendor/glm")
+
+# temp REQUIRED VULKAN IN SYSTEM INCLUDE LIBRARY 
+find_package(Vulkan REQUIRED)
+target_include_directories(BladeEngine PRIVATE ${Vulkan_INCLUDE_DIRS})
+target_link_libraries(BladeEngine PRIVATE ${Vulkan_LIBRARIES})
 
 set_target_properties(BladeEngine PROPERTIES LINKER_LANGUAGE CXX)
 

@@ -20,6 +20,8 @@ namespace BladeEngine
         void PollEvents();
         void InputTick();
 
+        std::vector<const char*> GetRequiredExtensions() const;
+
     private:
         void SetupCallbacks();
 

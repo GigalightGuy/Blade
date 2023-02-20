@@ -9,26 +9,29 @@ add_library(BladeEngine STATIC
     src/Core/KeyCodes.hpp
     src/Renderer/Renderer2D.hpp src/Renderer/Renderer2D.cpp
     src/Renderer/Texture.hpp
-    src/Renderer/Swapchain.hpp
-    src/Renderer/Camera.cpp
-    src/Platform/Vulkan/Init.cpp
-    src/Platform/Vulkan/QueueFamily.cpp
-    src/Platform/Vulkan/Swapchain.cpp
+    src/Renderer/Camera.hpp src/Renderer/Camera.cpp
+    src/Renderer/GraphicsAPI.hpp
     )
 
+
 if(WIN32)
-    target_sources(BladeEngine PRIVATE
-        #src/Platform/Vulkan/VulkanTexture.cpp
-        src/Platform/Vulkan/Swapchain.cpp
-        )
+    target_compile_definitions(BladeEngine PRIVATE BLADE_VULKAN_API)
+    set(USING_VULKAN_API "True")
 endif(WIN32)
 
 if(UNIX)
-    target_sources(BladeEngine PRIVATE
-        #src/Platform/Vulkan/VulkanTexture.cpp
-        src/Platform/Vulkan/Swapchain.cpp
-        )
+    target_compile_definitions(BladeEngine PRIVATE BLADE_VULKAN_API)
+    set(USING_VULKAN_API "True")
 endif(UNIX)
+
+if(USING_VULKAN_API)
+    target_sources(BladeEngine PRIVATE
+        src/Platform/Vulkan/VulkanTexture.cpp
+        src/Platform/Vulkan/VulkanSwapchain.hpp src/Platform/Vulkan/VulkanSwapchain.cpp
+        src/Platform/Vulkan/VulkanGraphicsAPI.cpp
+        src/Platform/Vulkan/VulkanValidationLayers.hpp src/Platform/Vulkan/VulkanValidationLayers.cpp
+        )
+endif(USING_VULKAN_API)
 
 target_link_libraries(BladeEngine PRIVATE 
     glfw)
@@ -38,10 +41,22 @@ target_include_directories(BladeEngine PRIVATE
     "vendor/spdlog/include" 
     "vendor/glm")
 
-# temp REQUIRED VULKAN IN SYSTEM INCLUDE LIBRARY 
-find_package(Vulkan REQUIRED)
-target_include_directories(BladeEngine PRIVATE ${Vulkan_INCLUDE_DIRS})
-target_link_libraries(BladeEngine PRIVATE ${Vulkan_LIBRARIES})
+if(DEFINED VULKAN_SDK_PATH)
+    set(Vulkan_INCLUDE_DIRS "${VULKAN_SDK_PATH}/Include")
+    set(Vulkan_LIBRARIES "${VULKAN_SDK_PATH}/Lib")
+    set(Vulkan_FOUND "True")
+else()
+    find_package(Vulkan REQUIRED)
+    message(STATUS "Found Vulkan: $ENV{VULKAN_SDK}")
+endif()
+
+if(NOT Vulkan_FOUND)
+    message(FATAL_ERROR "Could not find Vulkan library!")
+else()
+    message(STATUS "Using vulkan lib at: ${Vulkan_LIBRARIES}")
+    target_include_directories(BladeEngine PRIVATE ${Vulkan_INCLUDE_DIRS})
+    target_link_libraries(BladeEngine PRIVATE ${Vulkan_LIBRARIES})
+endif()
 
 set_target_properties(BladeEngine PROPERTIES LINKER_LANGUAGE CXX)
 

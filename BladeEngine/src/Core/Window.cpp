@@ -45,6 +45,17 @@ namespace BladeEngine
         PollEvents();
     }
 
+    std::vector<const char*> GetRequiredExtensions()
+	{
+		uint32_t glfwExtensionCount = 0;
+		const char** glfwExtensions;
+		glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+		std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+
+		return extensions;
+	}
+
     void Window::SetupCallbacks()
     {
         glfwSetFramebufferSizeCallback(m_WindowHandle, [](GLFWwindow* window, int width, int height)

@@ -33,11 +33,11 @@ namespace BladeEngine
 
         VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
 #if BLADE_DEBUG
-        auto validationLayers = Vulkan::GetValidationLayers();
+        auto validationLayers = Vulkan::Debug::GetValidationLayers();
         createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
 		createInfo.ppEnabledLayerNames = validationLayers.data();
 
-		Vulkan::PopulateDebugMessengerCreateInfo(debugCreateInfo);
+		Vulkan::Debug::PopulateDebugMessengerCreateInfo(debugCreateInfo);
 		createInfo.pNext = &debugCreateInfo;
 #else
 		createInfo.enabledLayerCount = 0;
@@ -48,6 +48,12 @@ namespace BladeEngine
 		{
 			BLD_CORE_ERROR("Failed to create Vulkan instance!");
 		}
+
+#if BLADE_DEBUG
+		Vulkan::Debug::SetupDebugMessenger(s_Instance);
+#endif
+
+		
 
     }
 

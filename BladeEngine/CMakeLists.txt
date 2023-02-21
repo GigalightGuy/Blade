@@ -26,8 +26,10 @@ endif(UNIX)
 
 if(USING_VULKAN_API)
     target_sources(BladeEngine PRIVATE
+        src/Platform/Vulkan/VulkanDevice.hpp src/Platform/Vulkan/VulkanDevice.cpp
         src/Platform/Vulkan/VulkanTexture.cpp
         src/Platform/Vulkan/VulkanSwapchain.hpp src/Platform/Vulkan/VulkanSwapchain.cpp
+        src/Platform/Vulkan/VulkanQueue.hpp src/Platform/Vulkan/VulkanQueue.cpp
         src/Platform/Vulkan/VulkanGraphicsAPI.cpp
         src/Platform/Vulkan/VulkanValidationLayers.hpp src/Platform/Vulkan/VulkanValidationLayers.cpp
         )

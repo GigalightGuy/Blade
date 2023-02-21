@@ -1,19 +1,29 @@
 #include "Window.hpp"
 
+#if BLADE_VULKAN_API
+#define GLFW_INCLUDE_VULKAN
+#endif // BLADE_VULKAN_API
 #include "GLFW/glfw3.h"
 
 #include "Game.hpp"
 
 namespace BladeEngine
 {
-    Window::Window()
+    Window::Window(uint32_t width, uint32_t height, const std::string& title)
     {
+        m_WindowData.Width = width;
+        m_WindowData.Height = height;
+
+        m_Title = title;
+
         if (!glfwInit())
         {
             return;
         }
 
-        m_WindowHandle = glfwCreateWindow(900, 600, "BladeGDK Sandbox", nullptr, nullptr);
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
+        m_WindowHandle = glfwCreateWindow(m_WindowData.Width, m_WindowData.Height, m_Title.c_str(), nullptr, nullptr);
 
         if (!m_WindowHandle)
         {

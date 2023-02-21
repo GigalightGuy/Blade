@@ -11,7 +11,7 @@ namespace BladeEngine
     class Window
     {
     public:
-        Window();
+        Window(uint32_t width, uint32_t height, const std::string& title);
         ~Window();
 
         inline virtual uint32_t GetWidth() const { return m_WindowData.Width; }
@@ -34,6 +34,7 @@ namespace BladeEngine
 
     private:
         GLFWwindow* m_WindowHandle;
+        std::string m_Title;
 
         struct WindowData
         {
@@ -41,5 +42,6 @@ namespace BladeEngine
         };
 
         WindowData m_WindowData;
+        
     };
 }

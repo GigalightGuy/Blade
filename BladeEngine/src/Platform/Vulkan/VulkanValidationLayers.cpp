@@ -2,7 +2,7 @@
 
 #include "../../Core/Log.hpp"
 
-namespace BladeEngine::Vulkan
+namespace BladeEngine::Vulkan::Debug
 {
     static const std::vector<const char*> s_ValidationLayers =
     {
@@ -53,5 +53,46 @@ namespace BladeEngine::Vulkan
         }
 
 		return VK_FALSE;
+	}
+
+    VkResult CreateDebugUtilsMessengerEXT(
+	    VkInstance instance,
+	    const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+	    const VkAllocationCallbacks* pAllocator,
+	    VkDebugUtilsMessengerEXT* pMessenger)
+    {
+	    auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+	    if (func)
+	    {
+		    return func(instance, pCreateInfo, pAllocator, pMessenger);
+	    }
+	    else
+	    {
+	    	return VK_ERROR_EXTENSION_NOT_PRESENT;
+	    }
+
+    }
+
+    void DestroyDebugUtilsMessengerEXT(
+    	VkInstance instance,
+    	VkDebugUtilsMessengerEXT messenger,
+    	const VkAllocationCallbacks* pAllocator)
+    {
+    	auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+    	if (func)
+    		func(instance, messenger, pAllocator);
+    }
+
+    static VkDebugUtilsMessengerEXT s_DebugMessenger;
+
+    void SetupDebugMessenger(VkInstance instance)
+	{
+		VkDebugUtilsMessengerCreateInfoEXT createInfo{};
+		PopulateDebugMessengerCreateInfo(createInfo);
+
+		if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &s_DebugMessenger) != VK_SUCCESS)
+		{
+			BLD_CORE_ERROR("Failed to set up Vulkan Debug Messenger!");
+		}
 	}
 }

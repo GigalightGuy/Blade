@@ -30,6 +30,21 @@ namespace BladeEngine::Vulkan
 
 		return supportDetails;
     }
+	
+	void VulkanSwapchain::CreateSwapchain()
+	{
+		
+	}
+	
+	void VulkanSwapchain::CleanupSwapchain()
+	{
+		
+	}
+	
+	void VulkanSwapchain::RecreateSwapchain(uint32_t width, uint32_t height)
+	{
+		
+	}
 
 
 }

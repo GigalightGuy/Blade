@@ -28,4 +28,6 @@ namespace BladeEngine::Vulkan::Debug
 		const VkAllocationCallbacks* pAllocator);
 
 	void SetupDebugMessenger(VkInstance instance);
+
+	void DestroyDebugMessenger(VkInstance instance);
 }

@@ -8,7 +8,8 @@
 namespace BladeEngine
 {
 	VkInstance GraphicsAPI::s_Instance;
-    VulkanDevice* GraphicsAPI::s_Device;
+    Vulkan::VulkanDevice* GraphicsAPI::s_Device;
+	VkSurfaceKHR GraphicsAPI::s_WindowSurface;
 
     void GraphicsAPI::Init(Window* window)
     {
@@ -57,13 +58,23 @@ namespace BladeEngine
 		Vulkan::Debug::SetupDebugMessenger(s_Instance);
 #endif
 
-		
+		s_WindowSurface = window->CreateWindowSurface(s_Instance);
+
+		s_Device = new Vulkan::VulkanDevice(s_Instance, s_WindowSurface);
 
     }
 
     void GraphicsAPI::Shutdown()
     {
+		delete s_Device;
 
+#if BLADE_DEBUG
+		Vulkan::Debug::DestroyDebugMessenger(s_Instance);
+#endif
+
+		vkDestroySurfaceKHR(s_Instance, s_WindowSurface, nullptr);
+
+		vkDestroyInstance(s_Instance, nullptr);
     }
 
     

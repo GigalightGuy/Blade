@@ -95,4 +95,9 @@ namespace BladeEngine::Vulkan::Debug
 			BLD_CORE_ERROR("Failed to set up Vulkan Debug Messenger!");
 		}
 	}
+
+	void DestroyDebugMessenger(VkInstance instance)
+	{
+		DestroyDebugUtilsMessengerEXT(instance, s_DebugMessenger, nullptr);
+	}
 }

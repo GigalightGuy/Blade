@@ -9,7 +9,10 @@ namespace BladeEngine
     class Window;
 
 #if BLADE_VULKAN_API
-    class VulkanDevice;
+    namespace Vulkan
+    {
+        class VulkanDevice;
+    }
 #endif
 
     class GraphicsAPI
@@ -21,7 +24,8 @@ namespace BladeEngine
     private:
 #if BLADE_VULKAN_API
         static VkInstance s_Instance;
-        static VulkanDevice* s_Device;
+        static Vulkan::VulkanDevice* s_Device;
+        static VkSurfaceKHR s_WindowSurface;
 #endif
 
     };

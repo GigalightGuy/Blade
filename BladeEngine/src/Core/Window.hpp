@@ -3,6 +3,10 @@
 #include <stdint.h>
 #include <vector>
 
+#if BLADE_VULKAN_API
+#include "vulkan/vulkan.hpp"
+#endif // BLADE_VULKAN_API
+
 #include "Input.hpp"
 
 struct GLFWwindow;
@@ -22,6 +26,10 @@ namespace BladeEngine
         void InputTick();
 
         std::vector<const char*> GetRequiredExtensions() const;
+
+#if BLADE_VULKAN_API
+        VkSurfaceKHR CreateWindowSurface(VkInstance vulkanInstance) const;
+#endif // BLADE_VULKAN_API
 
     private:
         void SetupCallbacks();

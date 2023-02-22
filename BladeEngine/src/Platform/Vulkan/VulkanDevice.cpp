@@ -12,8 +12,8 @@
 
 namespace BladeEngine::Vulkan
 {
-    VulkanDevice::VulkanDevice(VkInstance instance)
-        : m_Instance(instance)
+    VulkanDevice::VulkanDevice(VkInstance instance, VkSurfaceKHR windowSurface)
+        : m_Instance(instance), m_Surface(windowSurface)
     {
         PickGPU();
 		CreateLogicalDevice();
@@ -21,7 +21,7 @@ namespace BladeEngine::Vulkan
     
     VulkanDevice::~VulkanDevice()
     {
-        
+        vkDestroyDevice(m_Device, nullptr);
     }
 
     void VulkanDevice::PickGPU()

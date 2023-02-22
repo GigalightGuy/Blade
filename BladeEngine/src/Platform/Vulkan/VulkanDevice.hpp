@@ -14,7 +14,7 @@ namespace BladeEngine::Vulkan
     class VulkanDevice
     {
     public:
-        VulkanDevice(VkInstance instance);
+        VulkanDevice(VkInstance instance, VkSurfaceKHR windowSurface);
         ~VulkanDevice();
 
         inline const VkDevice GetLogicalDevice() const { return m_Device; }

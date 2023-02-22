@@ -6,6 +6,7 @@
 #include "GLFW/glfw3.h"
 
 #include "Game.hpp"
+#include "Log.hpp"
 
 namespace BladeEngine
 {
@@ -54,8 +55,21 @@ namespace BladeEngine
         UpdateKeyStates();
         PollEvents();
     }
+    
+#if BLADE_VULKAN_API
+    VkSurfaceKHR Window::CreateWindowSurface(VkInstance vulkanInstance) const
+    {
+        VkSurfaceKHR surface;
+        if (glfwCreateWindowSurface(vulkanInstance, m_WindowHandle, nullptr, &surface) != VK_SUCCESS)
+		{
+            BLD_CORE_ERROR("Failed to create Vulkan window surface!");
+		}
 
-    std::vector<const char*> Window::GetRequiredExtensions()
+        return surface;
+    }
+#endif // BLADE_VULKAN_API
+
+    std::vector<const char*> Window::GetRequiredExtensions() const
 	{
 		uint32_t glfwExtensionCount = 0;
 		const char** glfwExtensions;

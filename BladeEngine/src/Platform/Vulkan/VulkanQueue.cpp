@@ -1,5 +1,7 @@
 #include "VulkanQueue.hpp"
 
+#include "VulkanDevice.hpp"
+
 namespace BladeEngine::Vulkan
 {
     QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR windowSurface)
@@ -36,10 +38,16 @@ namespace BladeEngine::Vulkan
 		return indices;
     }
 
-    VulkanQueue::VulkanQueue()
+    VulkanQueue::VulkanQueue(VulkanDevice* logicalDevice, uint32_t queueFamilyIndex, uint32_t queueIndex)
+		: m_Device(logicalDevice), m_QueueFamilyIndex(queueFamilyIndex), m_QueueIndex(queueIndex)
     {
-        
+        vkGetDeviceQueue(logicalDevice->GetLogicalDevice(), queueFamilyIndex, queueIndex, &m_Queue);
     }
+	
+	VulkanQueue::~VulkanQueue()
+	{
+		
+	}
     
     
 }

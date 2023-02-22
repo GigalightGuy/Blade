@@ -4,8 +4,17 @@
 
 #include "vulkan/vulkan.hpp"
 
-namespace BladeEngine
+namespace BladeEngine::Vulkan
 {
+    struct SwapchainSupportDetails
+    {
+        VkSurfaceCapabilitiesKHR capabilities;
+	    std::vector<VkSurfaceFormatKHR> formats;
+	    std::vector<VkPresentModeKHR> presentModes;
+    };
+
+    SwapchainSupportDetails QuerySwapchainSupport(VkPhysicalDevice device, VkSurfaceKHR surface);
+
     class VulkanSwapchain
     {
     public:

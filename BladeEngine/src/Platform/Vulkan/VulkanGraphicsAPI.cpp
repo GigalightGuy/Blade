@@ -3,9 +3,13 @@
 #include "../../Core/Window.hpp"
 #include "../../Core/Log.hpp"
 #include "VulkanValidationLayers.hpp"
+#include "VulkanDevice.hpp"
 
 namespace BladeEngine
 {
+	VkInstance GraphicsAPI::s_Instance;
+    VulkanDevice* GraphicsAPI::s_Device;
+
     void GraphicsAPI::Init(Window* window)
     {
 		VkApplicationInfo appInfo{};

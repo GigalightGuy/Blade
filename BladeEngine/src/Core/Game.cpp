@@ -2,6 +2,7 @@
 
 #include "World.hpp"
 #include "Log.hpp"
+#include "../Renderer/GraphicsAPI.hpp"
 
 namespace BladeEngine
 {
@@ -18,13 +19,17 @@ namespace BladeEngine
 
         s_Instance = this;
 
-        m_Window = new Window();
+        m_Window = new Window(600, 900, "Blade Game");
+
+        GraphicsAPI::Init(m_Window);
 
         World::Init();
     }
 
     Game::~Game()
     {
+        GraphicsAPI::Shutdown();
+
         delete m_Window;
 
         World::Shutdown();

@@ -25,13 +25,15 @@ namespace BladeEngine::Vulkan
     class VulkanQueue
     {
     public:
-        VulkanQueue();
+        VulkanQueue(VulkanDevice* logicalDevice, uint32_t queueFamilyIndex, uint32_t queueIndex);
         ~VulkanQueue();
+
+        inline const VkQueue GetQueue() const { return m_Queue; }
 
     private:
         VkQueue m_Queue;
 
-        uint32_t m_FamilyIndex;
+        uint32_t m_QueueFamilyIndex;
         uint32_t m_QueueIndex;
 
         VulkanDevice* m_Device;

@@ -55,7 +55,7 @@ namespace BladeEngine
         PollEvents();
     }
 
-    std::vector<const char*> GetRequiredExtensions()
+    std::vector<const char*> Window::GetRequiredExtensions()
 	{
 		uint32_t glfwExtensionCount = 0;
 		const char** glfwExtensions;

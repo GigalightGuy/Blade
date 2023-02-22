@@ -1,18 +1,22 @@
 #include "VulkanDevice.hpp"
 
+#include <stdint.h>
 #include <map>
 #include <set>
 #include <string>
 
 #include "../../Core/Log.hpp"
 #include "VulkanQueue.hpp"
+#include "VulkanSwapchain.hpp"
+#include "VulkanValidationLayers.hpp"
 
 namespace BladeEngine::Vulkan
 {
     VulkanDevice::VulkanDevice(VkInstance instance)
         : m_Instance(instance)
     {
-        
+        PickGPU();
+		CreateLogicalDevice();
     }
     
     VulkanDevice::~VulkanDevice()
@@ -51,7 +55,7 @@ namespace BladeEngine::Vulkan
 		}
 	}
 
-    bool IsDeviceSuitable(VkPhysicalDevice device)
+    bool VulkanDevice::IsDeviceSuitable(VkPhysicalDevice device)
 	{
 		QueueFamilyIndices indices = FindQueueFamilies(device, m_Surface);
 
@@ -60,7 +64,7 @@ namespace BladeEngine::Vulkan
 		bool swapchainAdequate = false;
 		if (extensionsSupported)
 		{
-			SwapchainSupportDetails swapchainSupport = QuerySwapchainSupport(device);
+			SwapchainSupportDetails swapchainSupport = QuerySwapchainSupport(device, m_Surface);
 			swapchainAdequate = 
 				!swapchainSupport.formats.empty() && !swapchainSupport.presentModes.empty();
 		}
@@ -71,7 +75,7 @@ namespace BladeEngine::Vulkan
 		return indices.IsComplete() && extensionsSupported && swapchainAdequate && supportedFeatures.samplerAnisotropy;
 	}
 
-	bool CheckDeviceExtensionSupport(VkPhysicalDevice device)
+	bool VulkanDevice::CheckDeviceExtensionSupport(VkPhysicalDevice device)
 	{
 		uint32_t extensionCount = 0;
 		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
@@ -87,5 +91,58 @@ namespace BladeEngine::Vulkan
 		}
 
 		return requiredExtensions.empty();
+	}
+
+	void VulkanDevice::CreateLogicalDevice()
+	{
+		QueueFamilyIndices indices = FindQueueFamilies(m_GPU, m_Surface);
+
+		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+		std::set<uint32_t> uniqueQueueFamilies =
+		{
+			indices.GraphicsFamily.value(),
+			indices.PresentFamily.value()
+		};
+
+		float queuePriority = 1.0f;
+		for (uint32_t queueFamily : uniqueQueueFamilies)
+		{
+			VkDeviceQueueCreateInfo queueCreateInfo{};
+			queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			queueCreateInfo.queueFamilyIndex = queueFamily;
+			queueCreateInfo.queueCount = 1;
+			queueCreateInfo.pQueuePriorities = &queuePriority;
+			queueCreateInfos.push_back(queueCreateInfo);
+		}
+
+		VkPhysicalDeviceFeatures deviceFeatures{};
+		deviceFeatures.samplerAnisotropy = VK_TRUE;
+		deviceFeatures.sampleRateShading = VK_TRUE;
+
+		VkDeviceCreateInfo deviceCreateInfo{};
+		deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
+		deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+
+		deviceCreateInfo.pEnabledFeatures = &deviceFeatures;
+
+		deviceCreateInfo.ppEnabledExtensionNames = k_DeviceExtensions.data();
+		deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(k_DeviceExtensions.size());
+
+#if BLADE_DEBUG
+        auto validationLayers = Vulkan::Debug::GetValidationLayers();
+        deviceCreateInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+		deviceCreateInfo.ppEnabledLayerNames = validationLayers.data();
+#else
+		deviceCreateInfo.enabledLayerCount = 0;
+#endif
+
+		if (vkCreateDevice(m_GPU, &deviceCreateInfo, nullptr, &m_Device) != VK_SUCCESS)
+		{
+			BLD_CORE_ERROR("Failed to create Vulkan logical device!");
+		}
+
+		m_GraphicsQueue = new VulkanQueue(this, indices.GraphicsFamily.value(), 0);
+		m_PresentQueue = new VulkanQueue(this, indices.PresentFamily.value(), 0);
 	}
 }

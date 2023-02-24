@@ -29,14 +29,14 @@ if(USING_VULKAN_API)
         src/Platform/Vulkan/VulkanDevice.hpp src/Platform/Vulkan/VulkanDevice.cpp
         src/Platform/Vulkan/VulkanTexture.cpp
         src/Platform/Vulkan/VulkanSwapchain.hpp src/Platform/Vulkan/VulkanSwapchain.cpp
+        src/Platform/Vulkan/VulkanImage.hpp src/Platform/Vulkan/VulkanImage.cpp
         src/Platform/Vulkan/VulkanQueue.hpp src/Platform/Vulkan/VulkanQueue.cpp
         src/Platform/Vulkan/VulkanGraphicsAPI.cpp
         src/Platform/Vulkan/VulkanValidationLayers.hpp src/Platform/Vulkan/VulkanValidationLayers.cpp
         )
 endif(USING_VULKAN_API)
 
-target_link_libraries(BladeEngine PRIVATE 
-    glfw)
+target_link_libraries(BladeEngine PRIVATE glfw)
 
 target_include_directories(BladeEngine PRIVATE
     "vendor/GLFW/include" 

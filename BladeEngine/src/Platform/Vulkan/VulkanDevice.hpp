@@ -18,6 +18,8 @@ namespace BladeEngine::Vulkan
         ~VulkanDevice();
 
         inline const VkDevice GetLogicalDevice() const { return m_Device; }
+        inline const VkPhysicalDevice GetGPU() const { return m_GPU; }
+        inline const VkSurfaceKHR GetWindowSurface() const { return m_Surface; }
 
     private:
         void PickGPU();

@@ -36,15 +36,16 @@ namespace BladeEngine::Vulkan
         VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
         VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
+        void CreateSwapchainImages();
+
     private:
         VkSwapchainKHR m_SwapchainHandle;
 
-        std::vector<VulkanImage*> m_SwapchainImages;
+        std::vector<VkImage> m_SwapchainImages;
+        std::vector<VkImageView> m_SwapchainImageViews;
 
         VkFormat m_SwapchainImageFormat;
         VkExtent2D m_SwapchainExtent;
-
-        VkSurfaceKHR m_Surface; // do we need this here??
 
         uint32_t m_Width;
         uint32_t m_Height;

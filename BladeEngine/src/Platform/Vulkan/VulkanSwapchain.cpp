@@ -37,12 +37,12 @@ namespace BladeEngine::Vulkan
 	
 	VulkanSwapchain::VulkanSwapchain()
 	{
-		
+		CreateSwapchain();
 	}
 	
 	VulkanSwapchain::~VulkanSwapchain()
 	{
-		
+		CleanupSwapchain();
 	}
 
 	void VulkanSwapchain::RecreateSwapchain(uint32_t width, uint32_t height)
@@ -52,7 +52,7 @@ namespace BladeEngine::Vulkan
 		CleanupSwapchain();
 
 		CreateSwapchain();
-		CreateImageViews();
+		
 		//CreateColorResources();
 		//CreateDepthResources();
 		//CreateFramebuffers();
@@ -80,7 +80,7 @@ namespace BladeEngine::Vulkan
 
 		VkSwapchainCreateInfoKHR createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-		createInfo.surface = m_Surface;
+		createInfo.surface = windowSurface;
 
 		createInfo.minImageCount = imageCount;
 		createInfo.imageFormat = surfaceFormat.format;
@@ -123,18 +123,33 @@ namespace BladeEngine::Vulkan
 			BLD_CORE_ERROR("Failed to create Vulkan Swap Chain!");
 		}
 
-		std::vector<VkImage> images;
-		vkGetSwapchainImagesKHR(logicalDevice, m_SwapchainHandle, &imageCount, nullptr);
-		images.resize(imageCount);
-		vkGetSwapchainImagesKHR(logicalDevice, m_SwapchainHandle, &imageCount, images.data());
-
 		m_SwapchainImageFormat = surfaceFormat.format;
 		m_SwapchainExtent = extent;
+
+		CreateSwapchainImages();
 	}
 	
 	void VulkanSwapchain::CleanupSwapchain()
 	{
-		
+		vkDestroyImageView(m_Device->GetLogicalDevice(), m_ColorImageView, nullptr);
+		vkDestroyImage(m_Device->GetLogicalDevice(), m_ColorImage, nullptr);
+		vkFreeMemory(m_Device->GetLogicalDevice(), m_ColorImageMemory, nullptr);
+
+		vkDestroyImageView(m_Device->GetLogicalDevice(), m_DepthImageView, nullptr);
+		vkDestroyImage(m_Device->GetLogicalDevice(), m_DepthImage, nullptr);
+		vkFreeMemory(m_Device->GetLogicalDevice(), m_DepthImageMemory, nullptr);
+
+		for (auto framebuffer : m_SwapchainFramebuffers)
+		{
+			vkDestroyFramebuffer(m_Device->GetLogicalDevice(), framebuffer, nullptr);
+		}
+
+		for (auto imageView : m_SwapchainImageViews)
+		{
+			vkDestroyImageView(m_Device->GetLogicalDevice(), imageView, nullptr);
+		}
+
+		vkDestroySwapchainKHR(m_Device->GetLogicalDevice(), m_SwapchainHandle, nullptr);
 	}
 	
 	VkSurfaceFormatKHR VulkanSwapchain::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
@@ -168,8 +183,8 @@ namespace BladeEngine::Vulkan
 
 		VkExtent2D actualExtent =
 		{
-			static_cast<uint32_t>(m_Width),
-			static_cast<uint32_t>(m_Height)
+			m_Width,
+			m_Height
 		};
 
 		actualExtent.width = std::clamp(
@@ -184,6 +199,24 @@ namespace BladeEngine::Vulkan
 		);
 
 		return actualExtent;
+	}
+	
+	void VulkanSwapchain::CreateSwapchainImages()
+	{
+		VkDevice logicalDevice = m_Device->GetLogicalDevice();
+		uint32_t imageCount;
+
+		vkGetSwapchainImagesKHR(logicalDevice, m_SwapchainHandle, &imageCount, nullptr);
+		m_SwapchainImages.resize(imageCount);
+		vkGetSwapchainImagesKHR(logicalDevice, m_SwapchainHandle, &imageCount, m_SwapchainImages.data());
+
+        m_SwapchainImageViews.resize(m_SwapchainImages.size());
+
+		for (size_t i = 0; i < m_SwapchainImages.size(); i++)
+		{
+			m_SwapchainImageViews[i] = CreateImageView(logicalDevice, m_SwapchainImages[i], 
+				m_SwapchainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1);
+		}
 	}
 
 

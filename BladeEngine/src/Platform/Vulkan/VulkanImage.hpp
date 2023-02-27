@@ -13,7 +13,6 @@ namespace BladeEngine::Vulkan
     {
     public:
         VulkanImage(VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels, VulkanDevice* device);
-        VulkanImage(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels, VulkanDevice* device);
         ~VulkanImage();
 
     private:
@@ -22,6 +21,7 @@ namespace BladeEngine::Vulkan
     private:
         VkImage m_Image;
         VkImageView m_ImageView;
+        VkDeviceMemory m_ImageMemory;
 
         VkFormat m_Format;
         VkImageAspectFlags m_AspectFlags;
@@ -31,5 +31,14 @@ namespace BladeEngine::Vulkan
         VulkanDevice* m_Device;
     };
 
-    std::vector<VulkanImage*> CreateSwapchainImages(std::vector<VkImage> images); // TODO: Move this to VulkanSwapchain class, it makes no sense being here, Idk why I did this :((
+    VkImageView CreateImageView(VkDevice device, VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels);
+
+    bool TryFindSupportedFormat(
+        VkPhysicalDevice physicalDevice, 
+        const std::vector<VkFormat>& candidates, 
+        VkImageTiling tiling, VkFormatFeatureFlags features, 
+        VkFormat* outputFormat);
+
+    bool TryFindDepthFormat(VkPhysicalDevice physicalDevice, VkFormat* outputFormat);
+
 }

@@ -10,18 +10,6 @@ namespace BladeEngine::Vulkan
         
     }
     
-    VulkanImage::VulkanImage(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels, VulkanDevice* device)
-    {
-        m_Image = image;
-        m_Format = format;
-        m_AspectFlags = aspectFlags;
-        m_MipLevels = mipLevels;
-        m_Device = device;
-
-        CreateImageView();
-
-    }
-    
     VulkanImage::~VulkanImage()
     {
         
@@ -45,19 +33,66 @@ namespace BladeEngine::Vulkan
             BLD_CORE_ERROR("Failed to create Vulkan image view!");
 		}
     }
-
-    std::vector<VulkanImage*> CreateSwapchainImages(std::vector<VkImage> images)
+    
+    VkImageView CreateImageView(VkDevice device, VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels)
     {
-        std::vector<VulkanImage*> outputImages;
-        outputImages.resize(images.size());
+        VkImageViewCreateInfo viewInfo{};
+		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		viewInfo.image = image;
+		viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		viewInfo.format = format;
+		viewInfo.subresourceRange.aspectMask = aspectFlags;
+		viewInfo.subresourceRange.baseMipLevel = 0;
+		viewInfo.subresourceRange.levelCount = mipLevels;
+		viewInfo.subresourceRange.baseArrayLayer = 0;
+		viewInfo.subresourceRange.layerCount = 1;
 
-        for (size_t i = 0; i < images.size(); i++)
-        {
-            outputImages[i] = new VulkanImage(images[i]);
-        }
+		VkImageView imageView;
+		if (vkCreateImageView(device, &viewInfo, nullptr, &imageView) != VK_SUCCESS)
+		{
+			BLD_CORE_ERROR("Failed to create Vulkan image view!");
+		}
 
-        return outputImages;
+		return imageView;
     }
 
+	bool TryFindSupportedFormat(
+		VkPhysicalDevice physicalDevice, 
+		const std::vector<VkFormat>& candidates, 
+		VkImageTiling tiling, VkFormatFeatureFlags features, 
+		VkFormat* outputFormat)
+	{
+		for (auto format : candidates)
+		{
+			VkFormatProperties props;
+			vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
+
+			if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features)
+			{
+				(*outputFormat) = format;
+				return true;
+			}
+			else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features)
+			{
+				(*outputFormat) = format;
+				return true;
+			}
+		}
+
+		BLD_CORE_ERROR("Failed to find supported image format from the given candidates!");
+
+		return false;
+	}
+		
+	bool TryFindDepthFormat(VkPhysicalDevice physicalDevice, VkFormat* outputFormat)
+	{
+		return TryFindSupportedFormat(
+			physicalDevice,
+			{ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
+			VK_IMAGE_TILING_OPTIMAL,
+			VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT,
+			outputFormat
+		);
+	}
 
 }

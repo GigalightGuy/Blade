@@ -227,35 +227,31 @@ namespace BladeEngine::Vulkan
 	{
 		VkFormat colorFormat = m_SwapchainImageFormat;
 
-		CreateImage(m_SwapchainExtent.width, m_SwapchainExtent.height, 1, 
-			m_MSAASamples, colorFormat, VK_IMAGE_TILING_OPTIMAL, 
-			VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_ColorImage, m_ColorImageMemory);
-
-		m_ColorImageView = CreateImageView(m_ColorImage, colorFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1);
+		//m_ColorImage = new VulkanImage(width, height, 1, )
 	}
 	
 	void VulkanSwapchain::CreateDepthResources()
 	{
-		VkFormat depthFormat;
-		if (!TryFindDepthFormat(m_Device->GetGPU(), &depthFormat))
-		{
-			BLD_CORE_ERROR("Couldn't find Depth Format to create depth image for swap chain!");
-		}
-
-		CreateImage(
-			m_SwapchainExtent.width, m_SwapchainExtent.height, 1, m_MSAASamples,
-			depthFormat, VK_IMAGE_TILING_OPTIMAL, 
-			VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, 
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 
-			m_DepthImage, m_DepthImageMemory);
-
-		m_DepthImageView = CreateImageView(m_DepthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, 1);
-
-		// Not needed because the depth buffer starts out empty 
-		// so we don't care about what happens to the initial data of the depthimage
-		TransitionImageLayout(m_DepthImage, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, 
-			VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1);
+		//VkFormat depthFormat;
+		//if (!TryFindDepthFormat(m_Device->GetGPU(), &depthFormat))
+		//{
+		//	BLD_CORE_ERROR("Couldn't find Depth Format to create depth image for swap chain!");
+		//	return;
+		//}
+//
+		//CreateImage(
+		//	m_SwapchainExtent.width, m_SwapchainExtent.height, 1, m_MSAASamples,
+		//	depthFormat, VK_IMAGE_TILING_OPTIMAL, 
+		//	VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, 
+		//	VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 
+		//	m_DepthImage, m_DepthImageMemory);
+//
+		//m_DepthImageView = CreateImageView(m_DepthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, 1);
+//
+		//// Not needed because the depth buffer starts out empty 
+		//// so we don't care about what happens to the initial data of the depthimage
+		//TransitionImageLayout(m_DepthImage, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, 
+		//	VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1);
 	}
 
 	void VulkanSwapchain::CreateFramebuffers()

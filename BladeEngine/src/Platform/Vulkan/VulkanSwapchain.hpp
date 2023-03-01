@@ -38,6 +38,8 @@ namespace BladeEngine::Vulkan
 
         void CreateSwapchainImages();
 
+        void CreateColorResources();
+		void CreateDepthResources();
         void CreateFramebuffers();
 
     private:

@@ -12,21 +12,32 @@ namespace BladeEngine::Vulkan
     class VulkanImage
     {
     public:
-        VulkanImage(VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels, VulkanDevice* device);
+        VulkanImage(
+            uint32_t width, uint32_t height, uint32_t mipLevels, 
+			VkSampleCountFlagBits numSamples, VkFormat format, 
+            VkImageTiling tiling, VkImageUsageFlags usage, 
+            VkMemoryPropertyFlags memoryProperties, VkImageAspectFlags aspectFlags,
+            VulkanDevice* device);
         ~VulkanImage();
 
         inline VkImage GetImageHandle() const { return m_Image; }
         inline VkImageView GetImageView() const { return m_ImageView; }
 
     private:
+        void CreateImage(VkMemoryPropertyFlags memoryProperties, VkSampleCountFlagBits numSamples, VkImageUsageFlags usage);
         void CreateImageView();
+
+        uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
     private:
         VkImage m_Image;
         VkImageView m_ImageView;
         VkDeviceMemory m_ImageMemory;
 
+        uint32_t m_Width, m_Height;
+
         VkFormat m_Format;
+        VkImageTiling m_Tiling;
         VkImageAspectFlags m_AspectFlags;
 
         uint32_t m_MipLevels;

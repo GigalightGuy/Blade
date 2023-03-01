@@ -5,8 +5,6 @@
 
 #include "vulkan/vulkan.hpp"
 
-#include "VulkanImage.hpp"
-
 namespace BladeEngine::Vulkan
 {
     struct SwapchainSupportDetails
@@ -19,6 +17,8 @@ namespace BladeEngine::Vulkan
     SwapchainSupportDetails QuerySwapchainSupport(VkPhysicalDevice device, VkSurfaceKHR surface);
 
     class VulkanDevice;
+    class VulkanImage;
+    class VulkanRenderPass;
 
     class VulkanSwapchain
     {
@@ -38,8 +38,15 @@ namespace BladeEngine::Vulkan
 
         void CreateSwapchainImages();
 
+        void CreateFramebuffers();
+
     private:
         VkSwapchainKHR m_SwapchainHandle;
+
+        std::vector<VkFramebuffer> m_Framebuffers;
+
+        VulkanImage* m_ColorImage;
+		VulkanImage* m_DepthImage;
 
         std::vector<VkImage> m_SwapchainImages;
         std::vector<VkImageView> m_SwapchainImageViews;
@@ -47,8 +54,10 @@ namespace BladeEngine::Vulkan
         VkFormat m_SwapchainImageFormat;
         VkExtent2D m_SwapchainExtent;
 
-        uint32_t m_Width;
+        uint32_t m_Width; // do we need this? doesn't extent do the same thing?
         uint32_t m_Height;
+
+        VulkanRenderPass* m_RenderPass;
 
         VulkanDevice* m_Device;
     };

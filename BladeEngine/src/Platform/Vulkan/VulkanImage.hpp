@@ -15,6 +15,9 @@ namespace BladeEngine::Vulkan
         VulkanImage(VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels, VulkanDevice* device);
         ~VulkanImage();
 
+        inline VkImage GetImageHandle() const { return m_Image; }
+        inline VkImageView GetImageView() const { return m_ImageView; }
+
     private:
         void CreateImageView();
 

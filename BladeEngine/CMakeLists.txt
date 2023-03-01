@@ -32,6 +32,7 @@ if(USING_VULKAN_API)
         src/Platform/Vulkan/VulkanImage.hpp src/Platform/Vulkan/VulkanImage.cpp
         src/Platform/Vulkan/VulkanQueue.hpp src/Platform/Vulkan/VulkanQueue.cpp
         src/Platform/Vulkan/VulkanRenderPass.hpp src/Platform/Vulkan/VulkanRenderPass.cpp
+        src/Platform/Vulkan/VulkanPipeline.hpp src/Platform/Vulkan/VulkanPipeline.cpp
         src/Platform/Vulkan/VulkanGraphicsAPI.cpp
         src/Platform/Vulkan/VulkanValidationLayers.hpp src/Platform/Vulkan/VulkanValidationLayers.cpp
         )

@@ -14,7 +14,7 @@ namespace BladeEngine::Vulkan
     
     VulkanRenderPass::~VulkanRenderPass()
     {
-        vkDestroyRenderPass(m_Device->GetLogicalDevice(), m_RenderPass, nullptr);
+        vkDestroyRenderPass(m_Device->GetLogicalDevice(), m_RenderPassHandle, nullptr);
     }
 
     void VulkanRenderPass::CreateRenderPass(VkFormat swapchainImageFormat, VkSampleCountFlagBits msaaSamples)
@@ -91,7 +91,7 @@ namespace BladeEngine::Vulkan
 		renderPassCreateInfo.dependencyCount = 1;
 		renderPassCreateInfo.pDependencies = &subpassDependency;
 
-		if (vkCreateRenderPass(m_Device->GetLogicalDevice(), &renderPassCreateInfo, nullptr, &m_RenderPass) != VK_SUCCESS)
+		if (vkCreateRenderPass(m_Device->GetLogicalDevice(), &renderPassCreateInfo, nullptr, &m_RenderPassHandle) != VK_SUCCESS)
 		{
             BLD_CORE_ERROR("Failed to create Vulkan Render Pass!");
 		}

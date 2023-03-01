@@ -12,11 +12,13 @@ namespace BladeEngine::Vulkan
         VulkanRenderPass(VulkanDevice* device, VkFormat swapchainImageFormat, VkSampleCountFlagBits msaaSamples);
         ~VulkanRenderPass();
 
+        inline VkRenderPass GetRenderPassHandle() const { return m_RenderPassHandle; }
+
     private:
         void CreateRenderPass(VkFormat swapchainImageFormat, VkSampleCountFlagBits msaaSamples);
 
     private:
-        VkRenderPass m_RenderPass;
+        VkRenderPass m_RenderPassHandle;
 
         VulkanDevice* m_Device;
 

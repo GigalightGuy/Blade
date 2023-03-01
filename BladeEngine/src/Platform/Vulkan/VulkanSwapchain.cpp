@@ -3,6 +3,8 @@
 #include "../../Core/Log.hpp"
 #include "VulkanDevice.hpp"
 #include "VulkanQueue.hpp"
+#include "VulkanImage.hpp"
+#include "VulkanRenderPass.hpp"
 
 namespace BladeEngine::Vulkan
 {
@@ -53,9 +55,9 @@ namespace BladeEngine::Vulkan
 
 		CreateSwapchain();
 		
-		//CreateColorResources();
-		//CreateDepthResources();
-		//CreateFramebuffers();
+		CreateColorResources();
+		CreateDepthResources();
+		CreateFramebuffers();
 	}
 	
 	void VulkanSwapchain::CreateSwapchain()
@@ -131,15 +133,17 @@ namespace BladeEngine::Vulkan
 	
 	void VulkanSwapchain::CleanupSwapchain()
 	{
-		vkDestroyImageView(m_Device->GetLogicalDevice(), m_ColorImageView, nullptr);
-		vkDestroyImage(m_Device->GetLogicalDevice(), m_ColorImage, nullptr);
-		vkFreeMemory(m_Device->GetLogicalDevice(), m_ColorImageMemory, nullptr);
+		//vkDestroyImageView(m_Device->GetLogicalDevice(), m_ColorImageView, nullptr);
+		//vkDestroyImage(m_Device->GetLogicalDevice(), m_ColorImage, nullptr);
+		//vkFreeMemory(m_Device->GetLogicalDevice(), m_ColorImageMemory, nullptr);
+		delete m_ColorImage;
 
-		vkDestroyImageView(m_Device->GetLogicalDevice(), m_DepthImageView, nullptr);
-		vkDestroyImage(m_Device->GetLogicalDevice(), m_DepthImage, nullptr);
-		vkFreeMemory(m_Device->GetLogicalDevice(), m_DepthImageMemory, nullptr);
+		//vkDestroyImageView(m_Device->GetLogicalDevice(), m_DepthImageView, nullptr);
+		//vkDestroyImage(m_Device->GetLogicalDevice(), m_DepthImage, nullptr);
+		//vkFreeMemory(m_Device->GetLogicalDevice(), m_DepthImageMemory, nullptr);
+		delete m_DepthImage;
 
-		for (auto framebuffer : m_SwapchainFramebuffers)
+		for (auto framebuffer : m_Framebuffers)
 		{
 			vkDestroyFramebuffer(m_Device->GetLogicalDevice(), framebuffer, nullptr);
 		}
@@ -216,6 +220,69 @@ namespace BladeEngine::Vulkan
 		{
 			m_SwapchainImageViews[i] = CreateImageView(logicalDevice, m_SwapchainImages[i], 
 				m_SwapchainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1);
+		}
+	}
+	
+	void VulkanSwapchain::CreateColorResources()
+	{
+		VkFormat colorFormat = m_SwapchainImageFormat;
+
+		CreateImage(m_SwapchainExtent.width, m_SwapchainExtent.height, 1, 
+			m_MSAASamples, colorFormat, VK_IMAGE_TILING_OPTIMAL, 
+			VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_ColorImage, m_ColorImageMemory);
+
+		m_ColorImageView = CreateImageView(m_ColorImage, colorFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1);
+	}
+	
+	void VulkanSwapchain::CreateDepthResources()
+	{
+		VkFormat depthFormat;
+		if (!TryFindDepthFormat(m_Device->GetGPU(), &depthFormat))
+		{
+			BLD_CORE_ERROR("Couldn't find Depth Format to create depth image for swap chain!");
+		}
+
+		CreateImage(
+			m_SwapchainExtent.width, m_SwapchainExtent.height, 1, m_MSAASamples,
+			depthFormat, VK_IMAGE_TILING_OPTIMAL, 
+			VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, 
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 
+			m_DepthImage, m_DepthImageMemory);
+
+		m_DepthImageView = CreateImageView(m_DepthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, 1);
+
+		// Not needed because the depth buffer starts out empty 
+		// so we don't care about what happens to the initial data of the depthimage
+		TransitionImageLayout(m_DepthImage, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, 
+			VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1);
+	}
+
+	void VulkanSwapchain::CreateFramebuffers()
+	{
+		m_Framebuffers.resize(m_SwapchainImageViews.size());
+		for (size_t i = 0; i < m_SwapchainImageViews.size(); i++)
+		{
+			std::array<VkImageView, 3> attachments =
+			{
+				m_ColorImage->GetImageView(),
+				m_DepthImage->GetImageView(),
+				m_SwapchainImageViews[i]
+			};
+
+			VkFramebufferCreateInfo framebufferCreateInfo{};
+			framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+			framebufferCreateInfo.renderPass = m_RenderPass->GetRenderPassHandle();
+			framebufferCreateInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+			framebufferCreateInfo.pAttachments = attachments.data();
+			framebufferCreateInfo.width = m_SwapchainExtent.width;
+			framebufferCreateInfo.height = m_SwapchainExtent.height;
+			framebufferCreateInfo.layers = 1;
+
+			if (vkCreateFramebuffer(m_Device->GetLogicalDevice(), &framebufferCreateInfo, nullptr, &m_Framebuffers[i]) != VK_SUCCESS)
+			{
+				BLD_CORE_ERROR("Failed to create Framebuffer!");
+			}
 		}
 	}
 

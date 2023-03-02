@@ -26,7 +26,7 @@ namespace BladeEngine::Vulkan
         VulkanSwapchain();
         ~VulkanSwapchain();
 
-        void RecreateSwapchain(uint32_t width, uint32_t height);
+        void RecreateSwapchain();
 
     private:
         void CreateSwapchain();
@@ -56,8 +56,7 @@ namespace BladeEngine::Vulkan
         VkFormat m_SwapchainImageFormat;
         VkExtent2D m_SwapchainExtent;
 
-        uint32_t m_Width; // do we need this? doesn't extent do the same thing?
-        uint32_t m_Height;
+        VkSampleCountFlagBits m_MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
         VulkanRenderPass* m_RenderPass;
 

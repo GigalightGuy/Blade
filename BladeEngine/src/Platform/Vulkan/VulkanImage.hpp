@@ -17,7 +17,8 @@ namespace BladeEngine::Vulkan
 			VkSampleCountFlagBits numSamples, VkFormat format, 
             VkImageTiling tiling, VkImageUsageFlags usage, 
             VkMemoryPropertyFlags memoryProperties, VkImageAspectFlags aspectFlags,
-            VulkanDevice* device);
+            VulkanDevice* device,
+            bool isDepthBuffer = false); // TODO: Change mipLevels parameter to a bool to tell vulkan to generate mip levels or not
         ~VulkanImage();
 
         inline VkImage GetImageHandle() const { return m_Image; }
@@ -28,6 +29,10 @@ namespace BladeEngine::Vulkan
         void CreateImageView();
 
         uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
+        void TransitionImageLayout(VkImageLayout oldLayout, VkImageLayout newLayout);
+
+        bool HasStencilComponent(VkFormat format);
 
     private:
         VkImage m_Image;

@@ -1,5 +1,9 @@
 #include "VulkanPipeline.hpp"
 
+#include "../../Core/Log.hpp"
+#include "VulkanDevice.hpp"
+#include "VulkanRenderPass.hpp"
+
 namespace BladeEngine::Vulkan
 {
     void VulkanPipeline::CreateGraphicsPipeline()
@@ -141,9 +145,9 @@ namespace BladeEngine::Vulkan
 		pipelineLayoutCreateInfo.pushConstantRangeCount = 0;				   // Optional
 		pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;				   // Optional
 
-		if (vkCreatePipelineLayout(m_Device, &pipelineLayoutCreateInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS)
+		if (vkCreatePipelineLayout(m_Device->GetLogicalDevice(), &pipelineLayoutCreateInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS)
 		{
-			throw std::runtime_error("Failed to create pipeline layout!");
+			BLD_CORE_ERROR("Failed to create pipeline layout!");
 		}
 
 		VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo{};
@@ -163,18 +167,15 @@ namespace BladeEngine::Vulkan
 
 		graphicsPipelineCreateInfo.layout = m_PipelineLayout;
 
-		graphicsPipelineCreateInfo.renderPass = m_RenderPass;
+		graphicsPipelineCreateInfo.renderPass = m_RenderPass->GetRenderPassHandle();
 		graphicsPipelineCreateInfo.subpass = 0;
 
 		graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;    // Optional
 		graphicsPipelineCreateInfo.basePipelineIndex = -1;                 // Optional
 
-		if (vkCreateGraphicsPipelines(m_Device, VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, nullptr, &m_GraphicsPipeline) != VK_SUCCESS)
+		if (vkCreateGraphicsPipelines(m_Device->GetLogicalDevice(), VK_NULL_HANDLE, 1, &graphicsPipelineCreateInfo, nullptr, &m_GraphicsPipeline) != VK_SUCCESS)
 		{
-			throw std::runtime_error("Failed to create graphics pipeline!");
+			BLD_CORE_ERROR("Failed to create graphics pipeline!");
 		}
-
-		vkDestroyShaderModule(m_Device, vertShaderModule, nullptr);
-		vkDestroyShaderModule(m_Device, fragShaderModule, nullptr);
 	}
 }

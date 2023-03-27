@@ -1,8 +1,7 @@
 add_library(BladeEngine STATIC 
     src/Core/EntryPoint.cpp 
     src/BladeEngine.hpp
-    src/Core/Game.hpp src/Core/Game.cpp 
-    src/Core/World.hpp src/Core/World.cpp
+    src/Core/Game.hpp src/Core/Game.cpp
     src/Core/Window.hpp src/Core/Window.cpp
     src/Core/Log.hpp src/Core/Log.cpp
     src/Core/Input.hpp src/Core/Input.cpp
@@ -11,6 +10,9 @@ add_library(BladeEngine STATIC
     src/Renderer/Texture.hpp
     src/Renderer/Camera.hpp src/Renderer/Camera.cpp
     src/Renderer/GraphicsAPI.hpp
+    src/ECS/World.hpp src/ECS/World.cpp
+    src/ECS/Entity.hpp src/ECS/Entity.cpp
+    vendor/flecs/flecs.h vendor/flecs/flecs.c
     )
 
 
@@ -31,9 +33,9 @@ if(USING_VULKAN_API)
         src/Platform/Vulkan/VulkanSwapchain.hpp src/Platform/Vulkan/VulkanSwapchain.cpp
         src/Platform/Vulkan/VulkanImage.hpp src/Platform/Vulkan/VulkanImage.cpp
         src/Platform/Vulkan/VulkanQueue.hpp src/Platform/Vulkan/VulkanQueue.cpp
-        src/Platform/Vulkan/VulkanRenderPass.hpp src/Platform/Vulkan/VulkanRenderPass.cpp
-        src/Platform/Vulkan/VulkanPipeline.hpp src/Platform/Vulkan/VulkanPipeline.cpp
-        src/Platform/Vulkan/VulkanCommandPool.hpp src/Platform/Vulkan/VulkanCommandPool.cpp
+        #src/Platform/Vulkan/VulkanRenderPass.hpp src/Platform/Vulkan/VulkanRenderPass.cpp
+        #src/Platform/Vulkan/VulkanPipeline.hpp src/Platform/Vulkan/VulkanPipeline.cpp
+        #src/Platform/Vulkan/VulkanCommandPool.hpp src/Platform/Vulkan/VulkanCommandPool.cpp
         src/Platform/Vulkan/VulkanGraphicsAPI.cpp
         src/Platform/Vulkan/VulkanValidationLayers.hpp src/Platform/Vulkan/VulkanValidationLayers.cpp
         )
@@ -42,6 +44,7 @@ endif(USING_VULKAN_API)
 target_link_libraries(BladeEngine PRIVATE glfw)
 
 target_include_directories(BladeEngine PRIVATE
+    "vendor/flecs"
     "vendor/GLFW/include" 
     "vendor/spdlog/include" 
     "vendor/glm")

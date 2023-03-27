@@ -1,6 +1,6 @@
 #include "Game.hpp"
 
-#include "World.hpp"
+#include "../ECS/World.hpp"
 #include "Log.hpp"
 #include "../Renderer/GraphicsAPI.hpp"
 
@@ -23,7 +23,7 @@ namespace BladeEngine
 
         GraphicsAPI::Init(m_Window);
 
-        World::Init();
+        //World::Init();
     }
 
     Game::~Game()
@@ -32,7 +32,7 @@ namespace BladeEngine
 
         delete m_Window;
 
-        World::Shutdown();
+        //World::Shutdown();
     }
     
     void Game::Exit()
@@ -49,8 +49,8 @@ namespace BladeEngine
             m_Window->InputTick();
             //Input::Update();
             
-            World::Tick();
-            World::Render();
+            //World::Tick();
+            //World::Render();
 
             Update();
         }

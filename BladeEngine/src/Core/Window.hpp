@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <vector>
+#include <string>
 
 #if BLADE_VULKAN_API
 #include "vulkan/vulkan.hpp"

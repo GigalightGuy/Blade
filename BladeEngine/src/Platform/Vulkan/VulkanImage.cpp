@@ -11,7 +11,7 @@ namespace BladeEngine::Vulkan
             VkImageTiling tiling, VkImageUsageFlags usage, 
             VkMemoryPropertyFlags memoryProperties, VkImageAspectFlags aspectFlags,
             VulkanDevice* device,
-			bool isDepthBuffer = false)
+			bool isDepthBuffer)
 		: m_Width(width), m_Height(height), m_MipLevels(mipLevels), m_Format(format), m_Tiling(tiling) 
     {
         CreateImage(memoryProperties, numSamples, usage);

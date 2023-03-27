@@ -1,7 +1,5 @@
 #include "TestGame.hpp"
 
-#include <iostream>
-
 #include "BladeEngine.hpp"
 
 namespace BladeEngine

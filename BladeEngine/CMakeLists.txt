@@ -4,6 +4,7 @@ add_library(BladeEngine STATIC
     src/Core/Game.hpp src/Core/Game.cpp
     src/Core/Window.hpp src/Core/Window.cpp
     src/Core/Log.hpp src/Core/Log.cpp
+    src/Core/Time.hpp src/Core/Time.cpp
     src/Core/Input.hpp src/Core/Input.cpp
     src/Core/KeyCodes.hpp
     src/Renderer/Renderer2D.hpp src/Renderer/Renderer2D.cpp
@@ -12,6 +13,7 @@ add_library(BladeEngine STATIC
     src/Renderer/GraphicsAPI.hpp
     src/ECS/World.hpp src/ECS/World.cpp
     src/ECS/Entity.hpp src/ECS/Entity.cpp
+    src/Components/Components.hpp
     vendor/flecs/flecs.h vendor/flecs/flecs.c
     )
 

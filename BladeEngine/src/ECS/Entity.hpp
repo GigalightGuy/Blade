@@ -12,13 +12,16 @@ namespace BladeEngine
     {
     public:
         template<typename T>
-        inline void AddComponent();
+        inline void AddComponent() { m_FlecsEntity.add<T>(); }
 
         template<typename T>
-        inline void RemoveComponent();
+        inline void SetComponent(T&& value) { m_FlecsEntity.set<T>(value); }
 
         template<typename T>
-        inline T& GetComponent() const;
+        inline void RemoveComponent() { m_FlecsEntity.remove<T>(); }
+
+        template<typename T>
+        inline const T& GetComponent() const { return m_FlecsEntity.get<T>(); }
 
         inline const char* GetName() const { return m_FlecsEntity.name(); }
 

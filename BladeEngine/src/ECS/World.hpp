@@ -17,13 +17,18 @@ namespace BladeEngine
         inline static void DestroyEntity(Entity* entity) { delete entity; }
 
         template<typename ... Comps>
-        static void BindSystem(Func<Comps...> f, flecs::entity_t phase, const char* name);
+        static void BindSystem(flecs::entity_t phase, const char* name, Func<Comps&...> f);
+
+        template<typename ... Comps>
+        static void BindSystem(flecs::entity_t phase, const char* name, Func<flecs::entity, Comps&...> f);
 
     private:
-        inline static void Step();
+        static void Step(float deltaTime);
 
     private:
         static flecs::world s_FlecsWorld;
+
+        friend class Game;
 
     };
 }

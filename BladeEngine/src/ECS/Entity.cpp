@@ -17,23 +17,5 @@ namespace BladeEngine
         m_FlecsEntity.destruct();
     }
 
-    template<typename T>
-    void Entity::AddComponent()
-    {
-        m_FlecsEntity.add<T>();
-    }
-    
-    template<typename T>
-    void Entity::RemoveComponent()
-    {
-        m_FlecsEntity.remove<T>();
-    }
-    
-    template<typename T>
-    inline T& Entity::GetComponent() const
-    {
-        return m_FlecsEntity.get<T>();
-    }
-
     
 }

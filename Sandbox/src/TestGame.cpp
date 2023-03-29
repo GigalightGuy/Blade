@@ -4,6 +4,26 @@
 
 namespace BladeEngine
 {
+    struct Age
+    {
+        float Value;
+    };
+
+    void TestGame::SetupWorld()
+    {
+        auto bob = World::CreateEntity("Bob");
+        auto suzanne = World::CreateEntity("Suzanne");
+        auto chloe = World::CreateEntity("Chloe");
+
+        bob->SetComponent<Age>({ 10 });
+        suzanne->SetComponent<Age>({ 12 });
+        chloe->SetComponent<Age>({ 10 });
+
+        auto printAgeSystem = [](flecs::entity e, const Age& age) { BLD_DEBUG("{}'s Age is {}", e.name(), age.Value); };
+
+        //World::BindSystem<const Age>(printAgeSystem, flecs::OnUpdate, "Print Age");
+    }
+
     void TestGame::Update()
     {
         if (Input::GetKeyDown(KeyCode::A))

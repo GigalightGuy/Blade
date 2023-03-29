@@ -1,5 +1,6 @@
 #include "Game.hpp"
 
+#include "Time.hpp"
 #include "../ECS/World.hpp"
 #include "Log.hpp"
 #include "../Renderer/GraphicsAPI.hpp"
@@ -23,7 +24,7 @@ namespace BladeEngine
 
         GraphicsAPI::Init(m_Window);
 
-        //World::Init();
+        Time::Init();
     }
 
     Game::~Game()
@@ -31,8 +32,6 @@ namespace BladeEngine
         GraphicsAPI::Shutdown();
 
         delete m_Window;
-
-        //World::Shutdown();
     }
     
     void Game::Exit()
@@ -47,10 +46,10 @@ namespace BladeEngine
         while (!m_ShouldExit)
         {
             m_Window->InputTick();
-            //Input::Update();
             
-            //World::Tick();
-            //World::Render();
+            Time::Update();
+
+            World::Step(Time::DeltaTime());
 
             Update();
         }

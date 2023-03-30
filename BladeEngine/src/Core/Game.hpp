@@ -18,8 +18,6 @@ namespace BladeEngine
 
 	private:
 		virtual void SetupWorld() = 0;
-		
-  		virtual void Update() = 0;  // TODO: Remove this as it is not needed anymore
 
   		void Run();
   		void CleanUp();

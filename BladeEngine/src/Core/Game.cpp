@@ -42,6 +42,7 @@ namespace BladeEngine
     void Game::Run()
     {
         BLD_CORE_DEBUG("Game started Running!!");
+        SetupWorld();
 
         while (!m_ShouldExit)
         {
@@ -50,8 +51,6 @@ namespace BladeEngine
             Time::Update();
 
             World::Step(Time::DeltaTime());
-
-            Update();
         }
 
         CleanUp();

@@ -8,7 +8,5 @@ namespace BladeEngine
     {
     private:
         virtual void SetupWorld() override;
-
-        virtual void Update() override;
     };
 }

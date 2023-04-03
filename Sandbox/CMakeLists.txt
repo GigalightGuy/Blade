@@ -7,7 +7,7 @@ target_include_directories(Sandbox PRIVATE "${CMAKE_SOURCE_DIR}/BladeEngine/vend
 target_include_directories(Sandbox PRIVATE "${CMAKE_SOURCE_DIR}/BladeEngine/vendor/spdlog/include")
 
 target_compile_definitions(Sandbox PRIVATE
-$<$<CONFIG:Debug>:BLADE_DEBUG>
-$<$<CONFIG:Release>:BLADE_RELEASE>
-$<$<CONFIG:RelWithDebInfo>:BLADE_DEBUG>
-$<$<CONFIG:MinSizeRel>:BLADE_RELEASE>)
+    $<$<CONFIG:DEBUG>:BLADE_DEBUG>
+    $<$<CONFIG:RELEASE>:BLADE_RELEASE>
+    $<$<CONFIG:RELWITHDEBINFO>:BLADE_DEBUG>
+    $<$<CONFIG:MINSIZEREL>:BLADE_RELEASE>)

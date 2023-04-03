@@ -71,7 +71,7 @@ endif()
 set_target_properties(BladeEngine PROPERTIES LINKER_LANGUAGE CXX)
 
 target_compile_definitions(BladeEngine PRIVATE 
-    $<$<CONFIG:Debug>:BLADE_DEBUG>
-    $<$<CONFIG:Release>:BLADE_RELEASE>
-    $<$<CONFIG:RelWithDebInfo>:BLADE_DEBUG>
-    $<$<CONFIG:MinSizeRel>:BLADE_RELEASE>)
+    $<$<CONFIG:DEBUG>:BLADE_DEBUG>
+    $<$<CONFIG:RELEASE>:BLADE_RELEASE>
+    $<$<CONFIG:RELWITHDEBINFO>:BLADE_DEBUG>
+    $<$<CONFIG:MINSIZEREL>:BLADE_RELEASE>)

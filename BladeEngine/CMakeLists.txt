@@ -7,6 +7,8 @@ add_library(BladeEngine STATIC
     src/Core/Time.hpp src/Core/Time.cpp
     src/Core/Input.hpp src/Core/Input.cpp
     src/Core/KeyCodes.hpp
+    src/Core/Math.hpp
+    src/Core/Vec.hpp
     src/Renderer/Renderer2D.hpp src/Renderer/Renderer2D.cpp
     src/Renderer/Texture.hpp
     src/Renderer/Camera.hpp src/Renderer/Camera.cpp

@@ -23,6 +23,9 @@ namespace BladeEngine
         template<typename T>
         inline const T& GetComponent() const { return m_FlecsEntity.get<T>(); }
 
+        template<typename T>
+        inline T& GetComponent() { return m_FlecsEntity.get_mut<T>(); }
+
         inline const char* GetName() const { return m_FlecsEntity.name(); }
 
     private:

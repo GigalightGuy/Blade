@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "spdlog/fmt/ostr.h"
+
 #include "Math.hpp"
 
 namespace BladeEngine
@@ -10,6 +12,7 @@ namespace BladeEngine
     {
         float X, Y;
 
+        Vec2() {}
         Vec2(float x, float y) : X(x), Y(y) {}
 
         Vec2 operator-() const { return Vec2(-X, -Y); }

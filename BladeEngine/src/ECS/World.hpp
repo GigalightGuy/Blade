@@ -19,6 +19,12 @@ namespace BladeEngine
             s_FlecsWorld.system<Comps...>(name).kind(phase).each(f);
         }
 
+        template<typename ... Comps, typename Func>
+        static void BindSystem(float timer, const char* name, Func f)
+        {
+            s_FlecsWorld.system<Comps...>(name).interval(timer).each(f);
+        }
+
     private:
         static void Step(float deltaTime);
 

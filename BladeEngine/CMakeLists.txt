@@ -9,6 +9,7 @@ add_library(BladeEngine STATIC
     src/Core/KeyCodes.hpp
     src/Core/Math.hpp
     src/Core/Vec.hpp
+    src/Utils/Random.hpp src/Utils/Random.cpp
     src/Renderer/Renderer2D.hpp src/Renderer/Renderer2D.cpp
     src/Renderer/Texture.hpp
     src/Renderer/Camera.hpp src/Renderer/Camera.cpp

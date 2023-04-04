@@ -7,7 +7,18 @@ namespace BladeEngine
     class Time
     {
     public:
+        /**
+         * @brief World time in seconds.
+         * 
+         * @return time in seconds since the beginning of the world.
+         */
         inline static float CurrentWorldTime() { return s_CurrentWorldTime; }
+
+        /**
+         * @brief Elapsed time in seconds since last frame.
+         * 
+         * @return time in seconds since last frame.
+         */
         inline static float DeltaTime() { return s_DeltaTime; }
 
     private:

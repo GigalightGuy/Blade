@@ -14,6 +14,10 @@ namespace BladeEngine
   		Game();
   		~Game();
 
+		/**
+		 * @brief Tells application to exit.
+		 * 
+		 */
   		static void Exit();
 
 	private:

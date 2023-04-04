@@ -20,7 +20,17 @@ namespace BladeEngine
         Window(uint32_t width, uint32_t height, const std::string& title);
         ~Window();
 
+        /**
+         * @brief Get application window width.
+         * 
+         * @return window width.
+         */
         inline virtual uint32_t GetWidth() const { return m_WindowData.Width; }
+        /**
+         * @brief Get application window height.
+         * 
+         * @return window height.
+         */
 		inline virtual uint32_t GetHeight() const { return m_WindowData.Height; }
 
         void PollEvents();

@@ -19,7 +19,7 @@ namespace BladeEngine
 
     void ChangeMovement(Movement& mov)
     {
-        mov.Value = Utils::Random::NextVec2(-1.0, 1.0);
+        mov.Value = Normalize(Utils::Random::NextVec2(-1.0, 1.0));
     }
 
     void Move(flecs::entity e, Position& pos, const Movement& mov)
@@ -34,7 +34,7 @@ namespace BladeEngine
 
     void TestGame::SetupWorld()
     {
-        for (int i = 0; i < 10000; i++)
+        for (int i = 0; i < 100000; i++)
         {
             auto e = World::CreateEntity();
 
@@ -50,6 +50,8 @@ namespace BladeEngine
         World::BindSystem<Movement>(5.0f, "Change Movement", ChangeMovement);
         World::BindSystem<Position, const Movement>(flecs::OnUpdate, "Move", Move);
         World::BindSystem<const Position, ShouldPrint>(flecs::OnUpdate, "Print Position", PrintPosition);
+
+        BLD_DEBUG_ASSERT(false, "TEHE");
         
     }
 

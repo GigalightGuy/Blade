@@ -1,6 +1,8 @@
 add_library(BladeEngine STATIC 
-    src/Core/EntryPoint.cpp 
     src/BladeEngine.hpp
+    src/Core/Base.hpp
+    src/Core/Platform.hpp
+    src/Core/EntryPoint.cpp 
     src/Core/Game.hpp src/Core/Game.cpp
     src/Core/Window.hpp src/Core/Window.cpp
     src/Core/Log.hpp src/Core/Log.cpp

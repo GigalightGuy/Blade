@@ -46,7 +46,7 @@ namespace BladeEngine
          * @return constant reference to the component.
          */
         template<typename T>
-        inline const T& GetComponent() const { return m_FlecsEntity.get<T>(); }
+        inline const T* GetComponent() const { return m_FlecsEntity.get<T>(); }
 
         /**
          * @brief Get component of type T from this Entity if it exists.
@@ -56,7 +56,7 @@ namespace BladeEngine
          * @return reference to the component.
          */
         template<typename T>
-        inline T& GetComponent() { return m_FlecsEntity.get_mut<T>(); }
+        inline T* GetComponent() { return m_FlecsEntity.get_mut<T>(); }
 
         /**
          * @brief Get this Entity's name.

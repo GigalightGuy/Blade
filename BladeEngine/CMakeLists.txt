@@ -20,6 +20,7 @@ add_library(BladeEngine STATIC
     src/ECS/Entity.hpp src/ECS/Entity.cpp
     src/Components/Components.hpp
     vendor/flecs/flecs.h vendor/flecs/flecs.c
+    src/Physics/Physics2D.hpp src/Physics/Physics2D.cpp
     )
 
 
@@ -48,13 +49,18 @@ if(USING_VULKAN_API)
         )
 endif(USING_VULKAN_API)
 
-target_link_libraries(BladeEngine PRIVATE glfw)
+target_link_libraries(BladeEngine PRIVATE 
+    glfw 
+    box2d
+    )
 
 target_include_directories(BladeEngine PRIVATE
     "vendor/flecs"
     "vendor/GLFW/include" 
     "vendor/spdlog/include" 
-    "vendor/glm")
+    "vendor/glm"
+    "vendor/box2d/include"
+    )
 
 if(DEFINED VULKAN_SDK_PATH)
     set(Vulkan_INCLUDE_DIRS "${VULKAN_SDK_PATH}/Include")

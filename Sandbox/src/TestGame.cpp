@@ -5,27 +5,7 @@
 
 namespace BladeEngine
 {
-    struct Position
-    {
-        Vec2 Value;
-    };
-
-    struct Movement
-    {
-        Vec2 Value;
-    };
-
     struct ShouldPrint {};
-
-    void ChangeMovement(Movement& mov)
-    {
-        mov.Value = Normalize(Utils::Random::NextVec2(-1.0, 1.0));
-    }
-
-    void Move(flecs::entity e, Position& pos, const Movement& mov)
-    {
-        pos.Value += e.delta_time() * mov.Value;
-    }
 
     void PrintPosition(flecs::entity e, const Position& pos, ShouldPrint shouldPrint)
     {
@@ -34,24 +14,22 @@ namespace BladeEngine
 
     void TestGame::SetupWorld()
     {
-        for (int i = 0; i < 100000; i++)
-        {
-            auto e = World::CreateEntity();
-
-            e->SetComponent<Position>({ Utils::Random::NextVec2(-100.0, 100.0) });
-            e->SetComponent<Movement>({ Utils::Random::NextVec2(-1.0, 1.0) });
-        }
+        auto ground = World::CreateEntity("Ground");
+        ground->SetComponent<Position>({ { 0.0f, 0.0f } });
+        ground->AddComponent<Rigidbody2D>();
+        ground->AddComponent<BoxCollider2D>();
+        ground->GetComponent<BoxCollider2D>()->HalfExtents = { 20.0f, 1.0f };
 
         auto bob = World::CreateEntity("Bob");
-        bob->SetComponent<Position>({ Utils::Random::NextVec2(-100.0, 100.0) });
-        bob->SetComponent<Movement>({ Utils::Random::NextVec2(-1.0, 1.0) });
+        bob->SetComponent<Position>({ { 0.0f, 50.0f } });
+        bob->AddComponent<Rigidbody2D>();
+        auto bobRB = bob->GetComponent<Rigidbody2D>();
+        bobRB->LockRotation = true;
+        bobRB->Type = Rigidbody2D::BodyType::Dynamic;
+        bob->AddComponent<BoxCollider2D>();
         bob->AddComponent<ShouldPrint>();
 
-        World::BindSystem<Movement>(5.0f, "Change Movement", ChangeMovement);
-        World::BindSystem<Position, const Movement>(flecs::OnUpdate, "Move", Move);
         World::BindSystem<const Position, ShouldPrint>(flecs::OnUpdate, "Print Position", PrintPosition);
-
-        BLD_DEBUG_ASSERT(false, "TEHE");
         
     }
 

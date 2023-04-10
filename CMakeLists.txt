@@ -9,5 +9,6 @@ if(MSVC)
 endif(MSVC)
 
 add_subdirectory("BladeEngine/vendor/GLFW")
+add_subdirectory("BladeEngine/vendor/box2d")
 add_subdirectory("BladeEngine")
 add_subdirectory("Sandbox")

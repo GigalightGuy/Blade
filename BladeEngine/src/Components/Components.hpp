@@ -1,10 +1,15 @@
 #pragma once
 
+#include "../Core/Vec.hpp"
+#include "../Physics/Physics2D.hpp"
+
+class b2Body;
+
 namespace BladeEngine
 {
     struct Position
     {
-        float X, Y;
+        Vec2 Value;
     };
 
     struct Rotation
@@ -14,14 +19,38 @@ namespace BladeEngine
 
     struct Scale
     {
-        float X, Y;
+        Vec2 Value;
     };
 
     struct Sprite2D
     {
         class Texture2D* Texture;
-        float MinX, MinY;
-        float LengthX, LengthY;
+        Vec2 UVStartPos;
+        Vec2 UVDimensions;
+    };
+
+    struct Rigidbody2D
+    {
+        enum class BodyType { Static = 0, Kinematic, Dynamic };
+
+        BodyType Type = BodyType::Static;
+        bool LockRotation = false;
+
+        b2Body* RuntimeBody = nullptr;
+    };
+
+    struct BoxCollider2D
+    {
+        Vec2 HalfExtents = { 0.5f, 0.5f };
+
+        PhysicsMaterial Material;
+    };
+
+    struct CircleCollider2D
+    {
+        float Radius = 0.5f;
+
+        PhysicsMaterial Material;
     };
 
 }

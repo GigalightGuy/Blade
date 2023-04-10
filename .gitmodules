@@ -7,3 +7,6 @@
 [submodule "BladeEngine/vendor/glm"]
 	path = BladeEngine/vendor/glm
 	url = https://github.com/g-truc/glm.git
+[submodule "BladeEngine/vendor/Box2D"]
+	path = BladeEngine/vendor/Box2D
+	url = https://github.com/GigalightGuy/box2d.git

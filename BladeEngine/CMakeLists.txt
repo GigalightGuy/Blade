@@ -59,7 +59,7 @@ target_include_directories(BladeEngine PRIVATE
     "vendor/GLFW/include" 
     "vendor/spdlog/include" 
     "vendor/glm"
-    "vendor/box2d/include"
+    "vendor/Box2D/include"
     )
 
 if(DEFINED VULKAN_SDK_PATH)

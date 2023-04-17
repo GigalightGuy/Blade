@@ -5,6 +5,13 @@
 
 class b2Body;
 
+namespace BladeEngine::Graphics
+{
+    class Texture2D;
+}
+
+class BladeEngine::Graphics::Texture2D;
+
 namespace BladeEngine
 {
     struct Position
@@ -24,7 +31,7 @@ namespace BladeEngine
 
     struct Sprite2D
     {
-        class Texture2D* Texture;
+        Graphics::Texture2D* Texture;
         Vec2 UVStartPos;
         Vec2 UVDimensions;
     };

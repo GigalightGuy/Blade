@@ -12,10 +12,17 @@ add_library(BladeEngine STATIC
     src/Core/Math.hpp
     src/Core/Vec.hpp
     src/Utils/Random.hpp src/Utils/Random.cpp
-    src/Renderer/Renderer2D.hpp src/Renderer/Renderer2D.cpp
-    src/Renderer/Texture.hpp
-    src/Renderer/Camera.hpp src/Renderer/Camera.cpp
-    src/Renderer/GraphicsAPI.hpp
+
+    src/Core/Camera.hpp src/Core/Camera.cpp
+    src/Core/Utils.hpp src/Core/Utils.cpp
+
+    src/Graphics/Color.hpp src/Graphics/Color.cpp
+    src/Graphics/GraphicsManager.hpp src/Graphics/GraphicsManager.cpp
+    src/Graphics/Mesh.hpp src/Graphics/Mesh.cpp
+    src/Graphics/Shader.hpp src/Graphics/Shader.cpp
+    src/Graphics/Texture2D.hpp src/Graphics/Texture2D.cpp
+    src/Graphics/Vertex.hpp src/Graphics/Vertex.cpp
+
     src/ECS/World.hpp src/ECS/World.cpp
     src/ECS/Entity.hpp src/ECS/Entity.cpp
     src/Components/Components.hpp
@@ -36,16 +43,27 @@ endif(UNIX)
 
 if(USING_VULKAN_API)
     target_sources(BladeEngine PRIVATE
-        src/Platform/Vulkan/VulkanDevice.hpp src/Platform/Vulkan/VulkanDevice.cpp
-        src/Platform/Vulkan/VulkanTexture.cpp
-        src/Platform/Vulkan/VulkanSwapchain.hpp src/Platform/Vulkan/VulkanSwapchain.cpp
-        src/Platform/Vulkan/VulkanImage.hpp src/Platform/Vulkan/VulkanImage.cpp
-        src/Platform/Vulkan/VulkanQueue.hpp src/Platform/Vulkan/VulkanQueue.cpp
+        #src/Platform/Vulkan/VulkanDevice.hpp src/Platform/Vulkan/VulkanDevice.cpp
+        #src/Platform/Vulkan/VulkanTexture.cpp
+        #src/Platform/Vulkan/VulkanSwapchain.hpp src/Platform/Vulkan/VulkanSwapchain.cpp
+        #src/Platform/Vulkan/VulkanImage.hpp src/Platform/Vulkan/VulkanImage.cpp
+        #src/Platform/Vulkan/VulkanQueue.hpp src/Platform/Vulkan/VulkanQueue.cpp
         #src/Platform/Vulkan/VulkanRenderPass.hpp src/Platform/Vulkan/VulkanRenderPass.cpp
         #src/Platform/Vulkan/VulkanPipeline.hpp src/Platform/Vulkan/VulkanPipeline.cpp
         #src/Platform/Vulkan/VulkanCommandPool.hpp src/Platform/Vulkan/VulkanCommandPool.cpp
-        src/Platform/Vulkan/VulkanGraphicsAPI.cpp
-        src/Platform/Vulkan/VulkanValidationLayers.hpp src/Platform/Vulkan/VulkanValidationLayers.cpp
+        #src/Platform/Vulkan/VulkanGraphicsAPI.cpp
+        #src/Platform/Vulkan/VulkanValidationLayers.hpp src/Platform/Vulkan/VulkanValidationLayers.cpp
+
+        src/Graphics/Platform/Vulkan/BladeVulkanUtils.cpp             src/Graphics/Platform/Vulkan/BladeVulkanUtils.hpp
+		src/Graphics/Platform/Vulkan/BladeVulkanInstance.cpp          src/Graphics/Platform/Vulkan/BladeVulkanInstance.hpp
+		src/Graphics/Platform/Vulkan/BladeVulkanQueueFamily.cpp       src/Graphics/Platform/Vulkan/BladeVulkanQueueFamily.hpp	
+		src/Graphics/Platform/Vulkan/BladeVulkanDevice.cpp            src/Graphics/Platform/Vulkan/BladeVulkanDevice.hpp
+		src/Graphics/Platform/Vulkan/BladeVulkanSwapchain.cpp         src/Graphics/Platform/Vulkan/BladeVulkanSwapchain.hpp
+		src/Graphics/Platform/Vulkan/BladeVulkanShader.cpp            src/Graphics/Platform/Vulkan/BladeVulkanShader.hpp
+        src/Graphics/Platform/Vulkan/BladeVulkanGraphicsPipeline.cpp  src/Graphics/Platform/Vulkan/BladeVulkanGraphicsPipeline.hpp
+        src/Graphics/Platform/Vulkan/BladeVulkanMesh.cpp              src/Graphics/Platform/Vulkan/BladeVulkanMesh.hpp
+        src/Graphics/Platform/Vulkan/BladeVulkanTexture.cpp           src/Graphics/Platform/Vulkan/BladeVulkanTexture.hpp
+		src/Graphics/Platform/Vulkan/BladeVulkanRenderer.cpp          src/Graphics/Platform/Vulkan/BladeVulkanRenderer.hpp
         )
 endif(USING_VULKAN_API)
 
@@ -60,6 +78,7 @@ target_include_directories(BladeEngine PRIVATE
     "vendor/spdlog/include" 
     "vendor/glm"
     "vendor/Box2D/include"
+    "vendor/stb"
     )
 
 if(DEFINED VULKAN_SDK_PATH)

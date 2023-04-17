@@ -7,13 +7,37 @@ namespace BladeEngine
 {
     struct ShouldPrint {};
 
+    Graphics::Texture2D* textureGray;
+
+    void LoadTextures()
+    {
+        textureGray = new BladeEngine::Graphics::Texture2D("../assets/sprites/default-checker-gray.png");
+        textureGray->CreateGPUTexture();
+    }
+
     void PrintPosition(flecs::entity e, const Position& pos, ShouldPrint shouldPrint)
     {
         BLD_DEBUG("{} position is {}", e.name(), pos.Value);
     }
 
+    void DrawSprite(flecs::iter it, const Sprite2D* sprite, const Position* pos)
+    {
+        Graphics::GraphicsManager::Instance()->BeginDrawing();
+
+        for (auto i : it)
+        {
+            Graphics::GraphicsManager::Instance()->Draw(
+                sprite[i].Texture, glm::vec3(pos[i].Value.X, pos[i].Value.Y, 0.0f), 
+                glm::vec3(0.0f), glm::vec3(1.0f));
+        }
+        
+        Graphics::GraphicsManager::Instance()->EndDrawing();
+    }
+
     void TestGame::SetupWorld()
     {
+        LoadTextures();
+
         auto ground = World::CreateEntity("Ground");
         ground->SetComponent<Position>({ { 0.0f, 0.0f } });
         ground->AddComponent<Rigidbody2D>();
@@ -29,7 +53,11 @@ namespace BladeEngine
         bob->AddComponent<BoxCollider2D>();
         bob->AddComponent<ShouldPrint>();
 
-        World::BindSystem<const Position, ShouldPrint>(flecs::OnUpdate, "Print Position", PrintPosition);
+        bob->SetComponent<Sprite2D>({ textureGray });
+
+        //World::BindSystem<const Position, ShouldPrint>(flecs::OnUpdate, "Print Position", PrintPosition);
+
+        World::BindSystemIter<const Sprite2D, const Position>(flecs::PostUpdate, "Draw Sprite", DrawSprite);
         
     }
 

@@ -59,6 +59,22 @@ namespace BladeEngine
          * @tparam Comps component types that will be part of the query.
          * @tparam Func type of f
          * 
+         * @param phase pipeline phase that defines when in a frame the system runs.
+         * @param name name of the system.
+         * @param f function to be executed when running the system.
+         */
+        template<typename ... Comps, typename Func>
+        static void BindSystemIter(flecs::entity_t phase, const char* name, Func f)
+        {
+            s_FlecsWorld.system<Comps...>(name).kind(phase).iter(f);
+        }
+
+        /**
+         * @brief Creates and binds a system to the World.
+         * 
+         * @tparam Comps component types that will be part of the query.
+         * @tparam Func type of f
+         * 
          * @param timer interval between each time the system gets ran.
          * @param name name of the system.
          * @param f function to be executed when running the system.

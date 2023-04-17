@@ -4,7 +4,7 @@
 #include "../ECS/World.hpp"
 #include "../Components/Components.hpp"
 #include "Log.hpp"
-#include "../Renderer/GraphicsAPI.hpp"
+#include "../Graphics/GraphicsManager.hpp"
 #include "../Physics/Physics2D.hpp"
 
 #include "box2d/b2_world.h"
@@ -29,12 +29,12 @@ namespace BladeEngine
 
         m_Window = new Window(900, 600, "Blade Game");
 
-        GraphicsAPI::Init(m_Window);
+        Graphics::GraphicsManager::Instance()->Init(m_Window);
     }
 
     Game::~Game()
     {
-        GraphicsAPI::Shutdown();
+        Graphics::GraphicsManager::Instance()->Shutdown();
 
         delete m_Window;
     }

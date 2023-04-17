@@ -15,3 +15,5 @@
 #include "Physics/Physics2D.hpp"
 
 #include "Components/Components.hpp"
+
+#include "Graphics/GraphicsManager.hpp"

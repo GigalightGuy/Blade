@@ -11,7 +11,7 @@ namespace BladeEngine
 
     void LoadTextures()
     {
-        textureGray = new BladeEngine::Graphics::Texture2D("../assets/sprites/default-checker-gray.png");
+        textureGray = new BladeEngine::Graphics::Texture2D("../assets/sprites/Chick-Boy Free Pack/tile000.png");
         textureGray->CreateGPUTexture();
     }
 
@@ -28,7 +28,7 @@ namespace BladeEngine
         {
             Graphics::GraphicsManager::Instance()->Draw(
                 sprite[i].Texture, glm::vec3(pos[i].Value.X, pos[i].Value.Y, 0.0f), 
-                glm::vec3(0.0f), glm::vec3(1.0f));
+                glm::vec3(0.0f), glm::vec3(3.0f));
         }
         
         Graphics::GraphicsManager::Instance()->EndDrawing();
@@ -45,7 +45,7 @@ namespace BladeEngine
         ground->GetComponent<BoxCollider2D>()->HalfExtents = { 20.0f, 1.0f };
 
         auto bob = World::CreateEntity("Bob");
-        bob->SetComponent<Position>({ { 0.0f, 50.0f } });
+        bob->SetComponent<Position>({ { 20.0f, 50.0f } });
         bob->AddComponent<Rigidbody2D>();
         auto bobRB = bob->GetComponent<Rigidbody2D>();
         bobRB->LockRotation = true;

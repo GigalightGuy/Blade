@@ -74,14 +74,33 @@ namespace BladeEngine
         }
     }
 
-    void PhysicsStep(flecs::entity e, Position& pos, const Rigidbody2D& rb)
+    void PrePhysicsStep(const Position& pos, Rigidbody2D& rb)
+    {
+        rb.RuntimeBody->SetTransform({ pos.Value.X, pos.Value.Y }, 0.0f);
+    }
+
+    void PhysicsStep(flecs::iter it)
     {
         b2World* physicsWorld = (b2World*)Physics2D::GetPhysicsWorldHandle();
 
-        physicsWorld->Step(e.delta_time(), Physics2D::GetVelocityIterations(), Physics2D::GetPositionIterations());
+        physicsWorld->Step(it.delta_time(), Physics2D::GetVelocityIterations(), Physics2D::GetPositionIterations());
+    }
 
+    void PostPhysicsStep(Position& pos, const Rigidbody2D& rb)
+    {
         pos.Value.X = rb.RuntimeBody->GetPosition().x;
         pos.Value.Y = rb.RuntimeBody->GetPosition().y;
+    }
+
+    void BeginDrawing(flecs::iter it) { Graphics::GraphicsManager::Instance()->BeginDrawing(); }
+
+    void EndDrawing(flecs::iter it) { Graphics::GraphicsManager::Instance()->EndDrawing(); }
+
+    void DrawSprite(const Sprite2D& sprite, const Position& pos)
+    {
+        Graphics::GraphicsManager::Instance()->Draw(
+                sprite.Texture, glm::vec3(pos.Value.X, pos.Value.Y, 0.0f), 
+                glm::vec3(0.0f), glm::vec3(1.0f));
     }
 
     void Game::Run()
@@ -91,8 +110,18 @@ namespace BladeEngine
         Time::Init();
         Physics2D::Init();
 
+        // Physics World Setup
         World::BindSystem<const Position, Rigidbody2D>(flecs::OnStart, "Populate physics world", PopulatePhysicsWorld);
-        World::BindSystem<Position, const Rigidbody2D>(flecs::PostUpdate, "Physics Step", PhysicsStep);
+
+        // Physics World Update
+        World::BindSystem<const Position, Rigidbody2D>(flecs::PostUpdate, "Pre Physics Step", PrePhysicsStep);
+        World::BindSystemNoQuery(flecs::PostUpdate, "Physics Step", PhysicsStep);
+        World::BindSystem<Position, const Rigidbody2D>(flecs::PostUpdate, "Post Physics Step", PostPhysicsStep);
+
+        // Render
+        World::BindSystemNoQuery(flecs::PostUpdate, "Start Drawing", BeginDrawing);
+        World::BindSystem<const Sprite2D, const Position>(flecs::PostUpdate, "Draw Sprite", DrawSprite);
+        World::BindSystemNoQuery(flecs::PostUpdate, "End Drawing", EndDrawing);
 
         SetupWorld();
 

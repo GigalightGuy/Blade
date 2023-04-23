@@ -36,17 +36,6 @@ namespace BladeEngine
         Camera::GetMainCamera()->SetPosition({ pos.Value.X, pos.Value.Y, 10.0f });
     }
 
-    void BeginDrawing(flecs::iter it) { Graphics::GraphicsManager::Instance()->BeginDrawing(); }
-
-    void EndDrawing(flecs::iter it) { Graphics::GraphicsManager::Instance()->EndDrawing(); }
-
-    void DrawSprite(const Sprite2D& sprite, const Position& pos)
-    {
-        Graphics::GraphicsManager::Instance()->Draw(
-                sprite.Texture, glm::vec3(pos.Value.X, pos.Value.Y, 0.0f), 
-                glm::vec3(0.0f), glm::vec3(1.0f));
-    }
-
     void TestGame::SetupWorld()
     {
         LoadTextures();
@@ -126,11 +115,6 @@ namespace BladeEngine
         World::BindSystem<Position, const Controller>(flecs::OnUpdate, "Move", Move);
 
         World::BindSystem<const Player, const Position>(flecs::OnUpdate, "Focus Camera", FocusCamera);
-
-        World::BindSystemNoQuery(flecs::PostUpdate, "Start Drawing", BeginDrawing);
-        World::BindSystem<const Sprite2D, const Position>(flecs::PostUpdate, "Draw Sprite", DrawSprite);
-        World::BindSystemNoQuery(flecs::PostUpdate, "End Drawing", EndDrawing);
-        
     }
 
     Game* CreateGameInstance()

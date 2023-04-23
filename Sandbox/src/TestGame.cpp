@@ -5,33 +5,46 @@
 
 namespace BladeEngine
 {
-    struct ShouldPrint {};
+    struct Controller
+    {
+        KeyCode Left, Right;
 
-    Graphics::Texture2D* textureGray;
+        float Movespeed;
+    };
 
+    struct Player {};
+
+    Graphics::Texture2D* textureChickBoy;
+
+    // TODO: Move this to a load assets function in engine side
     void LoadTextures()
     {
-        textureGray = new BladeEngine::Graphics::Texture2D("../assets/sprites/default-checker-gray.png");
-        textureGray->CreateGPUTexture();
+        textureChickBoy = new BladeEngine::Graphics::Texture2D("../assets/sprites/Chick-Boy Free Pack/tile000.png");
+        textureChickBoy->CreateGPUTexture();
     }
 
-    void PrintPosition(flecs::entity e, const Position& pos, ShouldPrint shouldPrint)
+    void Move(flecs::entity e, Position& pos, const Controller& ctrl)
     {
-        BLD_DEBUG("{} position is {}", e.name(), pos.Value);
+        float movement = (Input::GetKey(ctrl.Left) ? -ctrl.Movespeed : 0.0f + 
+            Input::GetKey(ctrl.Right) ? ctrl.Movespeed : 0.0f) * e.delta_time();
+
+        pos.Value.X += movement;
     }
 
-    void DrawSprite(flecs::iter it, const Sprite2D* sprite, const Position* pos)
+    void FocusCamera(const Player& player, const Position& pos)
     {
-        Graphics::GraphicsManager::Instance()->BeginDrawing();
+        Camera::GetMainCamera()->SetPosition({ pos.Value.X, pos.Value.Y, 10.0f });
+    }
 
-        for (auto i : it)
-        {
-            Graphics::GraphicsManager::Instance()->Draw(
-                sprite[i].Texture, glm::vec3(pos[i].Value.X, pos[i].Value.Y, 0.0f), 
+    void BeginDrawing(flecs::iter it) { Graphics::GraphicsManager::Instance()->BeginDrawing(); }
+
+    void EndDrawing(flecs::iter it) { Graphics::GraphicsManager::Instance()->EndDrawing(); }
+
+    void DrawSprite(const Sprite2D& sprite, const Position& pos)
+    {
+        Graphics::GraphicsManager::Instance()->Draw(
+                sprite.Texture, glm::vec3(pos.Value.X, pos.Value.Y, 0.0f), 
                 glm::vec3(0.0f), glm::vec3(1.0f));
-        }
-        
-        Graphics::GraphicsManager::Instance()->EndDrawing();
     }
 
     void TestGame::SetupWorld()
@@ -44,20 +57,79 @@ namespace BladeEngine
         ground->AddComponent<BoxCollider2D>();
         ground->GetComponent<BoxCollider2D>()->HalfExtents = { 20.0f, 1.0f };
 
-        auto bob = World::CreateEntity("Bob");
-        bob->SetComponent<Position>({ { 0.0f, 50.0f } });
-        bob->AddComponent<Rigidbody2D>();
-        auto bobRB = bob->GetComponent<Rigidbody2D>();
-        bobRB->LockRotation = true;
-        bobRB->Type = Rigidbody2D::BodyType::Dynamic;
-        bob->AddComponent<BoxCollider2D>();
-        bob->AddComponent<ShouldPrint>();
+        {
+            auto chickBoy = World::CreateEntity("Chick Boy 1");
+            chickBoy->SetComponent<Position>({ { -10.0f, 50.0f } });
+            chickBoy->AddComponent<Rigidbody2D>();
+            auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
+            chickBoyRB->LockRotation = true;
+            chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
+            chickBoy->AddComponent<BoxCollider2D>();
 
-        bob->SetComponent<Sprite2D>({ textureGray });
+            chickBoy->SetComponent<Sprite2D>({ textureChickBoy });
+        }
+        
+        {
+            auto chickBoy = World::CreateEntity("Chick Boy 2");
+            chickBoy->SetComponent<Position>({ { -5.0f, 50.0f } });
+            chickBoy->AddComponent<Rigidbody2D>();
+            auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
+            chickBoyRB->LockRotation = true;
+            chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
+            chickBoy->AddComponent<BoxCollider2D>();
 
-        //World::BindSystem<const Position, ShouldPrint>(flecs::OnUpdate, "Print Position", PrintPosition);
+            chickBoy->SetComponent<Sprite2D>({ textureChickBoy });
+        }
 
-        World::BindSystemIter<const Sprite2D, const Position>(flecs::PostUpdate, "Draw Sprite", DrawSprite);
+        {
+            auto chickBoy = World::CreateEntity("Chick Boy 3");
+            chickBoy->SetComponent<Position>({ { 0.0f, 50.0f } });
+            chickBoy->AddComponent<Rigidbody2D>();
+            auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
+            chickBoyRB->LockRotation = true;
+            chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
+            chickBoy->AddComponent<BoxCollider2D>();
+
+            chickBoy->SetComponent<Sprite2D>({ textureChickBoy });
+        }
+
+        {
+            auto chickBoy = World::CreateEntity("Chick Boy 4");
+            chickBoy->SetComponent<Position>({ { 5.0f, 50.0f } });
+            chickBoy->AddComponent<Rigidbody2D>();
+            auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
+            chickBoyRB->LockRotation = true;
+            chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
+            chickBoy->AddComponent<BoxCollider2D>();
+
+            chickBoy->SetComponent<Sprite2D>({ textureChickBoy });
+        }
+
+        {
+            auto chickBoy = World::CreateEntity("Chick Boy 5");
+            chickBoy->SetComponent<Position>({ { 10.0f, 50.0f } });
+            chickBoy->AddComponent<Rigidbody2D>();
+            auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
+            chickBoyRB->LockRotation = true;
+            chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
+            chickBoy->AddComponent<BoxCollider2D>();
+
+            chickBoy->SetComponent<Sprite2D>({ textureChickBoy });
+        }
+
+        auto player = World::CreateEntity("Player");
+        player->SetComponent<Position>({ { 0.0f, 0.0f } });
+        player->SetComponent<Controller>({ KeyCode::A, KeyCode::D, 2.0f });
+        player->SetComponent<Sprite2D>({ textureChickBoy });
+        player->AddComponent<Player>();
+        
+        World::BindSystem<Position, const Controller>(flecs::OnUpdate, "Move", Move);
+
+        World::BindSystem<const Player, const Position>(flecs::OnUpdate, "Focus Camera", FocusCamera);
+
+        World::BindSystemNoQuery(flecs::PostUpdate, "Start Drawing", BeginDrawing);
+        World::BindSystem<const Sprite2D, const Position>(flecs::PostUpdate, "Draw Sprite", DrawSprite);
+        World::BindSystemNoQuery(flecs::PostUpdate, "End Drawing", EndDrawing);
         
     }
 

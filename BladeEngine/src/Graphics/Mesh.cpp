@@ -26,12 +26,12 @@ BladeEngine::Graphics::Mesh BladeEngine::Graphics::Quad(float width, float heigh
 {
     Mesh m;
     m.vertices = {
-      {-width/2.0f, -height/2.0f, 1.0f},
-      { width/2.0f, -height/2.0f, 1.0f},
-      { width/2.0f,  height/2.0f, 1.0f},
-      {-width/2.0f,  height/2.0f, 1.0f},
+      {-width/2.0f,   height/2.0f, 0.0f},
+      {-width/2.0f,  -height/2.0f, 0.0f},
+      { width/2.0f,  -height/2.0f, 0.0f},
+      { width/2.0f,   height/2.0f, 0.0f},
     };
     m.elements = {0, 1, 2, 2, 3, 0};
-    m.uvs = {{1.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f}};
+    m.uvs = {{0.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}};
     return m;
 }

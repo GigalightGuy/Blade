@@ -27,7 +27,7 @@ namespace BladeEngine
 
         s_Instance = this;
 
-        m_Window = new Window(900, 600, "Blade Game");
+        m_Window = new Window(1200, 800, "Blade Game");
 
         Graphics::GraphicsManager::Instance()->Init(m_Window);
     }

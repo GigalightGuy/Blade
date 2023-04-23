@@ -25,13 +25,15 @@ namespace BladeEngine
          * 
          * @return window width.
          */
-        inline virtual uint32_t GetWidth() const { return m_WindowData.Width; }
+        inline uint32_t GetWidth() const { return m_WindowData.Width; }
         /**
          * @brief Get application window height.
          * 
          * @return window height.
          */
-		inline virtual uint32_t GetHeight() const { return m_WindowData.Height; }
+		inline uint32_t GetHeight() const { return m_WindowData.Height; }
+
+        static inline float GetViewportAspectRatio() { return s_ViewportAspectRatio; }
 
         void PollEvents();
         void InputTick();
@@ -62,6 +64,8 @@ namespace BladeEngine
         };
 
         WindowData m_WindowData;
+
+        static float s_ViewportAspectRatio;
         
     };
 }

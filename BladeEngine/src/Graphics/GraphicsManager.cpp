@@ -11,7 +11,7 @@ GraphicsManager* GraphicsManager::s_Instance;
 
 BladeEngine::Graphics::GraphicsManager::GraphicsManager(Window* window)
 {
-    mainCamera = new BladeEngine::Camera(glm::vec2(800,600),glm::vec2(0.0f, 20.0f), 0, 0.1f,100.0f, CameraType::ORTHOGRAPHIC);   
+    mainCamera = new BladeEngine::Camera(20.0f, glm::vec2(0.0f, 0.0f), 0, 0.1f, 100.0f, CameraType::ORTHOGRAPHIC);   
     InitRenderer(window);
 }
 

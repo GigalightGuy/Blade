@@ -40,6 +40,21 @@ namespace BladeEngine
         /**
          * @brief Creates and binds a system to the World.
          * 
+         * @tparam Func type of f
+         * 
+         * @param phase pipeline phase that defines when in a frame the system runs.
+         * @param name name of the system.
+         * @param f function to be executed when running the system.
+         */
+        template<typename Func>
+        static void BindSystemNoQuery(flecs::entity_t phase, const char* name, Func f)
+        {
+            s_FlecsWorld.system(name).kind(phase).iter(f);
+        }
+
+        /**
+         * @brief Creates and binds a system to the World.
+         * 
          * @tparam Comps component types that will be part of the query.
          * @tparam Func type of f
          * 

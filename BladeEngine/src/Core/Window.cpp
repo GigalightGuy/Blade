@@ -10,8 +10,12 @@
 
 namespace BladeEngine
 {
+    float Window::s_ViewportAspectRatio;
+
     Window::Window(uint32_t width, uint32_t height, const std::string& title)
     {
+        s_ViewportAspectRatio = (float)width / height;
+
         m_WindowData.Width = width;
         m_WindowData.Height = height;
 

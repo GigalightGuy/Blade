@@ -5,18 +5,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace BladeEngine {
-/*
-    Simple Camera Implementation where the user creates
-    a simple 2D orthographic camera projection
-
-    Camera should define the window size for the renderer
-*/
 
 enum CameraType
 {
     PERSPECTIVE,
     ORTHOGRAPHIC,
 };
+
 class Camera {
 private:
     glm::mat4 projectionMatrix;
@@ -26,7 +21,7 @@ private:
     glm::vec3 position;
     glm::vec3 rotation;
     
-    float scale;
+    float size;
     
     float nearPlane,farPlane;
     
@@ -34,8 +29,8 @@ private:
 
     void GenerateMatrices();
 public:
-    Camera(glm::vec2 dimensions, glm::vec2 position = glm::vec2(0.0f, 0.0f), float rotation = 0.0f,float nearPlane = 0.1f,float farPlane = 100.0f,CameraType cameraType = CameraType::ORTHOGRAPHIC);
-    Camera(glm::vec2 dimensions, glm::vec3 position = glm::vec3(0.0f, 0.0f,0.0f), glm::vec3 rotation= glm::vec3(0.0f, 0.0f,0.0f),float nearPlane = 0.1f,float farPlane = 100.0f ,CameraType cameraType = CameraType::PERSPECTIVE);
+    Camera(float size, glm::vec2 position = glm::vec2(0.0f, 0.0f), float rotation = 0.0f,float nearPlane = 0.1f,float farPlane = 100.0f,CameraType cameraType = CameraType::ORTHOGRAPHIC);
+    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f,0.0f), glm::vec3 rotation= glm::vec3(0.0f, 0.0f,0.0f),float nearPlane = 0.1f,float farPlane = 100.0f ,CameraType cameraType = CameraType::PERSPECTIVE);
     ~Camera();
     
     void Resize(glm::vec2 dimensions);
@@ -49,5 +44,11 @@ public:
     float GetHeight();
     glm::mat4 GetProjectionMatrix();
     glm::mat4 GetViewMatrix();
+
+    inline static Camera* GetMainCamera() { return s_MainCamera; }
+
+private:
+    static Camera* s_MainCamera;
+
 };
 } // namespace BladeEngine

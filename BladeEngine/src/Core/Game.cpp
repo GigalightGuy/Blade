@@ -7,10 +7,7 @@
 #include "../Graphics/GraphicsManager.hpp"
 #include "../Physics/Physics2D.hpp"
 
-#include "box2d/b2_world.h"
-#include "box2d/b2_body.h"
-#include "box2d/b2_polygon_shape.h"
-#include "box2d/b2_fixture.h"
+#include "box2d/box2d.h"
 
 namespace BladeEngine
 {
@@ -72,6 +69,23 @@ namespace BladeEngine
 
             rb.RuntimeBody->CreateFixture(&fixtureDef);
         }
+
+        if (e.has<CircleCollider2D>())
+        {
+            CircleCollider2D* collider = e.get_mut<CircleCollider2D>();
+
+            b2CircleShape shape;
+            shape.m_radius = collider->Radius;
+
+            b2FixtureDef fixtureDef;
+            fixtureDef.shape = &shape;
+            fixtureDef.density = collider->Material.Density;
+            fixtureDef.friction = collider->Material.Friction;
+            fixtureDef.restitution = collider->Material.Restitution;
+            fixtureDef.restitutionThreshold = collider->Material.RestitutionThreshold;
+
+            rb.RuntimeBody->CreateFixture(&fixtureDef);
+        }
     }
 
     void PrePhysicsStep(const Position& pos, Rigidbody2D& rb)
@@ -96,11 +110,11 @@ namespace BladeEngine
 
     void EndDrawing(flecs::iter it) { Graphics::GraphicsManager::Instance()->EndDrawing(); }
 
-    void DrawSprite(const Sprite2D& sprite, const Position& pos)
+    void DrawSprite(const Sprite2D& sprite, const Position& pos, const Rotation& rot, const Scale& scale)
     {
         Graphics::GraphicsManager::Instance()->Draw(
                 sprite.Texture, glm::vec3(pos.Value.X, pos.Value.Y, 0.0f), 
-                glm::vec3(0.0f), glm::vec3(1.0f));
+                glm::vec3(0.0f, 0.0f, rot.Angle), glm::vec3(scale.Value.X, scale.Value.Y, 1.0f));
     }
 
     void Game::Run()
@@ -120,7 +134,7 @@ namespace BladeEngine
 
         // Render
         World::BindSystemNoQuery(flecs::PostUpdate, "Start Drawing", BeginDrawing);
-        World::BindSystem<const Sprite2D, const Position>(flecs::PostUpdate, "Draw Sprite", DrawSprite);
+        World::BindSystem<const Sprite2D, const Position, const Rotation, const Scale>(flecs::PostUpdate, "Draw Sprite", DrawSprite);
         World::BindSystemNoQuery(flecs::PostUpdate, "End Drawing", EndDrawing);
 
         SetupWorld();

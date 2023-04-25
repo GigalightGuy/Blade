@@ -1,9 +1,13 @@
 #pragma once
 
+#include "../Core/Vec.hpp"
+
 class b2World;
 
 namespace BladeEngine
 {
+    struct Rigidbody2D;
+
     struct PhysicsMaterial
     {
         float Density = 1.0f;
@@ -22,6 +26,15 @@ namespace BladeEngine
         static void SetPositionIterations(int value) { s_PositionIterations = value; }
 
         static void* GetPhysicsWorldHandle() { return s_PhysicsWorld; }
+
+        static void AddImpulse(Rigidbody2D& rb, Vec2 direction, float strength);
+        static void AddImpulse(Rigidbody2D& rb, Vec2 impulse);
+
+        static void AddForce(Rigidbody2D& rb, Vec2 direction, float strength);
+        static void AddForce(Rigidbody2D& rb, Vec2 force);
+
+        static Vec2 GetBodyVelocity(Rigidbody2D& rb);
+        static float GetBodyMass(Rigidbody2D& rb);
 
     private:
         static void Init();

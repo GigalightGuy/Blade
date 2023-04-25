@@ -55,6 +55,39 @@ namespace BladeEngine
     {
         return rb.RuntimeBody->GetMass();
     }
+    
+    bool Physics2D::Raycast(Rigidbody2D& rb, Vec2 origin, Vec2 direction, float maxLength, RaycastHitInfo& hitInfo)
+    {
+        b2RayCastInput input;
+        input.p1 = { origin.X, origin.Y };
+        input.p2 = { origin.X + direction.X, origin.Y + direction.Y };
+        input.maxFraction = maxLength;
+
+        float closestLength = maxLength + 0.0001f;
+        b2Vec2 intersectionNormal = { 0.0f, 0.0f };
+
+        b2Body* body = rb.RuntimeBody;
+        for (b2Fixture* f = body->GetFixtureList(); f; f = f->GetNext())
+        {
+            b2RayCastOutput output;
+            if (f->RayCast(&output, input, 0) && output.fraction < closestLength)
+            {
+                closestLength = output.fraction;
+                intersectionNormal = output.normal;
+            }
+        }
+
+        if (closestLength > maxLength)
+        {
+            return false;
+        }
+
+        hitInfo.Point = origin + direction * closestLength;
+        hitInfo.Normal = { intersectionNormal.x, intersectionNormal.y };
+
+        return true;
+
+    }
 
 
 }

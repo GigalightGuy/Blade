@@ -18,10 +18,13 @@ namespace BladeEngine
 
     struct Player {};
 
+    struct Ground {};
+
     Graphics::Texture2D* g_TextureChickBoy;
     Graphics::Texture2D* g_TexturePlatformBlock;
-
     std::vector<Graphics::Texture2D*> g_BackgroundTextures;
+
+    BladeEngine::Entity* g_Ground;
 
     // TODO: Move this to a load assets function in engine side
     void LoadTextures()
@@ -45,7 +48,7 @@ namespace BladeEngine
         }
     }
 
-    void Move(flecs::entity e, Rigidbody2D& rb, const Controller& ctrl)
+    void Move(flecs::entity e, const Controller& ctrl, Rigidbody2D& rb, const Position& pos)
     {
         float desiredVel = 0.0f;
         desiredVel += Input::GetKey(ctrl.Left) ? -ctrl.Movespeed : 0.0f;
@@ -57,10 +60,18 @@ namespace BladeEngine
 
         Physics2D::AddImpulse(rb, Vec2(impulse, 0.0f));
 
-        if (Input::GetKeyDown(ctrl.Jump))
+        RaycastHitInfo hitInfo;
+        bool isGrounded = Physics2D::Raycast(*(g_Ground->GetComponent<Rigidbody2D>()), pos.Value, Vec2(0.0f, -1.0f), 0.55f, hitInfo);
+
+        if (isGrounded && Input::GetKeyDown(ctrl.Jump))
         {
             Physics2D::AddImpulse(rb, Vec2(0.0f, 1.0f), ctrl.JumpForce);
         }
+    }
+
+    void HandleOutOfMap(Position& pos)
+    {
+        if (pos.Value.Y < -10.0f) pos.Value = Vec2(Utils::Random::NextFloat(-10.0f, 10.0f), 5.0f);
     }
 
     void FocusCamera(const Player& player, const Position& pos)
@@ -72,15 +83,16 @@ namespace BladeEngine
     {
         LoadTextures();
 
-        auto ground = World::CreateEntity("Ground");
-        ground->SetComponent<Position>({ { 0.0f, 0.0f } });
-        ground->SetComponent<Rotation>({ 0.0f });
-        ground->SetComponent<Scale>({ { 40.0f, 2.0f } });
-        ground->AddComponent<Rigidbody2D>();
-        ground->AddComponent<BoxCollider2D>();
-        ground->GetComponent<BoxCollider2D>()->HalfExtents = { 20.0f, 1.0f };
+        g_Ground = World::CreateEntity("Ground");
+        g_Ground->SetComponent<Position>({ { 0.0f, 0.0f } });
+        g_Ground->SetComponent<Rotation>({ 0.0f });
+        g_Ground->SetComponent<Scale>({ { 40.0f, 2.0f } });
+        g_Ground->AddComponent<Rigidbody2D>();
+        g_Ground->AddComponent<BoxCollider2D>();
+        g_Ground->GetComponent<BoxCollider2D>()->HalfExtents = { 20.0f, 1.0f };
 
-        ground->SetComponent<Sprite2D>({ g_TexturePlatformBlock });
+        g_Ground->SetComponent<Sprite2D>({ g_TexturePlatformBlock });
+        g_Ground->AddComponent<Ground>();
 
         {
             auto chickBoy = World::CreateEntity("Chick Boy 1");
@@ -159,12 +171,13 @@ namespace BladeEngine
             auto background = World::CreateEntity(ss.str());
             background->SetComponent<Position>({ { 0.0f, 0.0f } });
             background->SetComponent<Rotation>({ 0.0f });
-            background->SetComponent<Scale>({ { 50.0f, 50.0f } });
+            background->SetComponent<Scale>({ { 75.0f, 50.0f } });
 
             background->SetComponent<Sprite2D>({ g_BackgroundTextures[i] });
         }
         
-        World::BindSystem<Rigidbody2D, const Controller>(flecs::OnUpdate, "Move", Move);
+        World::BindSystem<const Controller, Rigidbody2D, const Position>(flecs::OnUpdate, "Move", Move);
+        World::BindSystem<Position>(flecs::OnUpdate, "Handle out of Map", HandleOutOfMap);
 
         World::BindSystem<const Player, const Position>(flecs::PostUpdate, "Focus Camera", FocusCamera);
     }

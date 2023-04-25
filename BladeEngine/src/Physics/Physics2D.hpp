@@ -16,6 +16,12 @@ namespace BladeEngine
         float RestitutionThreshold = 0.5f;
     };
 
+    struct RaycastHitInfo
+    {
+        Vec2 Point;
+        Vec2 Normal;
+    };
+
     class Physics2D
     {
     public:
@@ -35,6 +41,8 @@ namespace BladeEngine
 
         static Vec2 GetBodyVelocity(Rigidbody2D& rb);
         static float GetBodyMass(Rigidbody2D& rb);
+
+        static bool Raycast(Rigidbody2D& rb, Vec2 origin, Vec2 direction, float length, RaycastHitInfo& hitInfo);
 
     private:
         static void Init();

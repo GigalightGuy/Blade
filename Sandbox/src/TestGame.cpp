@@ -166,7 +166,7 @@ namespace BladeEngine
         
         World::BindSystem<Rigidbody2D, const Controller>(flecs::OnUpdate, "Move", Move);
 
-        World::BindSystem<const Player, const Position>(flecs::OnUpdate, "Focus Camera", FocusCamera);
+        World::BindSystem<const Player, const Position>(flecs::PostUpdate, "Focus Camera", FocusCamera);
     }
 
     Game* CreateGameInstance()

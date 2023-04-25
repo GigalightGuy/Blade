@@ -133,9 +133,9 @@ namespace BladeEngine
         World::BindSystem<Position, const Rigidbody2D>(flecs::PostUpdate, "Post Physics Step", PostPhysicsStep);
 
         // Render
-        World::BindSystemNoQuery(flecs::PostUpdate, "Start Drawing", BeginDrawing);
-        World::BindSystem<const Sprite2D, const Position, const Rotation, const Scale>(flecs::PostUpdate, "Draw Sprite", DrawSprite);
-        World::BindSystemNoQuery(flecs::PostUpdate, "End Drawing", EndDrawing);
+        World::BindSystemNoQuery(flecs::PreStore, "Start Drawing", BeginDrawing);
+        World::BindSystem<const Sprite2D, const Position, const Rotation, const Scale>(flecs::PreStore, "Draw Sprite", DrawSprite);
+        World::BindSystemNoQuery(flecs::PreStore, "End Drawing", EndDrawing);
 
         SetupWorld();
 

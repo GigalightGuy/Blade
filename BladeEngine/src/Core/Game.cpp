@@ -67,6 +67,12 @@ namespace BladeEngine
             fixtureDef.restitution = collider->Material.Restitution;
             fixtureDef.restitutionThreshold = collider->Material.RestitutionThreshold;
 
+            fixtureDef.filter.categoryBits = collider->CollisionLayers;
+            fixtureDef.filter.maskBits = collider->CollisionMask;
+            fixtureDef.filter.groupIndex = collider->GroupId;
+
+            fixtureDef.isSensor = collider->IsSensor;
+
             rb.RuntimeBody->CreateFixture(&fixtureDef);
         }
 
@@ -83,6 +89,12 @@ namespace BladeEngine
             fixtureDef.friction = collider->Material.Friction;
             fixtureDef.restitution = collider->Material.Restitution;
             fixtureDef.restitutionThreshold = collider->Material.RestitutionThreshold;
+
+            fixtureDef.filter.categoryBits = collider->CollisionLayers;
+            fixtureDef.filter.maskBits = collider->CollisionMask;
+            fixtureDef.filter.groupIndex = collider->GroupId;
+
+            fixtureDef.isSensor = collider->IsSensor;
 
             rb.RuntimeBody->CreateFixture(&fixtureDef);
         }

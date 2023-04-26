@@ -16,9 +16,13 @@ namespace BladeEngine
         float JumpForce;
     };
 
-    struct Player {};
+    struct PulseEmitter
+    {
+        float Strength = 10.0f;
+        float Radius = 5.0f;
+    };
 
-    struct Ground {};
+    struct Player {};
 
     Graphics::Texture2D* g_TextureChickBoy;
     Graphics::Texture2D* g_TexturePlatformBlock;
@@ -76,7 +80,22 @@ namespace BladeEngine
 
     void FocusCamera(const Player& player, const Position& pos)
     {
-        Camera::GetMainCamera()->SetPosition({ pos.Value.X, pos.Value.Y, 10.0f });
+        Camera::GetMainCamera()->SetPosition({ pos.Value.X, 2.0f, 10.0f });
+    }
+
+    void GeneratePulse(const PulseEmitter& emitter, const Position& pos)
+    {
+        World::GetECSWorldHandle()->filter<Rigidbody2D, const Position>().each(
+            [&](Rigidbody2D& rb, const Position& p)
+        {
+            Vec2 pulseVec = p.Value - pos.Value;
+
+            float distDiff = emitter.Radius - pulseVec.Length();
+            if (distDiff < 0) return;
+            
+            float pulseForce = distDiff / emitter.Radius * emitter.Strength;
+            Physics2D::AddImpulse(rb, Vec2(Normalize(pulseVec) * pulseForce));
+        });
     }
 
     void TestGame::SetupWorld()
@@ -92,7 +111,6 @@ namespace BladeEngine
         g_Ground->GetComponent<BoxCollider2D>()->HalfExtents = { 20.0f, 1.0f };
 
         g_Ground->SetComponent<Sprite2D>({ g_TexturePlatformBlock });
-        g_Ground->AddComponent<Ground>();
 
         {
             auto chickBoy = World::CreateEntity("Chick Boy 1");
@@ -150,6 +168,10 @@ namespace BladeEngine
             chickBoy->SetComponent<Sprite2D>({ g_TextureChickBoy });
         }
 
+        auto pulsator = World::CreateEntity("Pulsator");
+        pulsator->SetComponent<Position>({ { 0.0f, 0.0f } });
+        pulsator->AddComponent<PulseEmitter>();
+
         auto player = World::CreateEntity("Player");
         player->SetComponent<Position>({ { 0.0f, 5.0f } });
         player->SetComponent<Rotation>({ 0.0f });
@@ -171,11 +193,13 @@ namespace BladeEngine
             auto background = World::CreateEntity(ss.str());
             background->SetComponent<Position>({ { 0.0f, 0.0f } });
             background->SetComponent<Rotation>({ 0.0f });
-            background->SetComponent<Scale>({ { 75.0f, 50.0f } });
+            background->SetComponent<Scale>({ { 100.0f, 50.0f } });
 
             background->SetComponent<Sprite2D>({ g_BackgroundTextures[i] });
         }
         
+        World::BindSystem<const PulseEmitter, const Position>(2.0f, "Generate Pulse", GeneratePulse);
+
         World::BindSystem<const Controller, Rigidbody2D, const Position>(flecs::OnUpdate, "Move", Move);
         World::BindSystem<Position>(flecs::OnUpdate, "Handle out of Map", HandleOutOfMap);
 

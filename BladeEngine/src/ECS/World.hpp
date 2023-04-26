@@ -100,6 +100,8 @@ namespace BladeEngine
             s_FlecsWorld.system<Comps...>(name).interval(timer).each(f);
         }
 
+        static flecs::world* GetECSWorldHandle() { return &s_FlecsWorld; }
+
     private:
         static void Step(float deltaTime);
 

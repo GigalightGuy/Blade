@@ -42,18 +42,12 @@ if(UNIX)
 endif(UNIX)
 
 if(USING_VULKAN_API)
-    target_sources(BladeEngine PRIVATE
-        #src/Platform/Vulkan/VulkanDevice.hpp src/Platform/Vulkan/VulkanDevice.cpp
-        #src/Platform/Vulkan/VulkanTexture.cpp
-        #src/Platform/Vulkan/VulkanSwapchain.hpp src/Platform/Vulkan/VulkanSwapchain.cpp
-        #src/Platform/Vulkan/VulkanImage.hpp src/Platform/Vulkan/VulkanImage.cpp
-        #src/Platform/Vulkan/VulkanQueue.hpp src/Platform/Vulkan/VulkanQueue.cpp
-        #src/Platform/Vulkan/VulkanRenderPass.hpp src/Platform/Vulkan/VulkanRenderPass.cpp
-        #src/Platform/Vulkan/VulkanPipeline.hpp src/Platform/Vulkan/VulkanPipeline.cpp
-        #src/Platform/Vulkan/VulkanCommandPool.hpp src/Platform/Vulkan/VulkanCommandPool.cpp
-        #src/Platform/Vulkan/VulkanGraphicsAPI.cpp
-        #src/Platform/Vulkan/VulkanValidationLayers.hpp src/Platform/Vulkan/VulkanValidationLayers.cpp
 
+file(GLOB extraFilesCPP vendor/SPIRV-Cross/*.cpp)
+file(GLOB extraFilesHPP vendor/SPIRV-Cross/*.hpp)
+file(GLOB extraFilesH vendor/SPIRV-Cross/*.h)    
+
+target_sources(BladeEngine PRIVATE
         src/Graphics/Platform/Vulkan/BladeVulkanUtils.cpp             src/Graphics/Platform/Vulkan/BladeVulkanUtils.hpp
 		src/Graphics/Platform/Vulkan/BladeVulkanInstance.cpp          src/Graphics/Platform/Vulkan/BladeVulkanInstance.hpp
 		src/Graphics/Platform/Vulkan/BladeVulkanQueueFamily.cpp       src/Graphics/Platform/Vulkan/BladeVulkanQueueFamily.hpp	
@@ -64,6 +58,9 @@ if(USING_VULKAN_API)
         src/Graphics/Platform/Vulkan/BladeVulkanMesh.cpp              src/Graphics/Platform/Vulkan/BladeVulkanMesh.hpp
         src/Graphics/Platform/Vulkan/BladeVulkanTexture.cpp           src/Graphics/Platform/Vulkan/BladeVulkanTexture.hpp
 		src/Graphics/Platform/Vulkan/BladeVulkanRenderer.cpp          src/Graphics/Platform/Vulkan/BladeVulkanRenderer.hpp
+        ${extraFilesCPP} 
+        ${extraFilesHPP} 
+        ${extraFilesH}
         )
 endif(USING_VULKAN_API)
 
@@ -79,6 +76,7 @@ target_include_directories(BladeEngine PRIVATE
     "vendor/glm"
     "vendor/Box2D/include"
     "vendor/stb"
+    "vendor/SPIRV-Cross"
     )
 
 if(DEFINED VULKAN_SDK_PATH)

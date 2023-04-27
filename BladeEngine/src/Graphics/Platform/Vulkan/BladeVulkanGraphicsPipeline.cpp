@@ -198,8 +198,7 @@ void VulkanGraphicsPipeline::CreateDescriptorSetLayout(VkDevice device) {
   }
 }
 
-void VulkanGraphicsPipeline::CreateGraphicsPipeline(VkDevice device,
-                                                    VulkanShader *shader) {
+void VulkanGraphicsPipeline::CreateGraphicsPipeline(VkDevice device, VulkanShader *shader) {
   // Setup shader stages of pipeline
   VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
   vertShaderStageInfo.sType =

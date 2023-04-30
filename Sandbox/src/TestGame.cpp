@@ -34,7 +34,7 @@ void LoadTextures() {
   g_TextureChickBoy->CreateGPUTexture();
 
   g_TexturePlatformBlock = new Graphics::Texture2D(
-      "../assets/Sunny-land-assets-files/PNG/environment/props/block-big.png");
+      "../assets/sprites/Sunny-land-assets-files/PNG/environment/props/block-big.png");
   g_TexturePlatformBlock->CreateGPUTexture();
 
   g_BackgroundTextures.resize(6);

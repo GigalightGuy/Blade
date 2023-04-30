@@ -30,17 +30,17 @@ BladeEngine::Entity *g_Ground;
 // TODO: Move this to a load assets function in engine side
 void LoadTextures() {
   g_TextureChickBoy = new Graphics::Texture2D(
-      "../assets/sprites/Chick-Boy Free Pack/tile000.png");
+      "assets/sprites/Chick-Boy Free Pack/tile000.png");
   g_TextureChickBoy->CreateGPUTexture();
 
   g_TexturePlatformBlock = new Graphics::Texture2D(
-      "../assets/sprites/Sunny-land-assets-files/PNG/environment/props/block-big.png");
+      "assets/sprites/Sunny-land-assets-files/PNG/environment/props/block-big.png");
   g_TexturePlatformBlock->CreateGPUTexture();
 
   g_BackgroundTextures.resize(6);
   for (size_t i = 0; i < 6; i++) {
     std::stringstream path;
-    path << "../assets/sprites/PineForestParallax/MorningLayer" << i + 1
+    path << "assets/sprites/PineForestParallax/MorningLayer" << i + 1
          << ".png";
 
     Graphics::Texture2D *tex = new Graphics::Texture2D(path.str());

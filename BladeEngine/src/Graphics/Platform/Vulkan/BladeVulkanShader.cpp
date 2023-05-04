@@ -11,9 +11,41 @@ VulkanShader::VulkanShader(VkDevice device, std::vector<char> vertexShaderData,
 
   vertexShaderBindings = GetVertexShaderBindings(vertexShaderData);
   fragmentShaderBindings = GetFragmentShaderBindings(fragmentShaderData);
+  descriptorTypes = GetDescriptorTypes(vertexShaderData,fragmentShaderData);
 }
 
 VulkanShader::~VulkanShader() {}
+
+std::vector<VkDescriptorType> VulkanShader::GetDescriptorTypes(std::vector<char> vertexShaderData, std::vector<char> fragmentShaderData)
+{
+  std::vector<VkDescriptorType> descriptorTypes;
+  
+  //Vertex Types
+  std::vector<uint32_t> spvVert(vertexShaderData.size() / sizeof(uint32_t));
+  memcpy(spvVert.data(), vertexShaderData.data(), vertexShaderData.size());
+
+  spirv_cross::Compiler compilerVert = spirv_cross::Compiler(spvVert);
+  spirv_cross::ShaderResources resVert = compilerVert.get_shader_resources();
+
+  //Fragment Types
+  std::vector<uint32_t> spvFrag(fragmentShaderData.size() / sizeof(uint32_t));
+  memcpy(spvFrag.data(), fragmentShaderData.data(), fragmentShaderData.size());
+
+  spirv_cross::Compiler compilerFrag = spirv_cross::Compiler(spvFrag);
+  spirv_cross::ShaderResources resFrag = compilerFrag.get_shader_resources();
+
+  if(resVert.sampled_images.size() != 0 || resFrag.sampled_images.size() != 0 ) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);}
+  if(resVert.separate_images.size() != 0 || resFrag.separate_images.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE);}
+  if(resVert.storage_images.size() != 0 || resFrag.storage_images.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE);}
+  if(resVert.separate_images.size() != 0 || resFrag.separate_images.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER);}
+  if(resVert.storage_images.size() != 0 || resFrag.storage_images.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER);}
+  if(resVert.separate_samplers.size() != 0 || resFrag.separate_samplers.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_SAMPLER);}
+  if(resVert.uniform_buffers.size() != 0 || resFrag.uniform_buffers.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);}
+  if(resVert.subpass_inputs.size() != 0 || resFrag.subpass_inputs.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT);}
+  if(resVert.storage_buffers.size() != 0 || resFrag.storage_buffers.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER);}
+  
+  return descriptorTypes;
+}
 
 std::vector<VkDescriptorSetLayoutBinding> VulkanShader::GetVertexShaderBindings(std::vector<char> vertexShaderData)
 {

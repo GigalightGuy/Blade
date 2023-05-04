@@ -11,20 +11,23 @@ VulkanGraphicsPipeline::VulkanGraphicsPipeline(VkPhysicalDevice physicalDevice,
                                                VulkanShader *shader) {
   CreateRenderPass(device, swapchain->imageFormat,
                    swapchain->FindDepthFormat(physicalDevice));
-  CreateDescriptorSetLayout(device);
+  CreateDescriptorSetLayout(device,shader);
   CreateGraphicsPipeline(device, shader);
 }
 
 VulkanGraphicsPipeline::~VulkanGraphicsPipeline() {}
 
-void BladeEngine::Graphics::Vulkan::VulkanGraphicsPipeline::CreateDescriptorPools(VkDevice device,uint32_t descriptorCount) {
+void BladeEngine::Graphics::Vulkan::VulkanGraphicsPipeline::CreateDescriptorPools(VkDevice device,uint32_t descriptorCount, VulkanShader *shader) {
     //TODO: abstract pool creation to custom shaders
+    std::vector<VkDescriptorPoolSize> poolSizes;
+    for(const auto& type : shader->descriptorTypes)
+    {
+      VkDescriptorPoolSize size{};
+      size.type = type;
+      size.descriptorCount = descriptorCount;
+      poolSizes.push_back(size);
+    }
 
-    std::array<VkDescriptorPoolSize, 2> poolSizes{};
-    poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    poolSizes[0].descriptorCount = descriptorCount;
-    poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    poolSizes[1].descriptorCount = descriptorCount;
     VkDescriptorPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
@@ -68,20 +71,24 @@ void BladeEngine::Graphics::Vulkan::VulkanGraphicsPipeline::FreeDescriptorSets(V
 
 void BladeEngine::Graphics::Vulkan::VulkanGraphicsPipeline::UpdateDescriptorSet(VkDevice device,VkImageView imageView, VkSampler sampler,VulkanMesh mesh, uint32_t frameIndex, int descriptorSetIndex) 
 {
-    //TODO: abstract set update to custom shaders
-    //for (size_t i = firstDescriptorSet; i < endDescriptorSet; i++) {
       VkDescriptorBufferInfo bufferInfo{};
       bufferInfo.buffer = mesh.uniformBuffer;
       bufferInfo.offset = 0;
       bufferInfo.range = sizeof(MVP);
+
+      VkDescriptorBufferInfo extraBufferInfo{};
+      extraBufferInfo.buffer = mesh.uniformBufferExtra;
+      extraBufferInfo.offset = 0;
+      extraBufferInfo.range = sizeof(Extra);
 
       VkDescriptorImageInfo imageInfo{};
       imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
       imageInfo.imageView = imageView;
       imageInfo.sampler = sampler;
 
-      std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
-
+      std::array<VkWriteDescriptorSet, 3> descriptorWrites{};
+      
+      // Uniform Buffers
       descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
       descriptorWrites[0].dstSet = descriptorSets[frameIndex][descriptorSetIndex];
       descriptorWrites[0].dstBinding = 0;
@@ -90,6 +97,15 @@ void BladeEngine::Graphics::Vulkan::VulkanGraphicsPipeline::UpdateDescriptorSet(
       descriptorWrites[0].descriptorCount = 1;
       descriptorWrites[0].pBufferInfo = &bufferInfo;
 
+      descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+      descriptorWrites[2].dstSet = descriptorSets[frameIndex][descriptorSetIndex];
+      descriptorWrites[2].dstBinding = 2;
+      descriptorWrites[2].dstArrayElement = 0;
+      descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+      descriptorWrites[2].descriptorCount = 1;
+      descriptorWrites[2].pBufferInfo = &extraBufferInfo;
+
+      // Sampler Buffers
       descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
       descriptorWrites[1].dstSet = descriptorSets[frameIndex][descriptorSetIndex];
       descriptorWrites[1].dstBinding = 1;
@@ -99,7 +115,6 @@ void BladeEngine::Graphics::Vulkan::VulkanGraphicsPipeline::UpdateDescriptorSet(
       descriptorWrites[1].pImageInfo = &imageInfo;
 
       vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
-    //}
   }
 
 
@@ -169,24 +184,18 @@ void VulkanGraphicsPipeline::CreateRenderPass(VkDevice device,
   }
 }
 
-void VulkanGraphicsPipeline::CreateDescriptorSetLayout(VkDevice device) {
-  VkDescriptorSetLayoutBinding uboLayoutBinding{};
-  uboLayoutBinding.binding = 0;
-  uboLayoutBinding.descriptorCount = 1;
-  uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-  uboLayoutBinding.pImmutableSamplers = nullptr;
-  uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+void VulkanGraphicsPipeline::CreateDescriptorSetLayout(VkDevice device,VulkanShader* shader) {
 
-  VkDescriptorSetLayoutBinding samplerLayoutBinding{};
-  samplerLayoutBinding.binding = 1;
-  samplerLayoutBinding.descriptorCount = 1;
-  samplerLayoutBinding.descriptorType =
-      VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-  samplerLayoutBinding.pImmutableSamplers = nullptr;
-  samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+  std::vector<VkDescriptorSetLayoutBinding> bindings;
+  for(const auto& vertBinding : shader->vertexShaderBindings)
+  {
+    bindings.push_back(vertBinding);
+  }
+  for(const auto& fragBinding : shader->fragmentShaderBindings)
+  {
+    bindings.push_back(fragBinding);
+  }
 
-  std::array<VkDescriptorSetLayoutBinding, 2> bindings = {uboLayoutBinding,
-                                                          samplerLayoutBinding};
   VkDescriptorSetLayoutCreateInfo layoutInfo{};
   layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
   layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());

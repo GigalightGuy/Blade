@@ -1,5 +1,5 @@
 #pragma once
-
+#define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
 #include "../../Vertex.hpp"
 
 #include <vulkan/vulkan.h>
@@ -18,6 +18,10 @@ namespace BladeEngine
                 alignas(16) glm::mat4 model;
                 alignas(16) glm::mat4 view;
                 alignas(16) glm::mat4 proj;
+            };
+
+            struct Extra{    
+                alignas(16) glm::vec4 testColor;
             };
             
             void CreateBuffer(

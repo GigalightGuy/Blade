@@ -31,7 +31,7 @@ public:
   std::array<VkDescriptorPool, FRAMES_IN_FLIGHT> descriptorPools;
   std::array<std::vector<VkDescriptorSet>, FRAMES_IN_FLIGHT> descriptorSets;
 
-  void CreateDescriptorPools(VkDevice device,uint32_t count);
+  void CreateDescriptorPools(VkDevice device,uint32_t count,VulkanShader *shader);
   void CreateDescriptorSets(VkDevice device,uint32_t count, uint32_t frameIndex);  
   void FreeDescriptorSets(VkDevice device, uint32_t frameIndex);
   void UpdateDescriptorSet(VkDevice device,VkImageView imageView, VkSampler sampler,VulkanMesh mesh, uint32_t frameIndex, int descriptorSetIndex);
@@ -40,8 +40,8 @@ private:
   void CreateRenderPass(VkDevice device, VkFormat swapChainImageFormat,
                         VkFormat depthImageFormat);
   
-  void CreateDescriptorSetLayout(VkDevice device);
-  void CreateGraphicsPipeline(VkDevice device, VulkanShader *shader);
+  void CreateDescriptorSetLayout(VkDevice device,VulkanShader* shader);
+  void CreateGraphicsPipeline(VkDevice device, VulkanShader* shader);
 };
 } // namespace Vulkan
 } // namespace Graphics

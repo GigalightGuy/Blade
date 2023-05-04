@@ -15,12 +15,14 @@ BladeEngine::Graphics::Vulkan::VulkanMesh BladeEngine::Graphics::Vulkan::LoadMes
     CreateVertexBuffer(vertices,physicalDevice,device,graphicsQueue,commandPool, mesh.vertexBuffer,mesh.vertexBufferMemory);
     CreateElementsBuffer(elements,physicalDevice,device,graphicsQueue,commandPool, mesh.elementsBuffer,mesh.elementsBufferMemory);
     CreateUniformBuffer(physicalDevice,device,sizeof(MVP),mesh.uniformBuffer,mesh.uniformBufferMemory,mesh.uniformBufferMapped);
+    CreateUniformBuffer(physicalDevice,device,sizeof(Extra),mesh.uniformBufferExtra,mesh.uniformBufferMemoryExtra,mesh.uniformBufferMappedExtra);
     return mesh;
 }
 
-void BladeEngine::Graphics::Vulkan::VulkanMesh::UpdateUniformBuffer(BladeEngine::Graphics::Vulkan::MVP data)
+void BladeEngine::Graphics::Vulkan::VulkanMesh::UpdateUniformBuffer(BladeEngine::Graphics::Vulkan::MVP data, BladeEngine::Graphics::Vulkan::Extra extra)
 {
-      memcpy(uniformBufferMapped, &data, sizeof(data));
+    memcpy(uniformBufferMapped, &data, sizeof(data));
+    memcpy(uniformBufferMappedExtra, &extra, sizeof(extra));
 }
 
 

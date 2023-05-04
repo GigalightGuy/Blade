@@ -18,10 +18,14 @@ public:
   VkShaderModule fragmentModule;
   std::vector<VkDescriptorSetLayoutBinding> fragmentShaderBindings;
 
+  std::vector<VkDescriptorType> descriptorTypes;
+
 private:
   VkShaderModule CreateShaderModule(std::vector<char> data, VkDevice device);
   std::vector<VkDescriptorSetLayoutBinding> GetVertexShaderBindings(std::vector<char> vertexShaderData);
   std::vector<VkDescriptorSetLayoutBinding> GetFragmentShaderBindings(std::vector<char> fragmentShaderData);
+
+  std::vector<VkDescriptorType> GetDescriptorTypes(std::vector<char> vertexShaderData, std::vector<char> fragmentShaderData);
 
   void DestroyVertexModule(VkDevice device);
   void DestroyFragmentModule(VkDevice device);

@@ -23,8 +23,12 @@ namespace Vulkan{
         VkBuffer uniformBuffer;
         VkDeviceMemory uniformBufferMemory;
         void * uniformBufferMapped;
+
+        VkBuffer uniformBufferExtra;
+        VkDeviceMemory uniformBufferMemoryExtra;
+        void * uniformBufferMappedExtra;
         
-        void UpdateUniformBuffer(MVP data);
+        void UpdateUniformBuffer(MVP data,Extra extra);
         
         void Draw(VkCommandBuffer commandBuffer,VkPipelineLayout &pipelineLayout, VkDescriptorSet &descriptorSet);
         void Dispose(VkDevice device);

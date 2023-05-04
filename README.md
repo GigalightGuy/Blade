@@ -1,19 +1,11 @@
-# Blade
-2D Game Engine
+# Blade GDK
 
-# File format
+## Blade GDK Documentation
 
-```txt
-namespace BladeEngine
-{
-    class <NAME OF CLASS>
-    {
-    public:
-        type functionaName1();
-    protected:
-        type functionaName2();
-    private:
-        type functionaName3();
-    }
-}
-```
+### About
+### Getting Started
+### Example Project
+
+### Graphics
+### Core
+### ECS

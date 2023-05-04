@@ -19,8 +19,8 @@ BladeEngine::Graphics::Vulkan::VulkanRenderer::~VulkanRenderer()
 
 void BladeEngine::Graphics::Vulkan::VulkanRenderer::Init(Window* window)
 {
-    defaultVertexShader = new BladeEngine::Graphics::Shader("assets/shaders/default.vert",BladeEngine::Graphics::ShaderType::VERTEX);
-    defaultFragmentShader = new BladeEngine::Graphics::Shader("assets/shaders/default.frag",BladeEngine::Graphics::ShaderType::FRAGMENT);
+    defaultVertexShader = new Shader("assets/shaders/default2.vert",ShaderType::VERTEX);
+    defaultFragmentShader = new Shader("assets/shaders/default2.frag",ShaderType::FRAGMENT);
     
     std::vector<const char *> extensions = window->GetRequiredExtensions();
     extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
@@ -41,7 +41,7 @@ void BladeEngine::Graphics::Vulkan::VulkanRenderer::Init(Window* window)
 
     BladeEngine::Graphics::Vulkan::VulkanShader vkDefaultShader = VulkanShader(vkDevice->logicalDevice,defaultVertexShader->data,defaultFragmentShader->data);
     BladeEngine::Graphics::Vulkan::VulkanGraphicsPipeline vkGraphicsPipeline = VulkanGraphicsPipeline(vkDevice->physicalDevice,vkDevice->logicalDevice,vkSwapchain,&vkDefaultShader);
-    vkGraphicsPipeline.CreateDescriptorPools(vkDevice->logicalDevice, 100); // :))
+    vkGraphicsPipeline.CreateDescriptorPools(vkDevice->logicalDevice, 100, &vkDefaultShader);
     graphicsPipelines.push_back(vkGraphicsPipeline);
 }
 
@@ -107,7 +107,10 @@ void BladeEngine::Graphics::Vulkan::VulkanRenderer::EndDrawing()
         mvp.view = camera->GetViewMatrix();
         mvp.proj = camera->GetProjectionMatrix();
         
-        vkMeshes[i].UpdateUniformBuffer(mvp);
+        Extra extra{};
+        extra.testColor = glm::vec4(1,1,1,1);
+
+        vkMeshes[i].UpdateUniformBuffer(mvp,extra);
         auto vkTexture = vkTextures[i];
         auto vkMesh = vkMeshes[i];
         currentPipeline.UpdateDescriptorSet(

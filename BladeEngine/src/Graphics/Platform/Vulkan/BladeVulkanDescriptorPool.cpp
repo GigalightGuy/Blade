@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include "BladeVulkanDescriptorPool.hpp"
 
 using namespace BladeEngine::Graphics::Vulkan;

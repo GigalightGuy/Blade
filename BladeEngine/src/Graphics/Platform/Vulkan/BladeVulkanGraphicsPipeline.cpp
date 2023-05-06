@@ -69,17 +69,27 @@ void BladeEngine::Graphics::Vulkan::VulkanGraphicsPipeline::FreeDescriptorSets(V
   descriptorSets[frameIndex].clear();
 }
 
-void BladeEngine::Graphics::Vulkan::VulkanGraphicsPipeline::UpdateDescriptorSet(VkDevice device,VkImageView imageView, VkSampler sampler,VulkanMesh mesh, uint32_t frameIndex, int descriptorSetIndex) 
+
+
+void BladeEngine::Graphics::Vulkan::VulkanGraphicsPipeline::UpdateDescriptorSet(
+  VkDevice device,
+  // std::vector<VkWriteDescriptorSet> descriptorWrites
+  VkImageView imageView, 
+  VkSampler sampler,
+  VulkanMesh mesh, 
+  uint32_t frameIndex, 
+  int descriptorSetIndex
+  ) 
 {
       VkDescriptorBufferInfo bufferInfo{};
       bufferInfo.buffer = mesh.uniformBuffer;
       bufferInfo.offset = 0;
-      bufferInfo.range = sizeof(MVP);
+      bufferInfo.range = sizeof(VP);
 
-      VkDescriptorBufferInfo extraBufferInfo{};
-      extraBufferInfo.buffer = mesh.uniformBufferExtra;
-      extraBufferInfo.offset = 0;
-      extraBufferInfo.range = sizeof(Extra);
+      VkDescriptorBufferInfo modelBufferInfo{};
+      modelBufferInfo.buffer = mesh.uniformBufferModel;
+      modelBufferInfo.offset = 0;
+      modelBufferInfo.range = sizeof(Model);
 
       VkDescriptorImageInfo imageInfo{};
       imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -97,22 +107,22 @@ void BladeEngine::Graphics::Vulkan::VulkanGraphicsPipeline::UpdateDescriptorSet(
       descriptorWrites[0].descriptorCount = 1;
       descriptorWrites[0].pBufferInfo = &bufferInfo;
 
-      descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-      descriptorWrites[2].dstSet = descriptorSets[frameIndex][descriptorSetIndex];
-      descriptorWrites[2].dstBinding = 2;
-      descriptorWrites[2].dstArrayElement = 0;
-      descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-      descriptorWrites[2].descriptorCount = 1;
-      descriptorWrites[2].pBufferInfo = &extraBufferInfo;
-
-      // Sampler Buffers
       descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
       descriptorWrites[1].dstSet = descriptorSets[frameIndex][descriptorSetIndex];
       descriptorWrites[1].dstBinding = 1;
       descriptorWrites[1].dstArrayElement = 0;
-      descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+      descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
       descriptorWrites[1].descriptorCount = 1;
-      descriptorWrites[1].pImageInfo = &imageInfo;
+      descriptorWrites[1].pBufferInfo = &modelBufferInfo;
+      
+      // Sampler Buffers
+      descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+      descriptorWrites[2].dstSet = descriptorSets[frameIndex][descriptorSetIndex];
+      descriptorWrites[2].dstBinding = 2;
+      descriptorWrites[2].dstArrayElement = 0;
+      descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+      descriptorWrites[2].descriptorCount = 1;
+      descriptorWrites[2].pImageInfo = &imageInfo;
 
       vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
   }
@@ -231,9 +241,9 @@ void VulkanGraphicsPipeline::CreateGraphicsPipeline(VkDevice device, VulkanShade
   vertexInputInfo.sType =
       VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
-  auto bindingDescription = GetBindingDescription<VertexColorTexture>(
+  auto bindingDescription = GetBindingDescription<VertexTexture>(
       0); 
-  auto attributeDescriptions = GetAttributeDescriptions<VertexColorTexture>(
+  auto attributeDescriptions = GetAttributeDescriptions<VertexTexture>(
       0);
 
   vertexInputInfo.vertexBindingDescriptionCount = 1;

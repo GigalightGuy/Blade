@@ -14,16 +14,15 @@ namespace BladeEngine
         namespace Vulkan
         {
             
-            struct MVP{    
-                alignas(16) glm::mat4 model;
+            struct VP{    
                 alignas(16) glm::mat4 view;
                 alignas(16) glm::mat4 proj;
             };
 
-            struct Extra{    
-                alignas(16) glm::vec4 testColor;
+            struct Model{    
+                alignas(16) glm::mat4 model;
             };
-            
+
             void CreateBuffer(
                 VkPhysicalDevice physicalDevice,
                 VkDevice device, 
@@ -89,7 +88,7 @@ namespace BladeEngine
         
             
             void CreateVertexBuffer(
-                std::vector<BladeEngine::Graphics::VertexColorTexture> vertices,
+                std::vector<BladeEngine::Graphics::VertexTexture> vertices,
                 VkPhysicalDevice physicalDevice,
                 VkDevice device,
                 VkQueue graphicsQueue, 

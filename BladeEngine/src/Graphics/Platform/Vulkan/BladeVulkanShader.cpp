@@ -34,15 +34,15 @@ std::vector<VkDescriptorType> VulkanShader::GetDescriptorTypes(std::vector<char>
   spirv_cross::Compiler compilerFrag = spirv_cross::Compiler(spvFrag);
   spirv_cross::ShaderResources resFrag = compilerFrag.get_shader_resources();
 
-  if(resVert.sampled_images.size() != 0 || resFrag.sampled_images.size() != 0 ) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);}
-  if(resVert.separate_images.size() != 0 || resFrag.separate_images.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE);}
-  if(resVert.storage_images.size() != 0 || resFrag.storage_images.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE);}
-  if(resVert.separate_images.size() != 0 || resFrag.separate_images.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER);}
-  if(resVert.storage_images.size() != 0 || resFrag.storage_images.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER);}
-  if(resVert.separate_samplers.size() != 0 || resFrag.separate_samplers.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_SAMPLER);}
-  if(resVert.uniform_buffers.size() != 0 || resFrag.uniform_buffers.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);}
-  if(resVert.subpass_inputs.size() != 0 || resFrag.subpass_inputs.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT);}
-  if(resVert.storage_buffers.size() != 0 || resFrag.storage_buffers.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER);}
+  if(resVert.sampled_images.size() != 0 || resFrag.sampled_images.size() != 0 ) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);} //sampler2D
+  if(resVert.separate_images.size() != 0 || resFrag.separate_images.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE);}         //texture2D
+  if(resVert.storage_images.size() != 0 || resFrag.storage_images.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE);}           //image2D
+  if(resVert.separate_images.size() != 0 || resFrag.separate_images.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER);}  //samplerBuffer
+  if(resVert.storage_images.size() != 0 || resFrag.storage_images.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER);}    //imageBuffer
+  if(resVert.separate_samplers.size() != 0 || resFrag.separate_samplers.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_SAMPLER);}           //sampler
+  if(resVert.uniform_buffers.size() != 0 || resFrag.uniform_buffers.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);}        //uniform
+  if(resVert.subpass_inputs.size() != 0 || resFrag.subpass_inputs.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT);}        //subpassInput
+  if(resVert.storage_buffers.size() != 0 || resFrag.storage_buffers.size() != 0) {descriptorTypes.push_back(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER);}        //buffer SSBO
   
   return descriptorTypes;
 }

@@ -1,21 +1,20 @@
 #version 450
 
-layout(binding = 0) uniform MVP{
-  mat4 model;
-  mat4 view;
-  mat4 proj;
-}
-mvp;
+layout(binding = 0) uniform Camera{
+  mat4 viewMatrix;
+  mat4 projectionMatrix;
+}camera;
 
-layout(location = 0) in vec3 inPosition;
-layout(location = 1) in vec3 inColor;
-layout(location = 2) in vec2 inTextureCoordinate;
+layout(binding = 1) uniform Model{
+  mat4 transformMatrix;
+}model;
 
-layout(location = 0) out vec3 fragmentColor;
-layout(location = 1) out vec2 fragmentTextureCoordinate;
+layout(location = 0) in vec3 inVertexPosition;
+layout(location = 1) in vec2 inVertexTextureCoordinate;
+
+layout(location = 0) out vec2 fragmentTextureCoordinate;
 
 void main() {
-  gl_Position = mvp.proj * mvp.view * mvp.model * vec4(inPosition, 1.0);
-  fragmentColor = inColor;
-  fragmentTextureCoordinate = inTextureCoordinate;
+  gl_Position = camera.projectionMatrix * camera.viewMatrix * model.transformMatrix * vec4(inVertexPosition, 1.0);
+  fragmentTextureCoordinate = inVertexTextureCoordinate;
 }

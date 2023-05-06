@@ -107,61 +107,61 @@ void TestGame::SetupWorld() {
 
   g_Ground->SetComponent<Sprite2D>({g_TexturePlatformBlock});
 
-  {
-    auto chickBoy = World::CreateEntity("Chick Boy 1");
-    chickBoy->SetComponent<Position>({{-10.0f, 20.0f}});
-    chickBoy->SetComponent<Rotation>({0.0f});
-    chickBoy->SetComponent<Scale>({{1.0f, 1.0f}});
-    chickBoy->AddComponent<Rigidbody2D>();
-    auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
-    chickBoyRB->LockRotation = true;
-    chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
-    chickBoy->AddComponent<BoxCollider2D>();
+  // {
+  //   auto chickBoy = World::CreateEntity("Chick Boy 1");
+  //   chickBoy->SetComponent<Position>({{-10.0f, 20.0f}});
+  //   chickBoy->SetComponent<Rotation>({0.0f});
+  //   chickBoy->SetComponent<Scale>({{1.0f, 1.0f}});
+  //   chickBoy->AddComponent<Rigidbody2D>();
+  //   auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
+  //   chickBoyRB->LockRotation = true;
+  //   chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
+  //   chickBoy->AddComponent<BoxCollider2D>();
 
-    chickBoy->SetComponent<Sprite2D>({g_TextureChickBoy});
-  }
+  //   chickBoy->SetComponent<Sprite2D>({g_TextureChickBoy});
+  // }
 
-  {
-    auto chickBoy = World::CreateEntity("Chick Boy 2");
-    chickBoy->SetComponent<Position>({{-5.0f, 20.0f}});
-    chickBoy->SetComponent<Rotation>({0.0f});
-    chickBoy->SetComponent<Scale>({{1.0f, 1.0f}});
-    chickBoy->AddComponent<Rigidbody2D>();
-    auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
-    chickBoyRB->LockRotation = true;
-    chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
-    chickBoy->AddComponent<BoxCollider2D>();
+  // {
+  //   auto chickBoy = World::CreateEntity("Chick Boy 2");
+  //   chickBoy->SetComponent<Position>({{-5.0f, 20.0f}});
+  //   chickBoy->SetComponent<Rotation>({0.0f});
+  //   chickBoy->SetComponent<Scale>({{1.0f, 1.0f}});
+  //   chickBoy->AddComponent<Rigidbody2D>();
+  //   auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
+  //   chickBoyRB->LockRotation = true;
+  //   chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
+  //   chickBoy->AddComponent<BoxCollider2D>();
 
-    chickBoy->SetComponent<Sprite2D>({g_TextureChickBoy});
-  }
+  //   chickBoy->SetComponent<Sprite2D>({g_TextureChickBoy});
+  // }
 
-  {
-    auto chickBoy = World::CreateEntity("Chick Boy 3");
-    chickBoy->SetComponent<Position>({{5.0f, 20.0f}});
-    chickBoy->SetComponent<Rotation>({0.0f});
-    chickBoy->SetComponent<Scale>({{1.0f, 1.0f}});
-    chickBoy->AddComponent<Rigidbody2D>();
-    auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
-    chickBoyRB->LockRotation = true;
-    chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
-    chickBoy->AddComponent<BoxCollider2D>();
+  // {
+  //   auto chickBoy = World::CreateEntity("Chick Boy 3");
+  //   chickBoy->SetComponent<Position>({{5.0f, 20.0f}});
+  //   chickBoy->SetComponent<Rotation>({0.0f});
+  //   chickBoy->SetComponent<Scale>({{1.0f, 1.0f}});
+  //   chickBoy->AddComponent<Rigidbody2D>();
+  //   auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
+  //   chickBoyRB->LockRotation = true;
+  //   chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
+  //   chickBoy->AddComponent<BoxCollider2D>();
 
-    chickBoy->SetComponent<Sprite2D>({g_TextureChickBoy});
-  }
+  //   chickBoy->SetComponent<Sprite2D>({g_TextureChickBoy});
+  // }
 
-  {
-    auto chickBoy = World::CreateEntity("Chick Boy 4");
-    chickBoy->SetComponent<Position>({{10.0f, 20.0f}});
-    chickBoy->SetComponent<Rotation>({0.0f});
-    chickBoy->SetComponent<Scale>({{1.0f, 1.0f}});
-    chickBoy->AddComponent<Rigidbody2D>();
-    auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
-    chickBoyRB->LockRotation = true;
-    chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
-    chickBoy->AddComponent<BoxCollider2D>();
+  // {
+  //   auto chickBoy = World::CreateEntity("Chick Boy 4");
+  //   chickBoy->SetComponent<Position>({{10.0f, 20.0f}});
+  //   chickBoy->SetComponent<Rotation>({0.0f});
+  //   chickBoy->SetComponent<Scale>({{1.0f, 1.0f}});
+  //   chickBoy->AddComponent<Rigidbody2D>();
+  //   auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
+  //   chickBoyRB->LockRotation = true;
+  //   chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
+  //   chickBoy->AddComponent<BoxCollider2D>();
 
-    chickBoy->SetComponent<Sprite2D>({g_TextureChickBoy});
-  }
+  //   chickBoy->SetComponent<Sprite2D>({g_TextureChickBoy});
+  // }
 
   auto pulsator = World::CreateEntity("Pulsator");
   pulsator->SetComponent<Position>({{0.0f, 0.0f}});

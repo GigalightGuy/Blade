@@ -11,7 +11,7 @@ namespace Vulkan{
     
     struct VulkanMesh
     {
-        std::vector<BladeEngine::Graphics::VertexColorTexture> vertices;
+        std::vector<BladeEngine::Graphics::VertexTexture> vertices;
         std::vector<uint16_t> indices;
         
         VkBuffer vertexBuffer;
@@ -24,17 +24,17 @@ namespace Vulkan{
         VkDeviceMemory uniformBufferMemory;
         void * uniformBufferMapped;
 
-        VkBuffer uniformBufferExtra;
-        VkDeviceMemory uniformBufferMemoryExtra;
-        void * uniformBufferMappedExtra;
+        VkBuffer uniformBufferModel;
+        VkDeviceMemory uniformBufferMemoryModel;
+        void * uniformBufferMappedModel;
         
-        void UpdateUniformBuffer(MVP data,Extra extra);
+        void UpdateUniformBuffer(VP data,Model extra);
         
         void Draw(VkCommandBuffer commandBuffer,VkPipelineLayout &pipelineLayout, VkDescriptorSet &descriptorSet);
         void Dispose(VkDevice device);
     };
     
-    VulkanMesh LoadMesh(VkPhysicalDevice physicalDevice,VkDevice device,VkQueue graphicsQueue,VkCommandPool commandPool,std::vector<BladeEngine::Graphics::VertexColorTexture> vertices,std::vector<uint16_t> elements);
+    VulkanMesh LoadMesh(VkPhysicalDevice physicalDevice,VkDevice device,VkQueue graphicsQueue,VkCommandPool commandPool,std::vector<BladeEngine::Graphics::VertexTexture> vertices,std::vector<uint16_t> elements);
 }
 }
 }

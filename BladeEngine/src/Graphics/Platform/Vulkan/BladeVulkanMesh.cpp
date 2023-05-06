@@ -6,23 +6,23 @@ using namespace BladeEngine::Graphics::Vulkan;
 
 BladeEngine::Graphics::Vulkan::VulkanMesh BladeEngine::Graphics::Vulkan::LoadMesh(
     VkPhysicalDevice physicalDevice,VkDevice device,VkQueue graphicsQueue,VkCommandPool commandPool,
-    std::vector<BladeEngine::Graphics::VertexColorTexture> vertices,
+    std::vector<BladeEngine::Graphics::VertexTexture> vertices,
     std::vector<uint16_t> elements)
 {
-    VulkanMesh mesh;
+    VulkanMesh mesh{};
     mesh.indices = elements;
     mesh.vertices = vertices;
     CreateVertexBuffer(vertices,physicalDevice,device,graphicsQueue,commandPool, mesh.vertexBuffer,mesh.vertexBufferMemory);
     CreateElementsBuffer(elements,physicalDevice,device,graphicsQueue,commandPool, mesh.elementsBuffer,mesh.elementsBufferMemory);
-    CreateUniformBuffer(physicalDevice,device,sizeof(MVP),mesh.uniformBuffer,mesh.uniformBufferMemory,mesh.uniformBufferMapped);
-    CreateUniformBuffer(physicalDevice,device,sizeof(Extra),mesh.uniformBufferExtra,mesh.uniformBufferMemoryExtra,mesh.uniformBufferMappedExtra);
+    CreateUniformBuffer(physicalDevice,device,sizeof(VP),mesh.uniformBuffer,mesh.uniformBufferMemory,mesh.uniformBufferMapped);
+    CreateUniformBuffer(physicalDevice,device,sizeof(Model),mesh.uniformBufferModel,mesh.uniformBufferMemoryModel,mesh.uniformBufferMappedModel);
     return mesh;
 }
 
-void BladeEngine::Graphics::Vulkan::VulkanMesh::UpdateUniformBuffer(BladeEngine::Graphics::Vulkan::MVP data, BladeEngine::Graphics::Vulkan::Extra extra)
+void BladeEngine::Graphics::Vulkan::VulkanMesh::UpdateUniformBuffer(BladeEngine::Graphics::Vulkan::VP data, BladeEngine::Graphics::Vulkan::Model model)
 {
     memcpy(uniformBufferMapped, &data, sizeof(data));
-    memcpy(uniformBufferMappedExtra, &extra, sizeof(extra));
+    memcpy(uniformBufferMappedModel, &model, sizeof(model));
 }
 
 

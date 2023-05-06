@@ -5,7 +5,7 @@ using namespace BladeEngine::Graphics::Vulkan;
 
 void BladeEngine::Graphics::Vulkan::CreateBuffer(VkPhysicalDevice physicalDevice, VkDevice device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
 {
-    VkBufferCreateInfo bufferInfo{};
+  VkBufferCreateInfo bufferInfo{};
   bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
   bufferInfo.size = size;
   bufferInfo.usage = usage;
@@ -29,7 +29,6 @@ void BladeEngine::Graphics::Vulkan::CreateBuffer(VkPhysicalDevice physicalDevice
     throw std::runtime_error("failed to allocate buffer memory!");
   }
     
-    //TODO: Study Function
   vkBindBufferMemory(device, buffer, bufferMemory, 0);
 }
 
@@ -200,7 +199,7 @@ void BladeEngine::Graphics::Vulkan::CreateImage(VkPhysicalDevice physicalDevice,
 
 
 void BladeEngine::Graphics::Vulkan::CreateVertexBuffer(
-    std::vector<BladeEngine::Graphics::VertexColorTexture> vertices,
+    std::vector<BladeEngine::Graphics::VertexTexture> vertices,
     VkPhysicalDevice physicalDevice,
     VkDevice device,
     VkQueue graphicsQueue, 
@@ -345,7 +344,7 @@ namespace BladeEngine::Graphics::Vulkan
       attributeDescriptions[0].offset = offsetof(VertexTexture, position);
 
       attributeDescriptions[1].binding = shaderIndex;
-      attributeDescriptions[1].location = 2;
+      attributeDescriptions[1].location = 1;
       attributeDescriptions[1].format = VK_FORMAT_R32G32_SFLOAT;
       attributeDescriptions[1].offset = offsetof(VertexTexture, textureCoordinate);
       return attributeDescriptions;

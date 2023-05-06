@@ -4,8 +4,21 @@
 #include "BladeVulkanUtils.hpp"
 #include <string.h>
 #include <utility>
+#include <chrono>
 
 using namespace BladeEngine::Graphics::Vulkan;
+
+void printFPS() {
+    static auto oldTime = std::chrono::high_resolution_clock::now();
+    static int fps; fps++;
+
+    if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - oldTime) >= std::chrono::seconds{ 1 }) {
+        oldTime = std::chrono::high_resolution_clock::now();
+        std::cout << "FPS: " << fps <<  std::endl;
+        fps = 0;
+    }
+}
+
 
 BladeEngine::Graphics::Vulkan::VulkanRenderer::VulkanRenderer(BladeEngine::Camera *camera, Window* window)
 {
@@ -19,8 +32,8 @@ BladeEngine::Graphics::Vulkan::VulkanRenderer::~VulkanRenderer()
 
 void BladeEngine::Graphics::Vulkan::VulkanRenderer::Init(Window* window)
 {
-    defaultVertexShader = new Shader("assets/shaders/default2.vert",ShaderType::VERTEX);
-    defaultFragmentShader = new Shader("assets/shaders/default2.frag",ShaderType::FRAGMENT);
+    defaultVertexShader = new Shader("assets/shaders/default.vert",ShaderType::VERTEX);
+    defaultFragmentShader = new Shader("assets/shaders/default.frag",ShaderType::FRAGMENT);
     
     std::vector<const char *> extensions = window->GetRequiredExtensions();
     extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
@@ -55,12 +68,11 @@ void BladeEngine::Graphics::Vulkan::VulkanRenderer::Draw(BladeEngine::Graphics::
     VulkanTexture* vkTexture = (VulkanTexture*)texture->GetGPUTexture();
 
     BladeEngine::Graphics::Mesh mesh = Quad(1,1);
-    std::vector<VertexColorTexture> vertices;
+    std::vector<VertexTexture> vertices;
     int i = 0;
     for(i = 0; i < mesh.vertices.size();i++)
     {
-        VertexColorTexture vertice{};
-        vertice.color = glm::vec4(1);
+        VertexTexture vertice{};
         vertice.position = mesh.vertices[i];
         vertice.textureCoordinate = mesh.uvs[i];
         vertices.push_back(vertice);
@@ -73,13 +85,14 @@ void BladeEngine::Graphics::Vulkan::VulkanRenderer::Draw(BladeEngine::Graphics::
 
     BladeEngine::Graphics::Vulkan::VulkanMesh vkMesh = LoadMesh(vkDevice->physicalDevice,vkDevice->logicalDevice,vkDevice->graphicsQueue,vkCommandPool,vertices,elements);
     
+    vkTextures.push_back(vkTexture);
+    vkMeshes.push_back(vkMesh);
+    
     ModelData modelData{};
     modelData.position = position;
     modelData.rotation = rotation;
     modelData.scale = scale;
     
-    vkTextures.push_back(vkTexture);
-    vkMeshes.push_back(vkMesh);
     vkMeshesModelData.push_back(modelData);
 }
 
@@ -94,23 +107,21 @@ void BladeEngine::Graphics::Vulkan::VulkanRenderer::EndDrawing()
     
     for(int i = 0; i < vkMeshes.size(); i++)
     {
-        BladeEngine::Graphics::Vulkan::MVP mvp{};
+        BladeEngine::Graphics::Vulkan::VP vp{};
         auto data = vkMeshesModelData[i];
+        
+        vp.view = camera->GetViewMatrix();
+        vp.proj = camera->GetProjectionMatrix();
 
-        mvp.model = glm::scale(
+        BladeEngine::Graphics::Vulkan::Model model{};
+        model.model = glm::scale(
                         glm::rotate(
                             glm::translate(glm::mat4(1), data.position),
                             data.rotation.z,
                             glm::vec3(0,0,1)), 
                         data.scale);
-        
-        mvp.view = camera->GetViewMatrix();
-        mvp.proj = camera->GetProjectionMatrix();
-        
-        Extra extra{};
-        extra.testColor = glm::vec4(1,1,1,1);
 
-        vkMeshes[i].UpdateUniformBuffer(mvp,extra);
+        vkMeshes[i].UpdateUniformBuffer(vp,model);
         auto vkTexture = vkTextures[i];
         auto vkMesh = vkMeshes[i];
         currentPipeline.UpdateDescriptorSet(
@@ -125,6 +136,7 @@ void BladeEngine::Graphics::Vulkan::VulkanRenderer::EndDrawing()
     vkTextures.clear();
     vkMeshes.clear();
     vkMeshesModelData.clear();
+    printFPS();
 }
 
 VulkanTexture* VulkanRenderer::CreateGPUTexture(Texture2D* texture)

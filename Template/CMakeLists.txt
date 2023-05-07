@@ -1,7 +1,7 @@
 add_executable(
-    Template 
-    src/TemplateGame.cpp 
-    src/TemplateGame.hpp
+    ExampleGame 
+    src/ExampleGame.cpp 
+    src/ExampleGame.hpp
 
     src/Components/PlayerComponents.hpp
     src/Systems/PlayerSystems.cpp
@@ -14,12 +14,12 @@ add_executable(
     src/Components/GroundComponents.hpp
     )
 
-target_link_libraries(Template PRIVATE BladeEngine)
+target_link_libraries(ExampleGame PRIVATE BladeEngine)
 
-target_include_directories(Template PRIVATE "${CMAKE_SOURCE_DIR}/BladeEngine/src")
-target_include_directories(Template PRIVATE "${CMAKE_SOURCE_DIR}/BladeEngine/vendor/flecs") #TEMP
-target_include_directories(Template PRIVATE "${CMAKE_SOURCE_DIR}/BladeEngine/vendor/glm") #TEMP
-target_include_directories(Template PRIVATE "${CMAKE_SOURCE_DIR}/BladeEngine/vendor/spdlog/include")
+target_include_directories(ExampleGame PRIVATE "${CMAKE_SOURCE_DIR}/BladeEngine/src")
+target_include_directories(ExampleGame PRIVATE "${CMAKE_SOURCE_DIR}/BladeEngine/vendor/flecs") #TEMP
+target_include_directories(ExampleGame PRIVATE "${CMAKE_SOURCE_DIR}/BladeEngine/vendor/glm") #TEMP
+target_include_directories(ExampleGame PRIVATE "${CMAKE_SOURCE_DIR}/BladeEngine/vendor/spdlog/include")
 
 set(ASSETS_SPRITES_DIR assets/sprites)
 file(COPY ${ASSETS_SPRITES_DIR}
@@ -40,7 +40,7 @@ foreach(file ${files})
 endforeach()
 
 
-target_compile_definitions(Template PRIVATE
+target_compile_definitions(ExampleGame PRIVATE
     $<$<CONFIG:DEBUG>:BLADE_DEBUG>
     $<$<CONFIG:RELEASE>:BLADE_RELEASE>
     $<$<CONFIG:RELWITHDEBINFO>:BLADE_DEBUG>

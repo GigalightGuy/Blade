@@ -1,4 +1,4 @@
-#include "TemplateGame.hpp"
+#include "ExampleGame.hpp"
 
 #include "BladeEngine.hpp"
 #include "Utils/Random.hpp"
@@ -27,11 +27,11 @@ void LoadContent()
     bucketTexture = new Graphics::Texture2D("assets/sprites/bucket.png");
     bucketTexture->CreateGPUTexture();
 
-    waterBarTexture = new Graphics::Texture2D("assets/sprites/waterbar.jpg");
+    waterBarTexture = new Graphics::Texture2D("assets/sprites/water.png");
     waterBarTexture->CreateGPUTexture();
 }
 
-void TemplateGame::SetupWorld() 
+void ExampleGame::SetupWorld() 
 {
   LoadContent();
 
@@ -86,6 +86,6 @@ void TemplateGame::SetupWorld()
 
 Game *CreateGameInstance() 
 { 
-    return new TemplateGame(); 
+    return new ExampleGame(); 
 }
-} // namespace BladeEngine
+}

@@ -4,7 +4,7 @@
 
 namespace BladeEngine
 {
-    class TemplateGame : public Game
+    class ExampleGame : public Game
     {
     private:
         virtual void SetupWorld() override;

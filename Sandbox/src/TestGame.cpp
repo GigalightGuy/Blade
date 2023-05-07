@@ -65,7 +65,6 @@ void Move(flecs::entity e, const Controller &ctrl, Rigidbody2D &rb,
   bool isGrounded =
       Physics2D::Raycast(*(g_Ground->GetComponent<Rigidbody2D>()), pos.Value,
                          Vec2(0.0f, -1.0f), 0.55f, hitInfo);
-
   if (isGrounded && Input::GetKeyDown(ctrl.Jump)) {
     Physics2D::AddImpulse(rb, Vec2(0.0f, 1.0f), ctrl.JumpForce);
   }

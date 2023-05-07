@@ -2,7 +2,11 @@
 
 #include "Core/Game.hpp"
 
-struct Player {};
+struct Player {
+  int points;
+};
+
+struct WaterBar{};
 
 struct Controller {
   BladeEngine::KeyCode Left;

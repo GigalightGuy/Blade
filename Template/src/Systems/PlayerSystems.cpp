@@ -10,7 +10,14 @@ void Move(flecs::entity e, const Controller &ctrl, BladeEngine::Rigidbody2D &rb,
   float velChange = desiredVel - currentVel.X;
   float impulse = BladeEngine::Physics2D::GetBodyMass(rb) * velChange;
 
-  // BladeEngine::Physics2D::AddImpulse(rb, BladeEngine::Vec2(impulse, 0.0f));
-  // BladeEngine::Physics2D::AddForce(rb,BladeEngine::Vec2(impulse, 0.0f));
   BladeEngine::Physics2D::SetVelocity2D(rb,BladeEngine::Vec2(impulse, 0.0f),1);
+}
+
+void UpdateUI(BladeEngine::Scale &scale, const WaterBar &waterBar)
+{
+   BladeEngine::World::GetECSWorldHandle()->filter<const Player>().each(
+      [&](const Player& player) 
+      {
+        scale.Value.X = player.points*0.1f;                
+      });
 }

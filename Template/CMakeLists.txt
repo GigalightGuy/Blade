@@ -2,9 +2,16 @@ add_executable(
     Template 
     src/TemplateGame.cpp 
     src/TemplateGame.hpp
+
     src/Components/PlayerComponents.hpp
     src/Systems/PlayerSystems.cpp
     src/Systems/PlayerSystems.hpp
+
+    src/Components/RaindropComponents.hpp
+    src/Systems/RaindropSystems.cpp
+    src/Systems/RaindropSystems.hpp
+
+    src/Components/GroundComponents.hpp
     )
 
 target_link_libraries(Template PRIVATE BladeEngine)

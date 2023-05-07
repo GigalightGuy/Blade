@@ -25,6 +25,8 @@ namespace BladeEngine
     class Physics2D
     {
     public:
+        static void SetVelocity2D(Rigidbody2D& rb, Vec2 direction, float strength);
+
         static int GetVelocityIterations() { return s_VelocityIterations; }
         static int GetPositionIterations() { return s_PositionIterations; }
 

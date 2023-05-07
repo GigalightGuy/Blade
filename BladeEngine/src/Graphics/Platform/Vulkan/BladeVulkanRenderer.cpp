@@ -124,6 +124,7 @@ void BladeEngine::Graphics::Vulkan::VulkanRenderer::EndDrawing()
         vkMeshes[i].UpdateUniformBuffer(vp,model);
         auto vkTexture = vkTextures[i];
         auto vkMesh = vkMeshes[i];
+        
         currentPipeline.UpdateDescriptorSet(
             vkDevice->logicalDevice,
             vkTexture->textureImageView,

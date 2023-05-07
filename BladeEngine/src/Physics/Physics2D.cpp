@@ -23,6 +23,12 @@ namespace BladeEngine
         delete s_PhysicsWorld;
     }
     
+    void Physics2D::SetVelocity2D(Rigidbody2D& rb, Vec2 direction, float strength)
+    {
+        b2Vec2 velocity(direction.X * strength, direction.Y * strength);
+        rb.RuntimeBody->SetLinearVelocity(velocity);
+    }
+
     void Physics2D::AddImpulse(Rigidbody2D& rb, Vec2 direction, float strength)
     {
         b2Vec2 impulse(direction.X * strength, direction.Y * strength);

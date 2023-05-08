@@ -924,3 +924,115 @@ Get this Entity's name
 ```cpp
 inline const char* GetName()
 ```
+
+## Graphics
+Graphics wrapper using the Vulkan API for rendering 2D images
+
+## Color
+```cpp
+Color(uint8_t r, uint8_t g, uint8_t b)
+Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+```
+Get the color value
+```cpp
+glm::vec4 GetValues()
+```
+
+## Mesh
+```cpp
+Mesh(std::vector<glm::vec3> vertices, std::vector<uint16_t> elements, std::vector<glm::vec2> uvs)
+```
+```cpp
+Mesh Quad(float width,float height)
+```
+
+## ShaderType
+```cpp
+enum ShaderType {
+  VERTEX,
+  FRAGMENT,
+  COMPUTE,
+}
+```
+
+## Shader
+```cpp
+Shader(std::string path, ShaderType shaderType);
+```
+
+## Texture2D
+```cpp
+Texture2D(std::string path);
+```
+Create a Texture to be used by the Graphics Manager Renderer
+```cpp
+void CreateGPUTexture();
+```
+Destroys the generated Texture for the Graphics Manager Renderer
+```cpp
+void DestroyGPUTexture();
+```
+Gets the Graphics Manager Renderer Texture
+```cpp
+void* GetGPUTexture()
+```
+
+## VertexType
+```cpp
+enum VertexType 
+{ 
+    VERTEX_COLOR, 
+    VERTEX_COLOR_TEXTURE, 
+    VERTEX_TEXTURE 
+}
+```
+## VertexColor
+```cpp
+struct VertexColor {
+  glm::vec3 position;
+  glm::vec4 color;
+};
+```
+
+## VertexTexture
+```cpp
+struct VertexTexture {
+  glm::vec3 position;
+  glm::vec2 textureCoordinate;
+};
+```
+## VertexColorTexture
+```cpp
+struct VertexColorTexture {
+  glm::vec3 position;
+  glm::vec4 color;
+  glm::vec2 textureCoordinate;
+};
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

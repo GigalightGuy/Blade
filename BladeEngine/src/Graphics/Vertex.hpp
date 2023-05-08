@@ -6,13 +6,8 @@
 namespace BladeEngine {
 
 namespace Graphics {
-    
-    enum VertexType
-    {
-      VERTEX_COLOR,
-      VERTEX_COLOR_TEXTURE,
-      VERTEX_TEXTURE
-    };
+
+enum VertexType { VERTEX_COLOR, VERTEX_COLOR_TEXTURE, VERTEX_TEXTURE };
 
 struct VertexColor {
   glm::vec3 position;

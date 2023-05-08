@@ -3,7 +3,6 @@
 #include <iostream>
 #include <string>
 
-
 namespace BladeEngine {
 namespace Graphics {
 class Texture2D {
@@ -16,7 +15,7 @@ public:
   void CreateGPUTexture();
   void DestroyGPUTexture();
 
-  inline void* GetGPUTexture() const { return gpuTextureHandle; }
+  inline void *GetGPUTexture() const { return gpuTextureHandle; }
 
   // Texture width in pixels
   int width;
@@ -25,9 +24,9 @@ public:
   // Texture image size in all channels (R,G,B,A)
   uint64_t imageSize;
   // Texture pixel data
-  unsigned char* pixels;
+  unsigned char *pixels;
 
-  void* gpuTextureHandle;
+  void *gpuTextureHandle;
 
 private:
 };

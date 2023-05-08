@@ -2,19 +2,17 @@
 
 ## Blade GDK Documentation
 
-### About
+# About
 Blade GDK is a ***Game Development Kit*** focused on 2D Games for Windows and Linux x86 machines.
 It uses the Vulkan API for Graphics Rendering and modern ECS concepts with the [Flecs](https://github.com/SanderMertens/flecs) project by [Sander Martens](https://github.com/SanderMertens) 
 
----
-
-### Requirements - Linux
+# Requirements
 - [CMake](https://cmake.org/)
 - [Vulkan SDK](https://vulkan.lunarg.com/)
 - [GlslangValidator](https://github.com/KhronosGroup/glslang) as environment variable
 - [Visual Studio Code](https://code.visualstudio.com/)
 
-### Getting Started
+# Getting Started
 
 Clone Blade Engine Project into your desired External Library folder and include the following lines into your CMakeLists.txt file. Exemple bellow consideres that the cloned project is in the folder named **external**.
 
@@ -657,6 +655,222 @@ target_compile_definitions(ExampleGame PRIVATE
 
 - Now generate the cmake project, build it and run
 
+# Core
+
+## Window
+
+### Default Window System used with the [GLFW](https://github.com/glfw/glfw) window manager 
+
+```cpp
+Window(uint32_t width, uint32_t height, const std::string& title);
+```
+Get application window width.
+```cpp
+uint32_t GetWidth()
+```
+
+Get application window height.
+```cpp
+uint32_t GetHeight()
+```
+
+Get application aspect ratio.
+```cpp
+float GetViewportAspectRatio()
+```
+
+Call Operating System events to manage the window 
+```cpp
+void PollEvents()
+```
+
+Update the Input Key states
+```cpp
+void InputTick()
+```
+Get the required extensions of the Window Manager
+```cpp
+std::vector<const char*> GetRequiredExtensions()
+```
+## Vec2
+### Struct that contains 2 floats: X, Y
+```cpp
+Vec2(float x, float y)
+```
+Calculates the squared length of this Vec2
+```cpp
+float SqrLength()
+```
+
+Calculates the length of this Vec2
+```cpp
+float Length()
+```
+
+Calculates the dot product of u and v
+```cpp
+float Dot(const Vec2& u, const Vec2& v)
+```
+
+Normalizes v
+```cpp
+Vec2 Normalize(Vec2 v)
+```
+## Vec3
+### Struct that contains 3 floats: X, Y, Z
+```cpp
+Vec3(float x, float y, float z)
+```
+Calculates the squared length of this Vec3
+```cpp
+float SqrLength()
+```
+
+Calculates the length of this Vec3
+```cpp
+float Length()
+```
+
+Calculates the dot product of u and v
+```cpp
+float Dot(const Vec3& u, const Vec3& v)
+```
+
+Normalizes v
+```cpp
+Vec3 Normalize(Vec3 v)
+```
+Calculates the cross product of u and v
+```cpp
+Vec3 Cross(const Vec3& u, const Vec3& v)
+```
+
+## Utils
+### static class with general use functions
+
+Read file data into char vector
+```cpp
+static std::vector<char> ReadFile_vec(const std::string &filename);
+```
+Read file data into String
+```cpp
+static std::string ReadFile_str(const std::string &filename);
+```
+
+## Time
+### static class to manage time passed in the executed program
+
+Get World time in seconds
+```cpp
+CurrentWorldTime()
+```
+
+Get Elapsed time in seconds since last frame
+```cpp
+float DeltaTime()
+```
+## Input
+### static class to Get Input Key states
+
+Check if key is being held
+```cpp
+static bool GetKey(KeyCode key)
+```
+
+Check if mouse button is being held
+```cpp
+static bool GetMouseButton(MouseButton button)
+```
+
+Check if key was pressed this frame
+```cpp
+static bool GetKeyDown(KeyCode key)
+```
+
+Check if mouse button was pressed this frame
+```cpp
+static bool GetMouseButtonDown(MouseButton button)
+```
+
+Check if key was released this frame
+```cpp
+static bool GetKeyUp(KeyCode key)
+```
+
+Check if mouse button was released this frame
+```cpp
+static bool GetMouseButtonUp(MouseButton button)
+```
+
+Get the cursor position
+```cpp
+static std::pair<float, float> GetCursorPos() 
+```
+
+Get the cursor position x
+```cpp
+static float GetCursorX()
+```
+
+Get the cursor position y
+```cpp
+static float GetCursorY()
+```
+
+## Game
+Base class for game projects
+```cpp
+Game()
+```
+Tells application to exit
+```cpp
+static void Exit()
+```
+## Camera
+class to manage Camera instances
+```cpp
+Camera(float size, glm::vec2 position = glm::vec2(0.0f, 0.0f), float rotation = 0.0f,float nearPlane = 0.1f,float farPlane = 100.0f,CameraType cameraType = CameraType::ORTHOGRAPHIC);
+
+Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f,0.0f), glm::vec3 rotation= glm::vec3(0.0f, 0.0f,0.0f),float nearPlane = 0.1f,float farPlane = 100.0f ,CameraType cameraType = CameraType::PERSPECTIVE);
+```
+Resize camera dimensions
+```cpp
+void Resize(glm::vec2 dimensions);
+```
+Set Camera Position
+```cpp
+void SetPosition(glm::vec2 position);
+
+void SetPosition(glm::vec3 position);
+```
+Set Camera Rotation on the Z axis
+```cpp
+void SetRotation(float rotation);
+```
+Set Camera Rotation for all axis
+```cpp
+void SetRotation(glm::vec3 rotation);
+```
+Get Camera Aspect ratio
+```cpp
+float Aspect();
+```
+Get Camera Width
+```cpp
+float GetWidth();
+```
+Get Camera Height
+```cpp
+float GetHeight();
+```
+Get Camera Projection Matrix
+```cpp
+glm::mat4 GetProjectionMatrix();
+```
+Get Camera View Matrix
+```cpp
+glm::mat4 GetViewMatrix();
+```
 ### Graphics
-### Core
+
 ### ECS

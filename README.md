@@ -871,6 +871,56 @@ Get Camera View Matrix
 ```cpp
 glm::mat4 GetViewMatrix();
 ```
-### Graphics
+# ECS
+### [Flecs](https://github.com/SanderMertens/flecs) Entity Component System used to make game logic in the Blade GDK game projects 
 
-### ECS
+## World
+### static class that contains and manages the ECS World and its entities
+
+Creates a new Entity in the World
+```cpp
+static Entity* CreateEntity()
+```           
+
+Creates a new Entity in the World with a name
+```cpp
+static Entity* CreateEntity(const std::string& entityName)
+```           
+
+Destroys entity and removes it from World
+```cpp
+static void DestroyEntity(Entity* entity)
+```           
+
+Creates and binds a system to the World
+```cpp
+template<typename Func> static void BindSystemNoQuery(flecs::entity_t phase, const char* name, Func f)
+
+template<typename ... Comps, typename Func> static void BindSystem(flecs::entity_t phase, const char* name, Func f)
+        
+template<typename ... Comps, typename Func> static void BindSystemIter(flecs::entity_t phase, const char* name, Func f)
+
+template<typename ... Comps, typename Func> static void BindSystem(float timer, const char* name, Func f)
+```           
+## Entity
+
+Creates and adds a new component of type T to this Entity
+```cpp
+template<typename T> inline void AddComponent()
+```
+Sets the data for the component of type T in this Entity
+```cpp
+template<typename T> inline void SetComponent(T&& value)
+```
+Removes component of type T from this Entity if it exists
+```cpp
+template<typename T> inline void RemoveComponent()
+```
+Get component of type T from this Entity if it exists
+```cpp
+template<typename T> inline const T* GetComponent()
+```
+Get this Entity's name
+```cpp
+inline const char* GetName()
+```

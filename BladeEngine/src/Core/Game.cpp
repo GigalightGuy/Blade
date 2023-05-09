@@ -6,6 +6,7 @@
 #include "Log.hpp"
 #include "../Graphics/GraphicsManager.hpp"
 #include "../Physics/Physics2D.hpp"
+#include "../Graphics/Mesh.hpp"
 
 #include "box2d/box2d.h"
 
@@ -39,6 +40,28 @@ namespace BladeEngine
     void Game::Exit()
     {
         s_Instance->m_ShouldExit = true;
+    }
+
+    void Game::LoadResources()
+    {
+        LoadCoreResources();
+        LoadGameResources();
+    }
+
+    void Game::UnloadResources()
+    {
+        UnloadCoreResources();
+        UnloadGameResources();
+    }
+
+    void Game::LoadCoreResources()
+    {
+        Graphics::Mesh::LoadDefaultMeshes();
+    }
+
+    void Game::UnloadCoreResources()
+    {
+        Graphics::Mesh::UnloadDefaultMeshes();
     }
 
     // TODO(Pedro): Probably not the best for this, should change later
@@ -131,6 +154,9 @@ namespace BladeEngine
 
     void Game::Run()
     {
+        BLD_CORE_DEBUG("Loading resources...");
+        LoadResources();
+
         BLD_CORE_DEBUG("Game started Running!!");
 
         Time::Init();
@@ -166,5 +192,7 @@ namespace BladeEngine
     void Game::CleanUp()
     {
         Physics2D::Shutdown();
+
+        UnloadResources();
     }
 }

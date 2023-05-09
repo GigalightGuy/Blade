@@ -34,7 +34,7 @@ public:
   void CreateDescriptorPools(VkDevice device,uint32_t count);
   void CreateDescriptorSets(VkDevice device,uint32_t count, uint32_t frameIndex);  
   void FreeDescriptorSets(VkDevice device, uint32_t frameIndex);
-  void UpdateDescriptorSet(VkDevice device,VkImageView imageView, VkSampler sampler,VulkanMesh mesh, uint32_t frameIndex, int descriptorSetIndex);
+  void UpdateDescriptorSet(VkDevice device,VkImageView imageView, VkSampler sampler, VulkanBuffer& uniformBuffer, uint32_t frameIndex, int descriptorSetIndex);
   
 private:
   void CreateRenderPass(VkDevice device, VkFormat swapChainImageFormat,

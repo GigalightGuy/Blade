@@ -11,6 +11,8 @@ add_library(BladeEngine STATIC
     src/Core/KeyCodes.hpp
     src/Core/Math.hpp
     src/Core/Vec.hpp
+    src/Core/Buffer.hpp
+
     src/Utils/Random.hpp src/Utils/Random.cpp
 
     src/Core/Camera.hpp src/Core/Camera.cpp
@@ -64,6 +66,7 @@ if(USING_VULKAN_API)
         src/Graphics/Platform/Vulkan/BladeVulkanMesh.cpp              src/Graphics/Platform/Vulkan/BladeVulkanMesh.hpp
         src/Graphics/Platform/Vulkan/BladeVulkanTexture.cpp           src/Graphics/Platform/Vulkan/BladeVulkanTexture.hpp
 		src/Graphics/Platform/Vulkan/BladeVulkanRenderer.cpp          src/Graphics/Platform/Vulkan/BladeVulkanRenderer.hpp
+        src/Graphics/Platform/Vulkan/VulkanBuffer.hpp
         )
 endif(USING_VULKAN_API)
 

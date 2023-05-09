@@ -21,12 +21,19 @@ namespace BladeEngine
   		static void Exit();
 
 	private:
+		void LoadResources();
+		void UnloadResources();
+
+		void LoadCoreResources();
+		void UnloadCoreResources();
+
+		virtual void LoadGameResources() = 0;
+		virtual void UnloadGameResources() = 0;
+
 		virtual void SetupWorld() = 0;
 
   		void Run();
   		void CleanUp();
-
-  		void UpdateInput();
 
 	private:
   		bool m_ShouldExit = false;

@@ -76,7 +76,7 @@ void BladeEngine::Graphics::GraphicsManager::Draw(
     glm::vec3 rotation, 
     glm::vec3 scale)
 {
-    vkRenderer->Draw(texture,position,rotation,scale);
+    vkRenderer->DrawSprite(texture,position,rotation,scale);
 }
 
 void BladeEngine::Graphics::GraphicsManager::EndDrawing()
@@ -84,12 +84,22 @@ void BladeEngine::Graphics::GraphicsManager::EndDrawing()
     vkRenderer->EndDrawing();
 }
 
-void* GraphicsManager::CreateGPUTexture(Texture2D* texture)
+void* GraphicsManager::UploadTextureToGPU(Texture2D* texture)
 {
-    return vkRenderer->CreateGPUTexture(texture);
+    return vkRenderer->UploadTextureToGPU(texture);
 }
 
-void GraphicsManager::DestroyGPUTexture(void* gpuTexture)
+void GraphicsManager::ReleaseGPUTexture(void* gpuTexture)
 {
-    vkRenderer->DestroyGPUTexture((Vulkan::VulkanTexture*)gpuTexture);
+    vkRenderer->ReleaseGPUTexture((Vulkan::VulkanTexture*)gpuTexture);
+}
+
+void* BladeEngine::Graphics::GraphicsManager::UploadMeshToGPU(Buffer vertices, Buffer indices)
+{
+    return vkRenderer->UploadMeshToGPU(vertices, indices);
+}
+
+void BladeEngine::Graphics::GraphicsManager::ReleaseGPUMesh(void* gpuMesh)
+{
+    vkRenderer->ReleaseGPUMesh((Vulkan::VulkanMesh*)gpuMesh);
 }

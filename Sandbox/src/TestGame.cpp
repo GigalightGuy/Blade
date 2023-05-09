@@ -52,6 +52,18 @@ namespace BladeEngine
         }
     }
 
+    void UnloadTextures()
+    {
+        g_TextureChickBoy->DestroyGPUTexture();
+
+        g_TexturePlatformBlock->DestroyGPUTexture();
+
+        for (size_t i = 0; i < g_BackgroundTextures.size(); i++)
+        {
+            g_BackgroundTextures[i]->DestroyGPUTexture();
+        }
+    }
+
     void Move(flecs::entity e, const Controller& ctrl, Rigidbody2D& rb, const Position& pos)
     {
         float desiredVel = 0.0f;
@@ -98,10 +110,18 @@ namespace BladeEngine
         });
     }
 
-    void TestGame::SetupWorld()
+    void TestGame::LoadGameResources()
     {
         LoadTextures();
+    }
 
+    void TestGame::UnloadGameResources()
+    {
+        UnloadTextures();
+    }
+
+    void TestGame::SetupWorld()
+    {
         g_Ground = World::CreateEntity("Ground");
         g_Ground->SetComponent<Position>({ { 0.0f, 0.0f } });
         g_Ground->SetComponent<Rotation>({ 0.0f });

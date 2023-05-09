@@ -31,10 +31,10 @@ Texture2D::~Texture2D()
 
 void Texture2D::CreateGPUTexture()
 {
-  gpuTextureHandle = GraphicsManager::Instance()->CreateGPUTexture(this);
+  gpuTextureHandle = GraphicsManager::Instance()->UploadTextureToGPU(this);
 }
 
 void Texture2D::DestroyGPUTexture()
 {
-  GraphicsManager::Instance()->DestroyGPUTexture(gpuTextureHandle);
+  GraphicsManager::Instance()->ReleaseGPUTexture(gpuTextureHandle);
 }

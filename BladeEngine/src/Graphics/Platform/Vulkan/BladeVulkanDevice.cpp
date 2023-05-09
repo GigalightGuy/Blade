@@ -152,13 +152,13 @@ void VulkanDevice::CreateLogicalDevice(VkSurfaceKHR surface,
   createInfo.ppEnabledExtensionNames = extensions.data();
 
   // DEPRECATED BY VULKAN 1.1
-  /*if (enableValidationLayers) {
+  #if defined(BLD_VK_VALIDATION_LAYERS)
     createInfo.enabledLayerCount =
         static_cast<uint32_t>(validationLayers.size());
     createInfo.ppEnabledLayerNames = validationLayers.data();
-  } else {
+  #else
     createInfo.enabledLayerCount = 0;
-  }*/
+  #endif
 
   if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &logicalDevice) !=
       VK_SUCCESS) {

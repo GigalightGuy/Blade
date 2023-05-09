@@ -1,4 +1,5 @@
 #include "BladeVulkanUtils.hpp"
+
 #include <string.h>
 
 using namespace BladeEngine::Graphics::Vulkan;
@@ -200,15 +201,14 @@ void BladeEngine::Graphics::Vulkan::CreateImage(VkPhysicalDevice physicalDevice,
 
 
 void BladeEngine::Graphics::Vulkan::CreateVertexBuffer(
-    std::vector<BladeEngine::Graphics::VertexColorTexture> vertices,
+    Buffer vertices,
     VkPhysicalDevice physicalDevice,
     VkDevice device,
     VkQueue graphicsQueue, 
     VkCommandPool commandPool,
-    VkBuffer& vertexBuffer,
-    VkDeviceMemory &vertexBufferMemory) {
+    VulkanBuffer& vertexBuffer) {
   
-    VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+    VkDeviceSize bufferSize = vertices.Size;
 
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
@@ -221,30 +221,29 @@ void BladeEngine::Graphics::Vulkan::CreateVertexBuffer(
     void *data;
     vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0,
                 &data);
-    memcpy(data, vertices.data(), (size_t)bufferSize);
+    memcpy(data, vertices.Data, (size_t)bufferSize);
     vkUnmapMemory(device, stagingBufferMemory);
 
     CreateBuffer(
         physicalDevice, device, bufferSize,
         VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer.BufferHandle, vertexBuffer.MemoryHandle);
 
-    CopyBuffer(device,graphicsQueue, commandPool, stagingBuffer, vertexBuffer, bufferSize);
+    CopyBuffer(device,graphicsQueue, commandPool, stagingBuffer, vertexBuffer.BufferHandle, bufferSize);
 
     vkDestroyBuffer(device, stagingBuffer, nullptr);
     vkFreeMemory(device, stagingBufferMemory, nullptr);
 }
 
-void BladeEngine::Graphics::Vulkan::CreateElementsBuffer(
-    std::vector<uint16_t> elements,
+void BladeEngine::Graphics::Vulkan::CreateIndexBuffer(
+    Buffer elements,
     VkPhysicalDevice physicalDevice,
     VkDevice device,
     VkQueue graphicsQueue, 
     VkCommandPool commandPool,
-    VkBuffer& elementsBuffer,
-    VkDeviceMemory& elementsBufferMemory) {
+    VulkanBuffer& indexBuffer) {
     
-    VkDeviceSize bufferSize = sizeof(elements[0]) * elements.size();
+    VkDeviceSize bufferSize = elements.Size;
 
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
@@ -257,28 +256,33 @@ void BladeEngine::Graphics::Vulkan::CreateElementsBuffer(
     void *data;
     vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0,
                 &data);
-    memcpy(data, elements.data(), (size_t)bufferSize);
+    memcpy(data, elements.Data, (size_t)bufferSize);
     vkUnmapMemory(device, stagingBufferMemory);
 
     CreateBuffer(
         physicalDevice, device, bufferSize,
         VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, elementsBuffer, elementsBufferMemory);
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer.BufferHandle, indexBuffer.MemoryHandle);
 
-    CopyBuffer(device,graphicsQueue,commandPool,stagingBuffer, elementsBuffer, bufferSize);
+    CopyBuffer(device,graphicsQueue,commandPool,stagingBuffer, indexBuffer.BufferHandle, bufferSize);
 
     vkDestroyBuffer(device, stagingBuffer, nullptr);
     vkFreeMemory(device, stagingBufferMemory, nullptr);
 }
 
-void BladeEngine::Graphics::Vulkan::CreateUniformBuffer(VkPhysicalDevice physicalDevice,VkDevice device, VkDeviceSize size, VkBuffer& uniformBuffer, VkDeviceMemory& uniformBufferMemory, void *& uniformBufferMapped)
+void BladeEngine::Graphics::Vulkan::CreateUniformBuffer(
+    VkPhysicalDevice physicalDevice,
+    VkDevice device, 
+    VkDeviceSize size, 
+    VulkanBuffer& uniformBuffer)
 {
       CreateBuffer(physicalDevice,device,size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                   uniformBuffer, uniformBufferMemory);
-      vkMapMemory(device, uniformBufferMemory, 0, size, 0,
-                  &uniformBufferMapped);
+                   uniformBuffer.BufferHandle, uniformBuffer.MemoryHandle);
+
+      vkMapMemory(device, uniformBuffer.MemoryHandle, 0, size, 0,
+                  &uniformBuffer.MappedMemory);
 }
 
 namespace BladeEngine::Graphics::Vulkan

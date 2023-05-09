@@ -1,4 +1,5 @@
 #pragma once
+
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -35,6 +36,7 @@ private:
   // Helper Functions
   bool CheckDeviceExtensionSupport(VkPhysicalDevice physicalDevice,
                                    std::vector<const char *> extensions);
+                                   
   bool IsDeviceSuitable(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface,
                         std::vector<const char *> extensions);
 

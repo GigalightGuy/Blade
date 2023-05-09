@@ -12,6 +12,12 @@ namespace BladeEngine
 
     b2World* Physics2D::s_PhysicsWorld;
 
+    void Physics2D::SetVelocity2D(Rigidbody2D& rb, Vec2 direction, float strength)
+    {
+        b2Vec2 velocity(direction.X * strength, direction.Y * strength);
+        rb.RuntimeBody->SetLinearVelocity(velocity);
+    }
+
     void Physics2D::Init()
     {
         b2Vec2 gravity(0.0f, -9.8f);

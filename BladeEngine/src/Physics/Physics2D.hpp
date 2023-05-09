@@ -28,6 +28,8 @@ namespace BladeEngine
         static int GetVelocityIterations() { return s_VelocityIterations; }
         static int GetPositionIterations() { return s_PositionIterations; }
 
+        static void SetVelocity2D(Rigidbody2D& rb, Vec2 direction, float strength);
+
         static void SetVelocityIterations(int value) { s_VelocityIterations = value; }
         static void SetPositionIterations(int value) { s_PositionIterations = value; }
 

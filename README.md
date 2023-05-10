@@ -4,95 +4,127 @@
 
 # About
 Blade GDK is a ***Game Development Kit*** focused on 2D Games for Windows and Linux x86 machines.
-It uses the Vulkan API for Graphics Rendering and modern ECS concepts with the [Flecs](https://github.com/SanderMertens/flecs) project by [Sander Martens](https://github.com/SanderMertens) 
+It uses the Vulkan API for Graphics Rendering and modern ECS concepts with the [Flecs](https://github.com/SanderMertens/flecs) project by [Sander Mertens](https://github.com/SanderMertens) 
 
 # Requirements
-- [CMake](https://cmake.org/)
 - [Vulkan SDK](https://vulkan.lunarg.com/)
-- [GlslangValidator](https://github.com/KhronosGroup/glslang) as environment variable
-- [Visual Studio Code](https://code.visualstudio.com/)
+- [Visual Studio 2022](https://code.visualstudio.com/)
 
 # Getting Started
 
-Clone Blade Engine Project into your desired External Library folder and include the following lines into your CMakeLists.txt file. Exemple bellow consideres that the cloned project is in the folder named **external**.
+To jump right into writing game code, you can jump into EmptyGame.cpp.  
 
-```cmake
-target_link_libraries(Template PRIVATE BladeEngine)
+The default content of EmptyGame.cpp has 3 empty functions:  
+  
+```cpp
+#include "EmptyGame.hpp"
 
-target_include_directories(Template PRIVATE "${CMAKE_SOURCE_DIR}/external/BladeEngine/src")
-target_include_directories(Template PRIVATE "${CMAKE_SOURCE_DIR}/external/BladeEngine/vendor/flecs")
-target_include_directories(Template PRIVATE "${CMAKE_SOURCE_DIR}/external/BladeEngine/vendor/glm")
-target_include_directories(Template PRIVATE "${CMAKE_SOURCE_DIR}/external/BladeEngine/vendor/spdlog/include")
+#include "BladeEngine.hpp"
+
+namespace BladeEngine 
+{
+
+	// Load your game assets inside this function
+	void ExampleGame::LoadGameResources()
+	{
+	}
+
+	// Unload your game assets inside this function
+	void ExampleGame::UnloadGameResources()
+	{
+	}
+
+	// Initialize your game world state inside this function
+	// Entity creation and system binding goes in here
+	void ExampleGame::SetupWorld()
+	{
+	}
+
+}
+```
+
+These 3 functions are called from engine side.  
+`LoadGameResources` should be used to load any external files needed for your game such as textures, audio clips, custom shaders, etc... 
+If you load your own assets to the game, you should also unload them when your finished and that's why you have `UnloadGameResources`.  
+`LoadGameResources` is called by the engine when you start your game and `UnloadGameResources` is called when you are exiting the game.  
+
+`SetupWorld` is called by the engine after initialization and loading of resources right before the gameplay starts.
+Its purpose is for the developer to have somewhere where they can layout their game world and their game logic.
+
+To get started, you can load a texture inside the `LoadGameResources` like this:  
+  
+```cpp
+Graphics::Texture2D* rainDropTexture;
+
+// Load your game assets inside this function
+void ExampleGame::LoadGameResources()
+{
+	rainDropTexture = new Graphics::Texture2D("assets/blade.png");
+}
+```
+
+This reads the texture data from a image file and stores that data inside an object of type `Texture2D`.  
+
+Now we have the texture we wanted to use inside our game, but if we want to use ir for rendering, we still need to get this texture data into the GPU.  
+For that, we need to add the following line after creating our `Texture2D` object:  
+
+```cpp
+// Load your game assets inside this function
+void ExampleGame::LoadGameResources()
+{
+	bladeTexture = new Graphics::Texture2D("assets/blade.png");
+	bladeTexture->CreateGPUTexture(); // New line of code
+}
+```
+
+This is gonna create a texture in GPU with the data we loaded into our `Texture2D`. 
+
+If we are creating a texture in the GPU, it is probably a good idea to also get rid of it before we exit our game. 
+Let's use `UnloadGameResources` for that: 
+ 
+```cpp
+void ExampleGame::UnloadGameResources()
+{
+	bladeTexture->DestroyGPUTexture();
+}
+```
+Great, we now have a texture in GPU and we also get rid of it when we don't need it anymore! 
+Everything is in place for us to get something drawn to the screen. 
+ 
+We are finally gonna use the `SetupWorld` function to... well, set up our world! 
+ 
+Objects that reside inside our game world are called **Entities**, but they actually are just empty shells,
+**Components** are what give them some meaning. 
+ 
+A **Component** is just a simple data container (struct) with no logic attached to it. 
+An **Entity** can have multiple **Components** associated with it. 
+ 
+Now that we know what are **Entities** and **Components**, let's create our first Entity: 
+```cpp
+void ExampleGame::SetupWorld()
+{
+	Entity bladeEntity = World::CreateEntity("Blade");
+}
+```
+Done. Simple, ain't it? 
+
+Here we are calling `World::CreateEntity`, meaning we are asking the class that manages our game world to create us an **Entity**. 
+The text we are passing as parameter to `CreateEntity` is an optional name for the **Entity** we are creating. 
+
+Now we have our first ever **Entity** in our game world, but remember what I said about **Entities** having no use if no components are attached to it. 
+Our **Entity** is just an identifier, without any **Components** associated with it, it can not hold any meaningful data. Let's solve that: 
+```cpp
+void ExampleGame::SetupWorld()
+{
+	Entity bladeEntity = World::CreateEntity("Blade");
+	
+	bladeEntity.SetComponent<Sprite2D>({ bladeTexture });
+}
 ```
 
 ### Example Project
 
 ### **Setup**
-
-- Create an assets folder with subdirectories named shaders and sprites
-
-```
-root/
-    assets/
-        sprites/
-        shaders/
-```
-
-- Create the default shader files to be used in the rendering of the project, named default.vert and default.frag
-
-```
-root/
-    assets/
-        sprites/
-        shaders/
-            default.vert
-            default.frag
-```
-
-default.vert
-```glsl
-#version 450
-
-layout(binding = 0) uniform Camera{
-  mat4 viewMatrix;
-  mat4 projectionMatrix;
-}camera;
-
-layout(binding = 1) uniform Model{
-  mat4 transformMatrix;
-}model;
-
-layout(location = 0) in vec3 inVertexPosition;
-layout(location = 1) in vec2 inVertexTextureCoordinate;
-
-layout(location = 0) out vec2 fragmentTextureCoordinate;
-
-void main() {
-  gl_Position = camera.projectionMatrix * camera.viewMatrix * model.transformMatrix * vec4(inVertexPosition, 1.0);
-  fragmentTextureCoordinate = inVertexTextureCoordinate;
-}
-```
-
-default.frag
-```glsl
-#version 450
-
-layout(binding = 2) uniform sampler2D texureSampler;
-
-layout(location = 0) in vec2 fragmentTextureCoordinate;
-
-layout(location = 0) out vec4 outColor;
-
-void main() {
-    
-    outColor = texture(texureSampler, fragmentTextureCoordinate);
-    
-    if(outColor.a <= 0)
-    {
-        discard;
-    }
-}
-```
 
 - Download an image of a bucket, a rain drop and a blue square texture and add them to the sprites directory
 

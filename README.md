@@ -5,9 +5,9 @@ Blade GDK is a ***Game Development Kit*** focused on 2D Games for Windows and Li
 It uses the Vulkan API for Graphics Rendering and modern ECS concepts with the [Flecs](https://github.com/SanderMertens/flecs) project by [Sander Mertens](https://github.com/SanderMertens) 
 
 # Index
-[Getting Started](#getting-started) 
-[Example Project](#example-project) 
-[Documentation](#documentation) 
+[Getting Started](#getting-started)  
+[Example Project](#example-project)  
+[Documentation](#documentation)  
 
 # Requirements
 - [Vulkan SDK](https://vulkan.lunarg.com/)

@@ -11,7 +11,7 @@ It uses the Vulkan API for Graphics Rendering and modern ECS concepts with the [
 
 # Requirements
 - [Vulkan SDK](https://vulkan.lunarg.com/)
-- [Visual Studio 2022](https://code.visualstudio.com/)
+- [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
 
 # Getting Started
 

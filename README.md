@@ -152,7 +152,7 @@ void ExampleGame::SetupWorld()
 Once again we use `SetComponent<T>` to both add and set the values for our new **Components**.
 `Position`, `Rotation` and `Scale` are all built in **Components**;
 
-Both structs `Position` and `Scale` use the `Vec2` type to store 2 values (`Vec2` also has some neat vector math functions to make your life easier!). 
+Both structs `Position` and `Scale` use the `Vec2` type to store 2 values ([Vec2](#vec2) also has some neat vector math functions to make your life easier!). 
 
 Now if you run your code, you will finally get to see your textured quad in the center of the screen,
 because the default camera is looking at position (0,0).

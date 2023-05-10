@@ -121,6 +121,47 @@ void ExampleGame::SetupWorld()
 	bladeEntity.SetComponent<Sprite2D>({ bladeTexture });
 }
 ```
+`SetComponent<T>` can be used to set the data of a **Component** of type `T`,
+if the **Entity** does not yet have a **Component** of type `T`,
+this function will also add a component of said type to the **Entity**. 
+
+`Sprite2D` is a default **Component** type that takes a `Texture2D` reference and also works as a hint to tell the engine we want this **Entity** to get rendered. 
+When I say render the **Entity**, I actually mean rendering a qaud with the `Texture2D` that is referenced by the `Sprite2D` **Component**. 
+
+Now that we gave our **Entity** a `Sprite2D` **Component**, it should have everything it needs to get drawn to the screen!... right? 
+Well, we are indeed informing the engine we want to draw a quad with a certain texture, but it still wants some more information. 
+
+Don't worry, it's not much. 
+The engine just wants to know where the **Entity** is located in the game world, so it knows where to draw it and also the its rotation and size. 
+
+Let's get to it: 
+```cpp
+void ExampleGame::SetupWorld()
+{
+	...
+	
+	bladeEntity.SetComponent<Sprite2D>({ bladeTexture });
+	
+	// New code
+	bladeEntity.SetComponent<Position>({ { 0.0f, 0.0f } });
+	bladeEntity.SetComponent<Rotation>({ 0.0f });
+	bladeEntity.SetComponent<Scale>({ { 1.0f, 1.0f } });
+	//---------
+}
+```
+Once again we use `SetComponent<T>` to both add and set the values for our new **Components**.
+`Position`, `Rotation` and `Scale` are all built in **Components**;
+
+Both structs `Position` and `Scale` use the `Vec2` type to store 2 values (`Vec2` also has some neat vector math functions to make your life easier!). 
+
+Now if you run your code, you will finally get to see your textured quad in the center of the screen,
+because the default camera is looking at position (0,0).
+
+Don't forget to load an actual image inside `LoadGameResources` if you want to see the quad.
+
+This **Getting Started** simple example is too simple and boring, we didn't even add any interactions to our game :(, but fear not,
+if you want to see what else you can do with the **Blade Engine**, take a look at the [Example Project](#example-project) section and
+you can always refer to the [Documentation](#documentation) if you ever are in doubt about API specifics.
 
 ### Example Project
 
@@ -685,7 +726,9 @@ target_compile_definitions(ExampleGame PRIVATE
     $<$<CONFIG:MINSIZEREL>:BLADE_RELEASE>)
 ```
 
-- Now generate the cmake project, build it and run
+- Now generate the cmake project, build it and run 
+
+# Documentation
 
 # Core
 

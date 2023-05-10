@@ -166,7 +166,7 @@ This **Getting Started** simple example is too simple and boring, we didn't even
 if you want to see what else you can do with the **Blade Engine**, take a look at the [Example Project](#example-project) section and
 you can always refer to the [Documentation](#documentation) if you ever are in doubt about API specifics.
 
-### Example Project
+# Example Project
 
 ### **Setup**
 

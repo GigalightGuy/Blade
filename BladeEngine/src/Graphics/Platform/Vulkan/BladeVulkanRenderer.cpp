@@ -19,8 +19,8 @@ namespace BladeEngine::Graphics::Vulkan
 
 	void VulkanRenderer::Init(Window* window)
 	{
-		defaultVertexShader = new Shader("../assets/shaders/default.vert", ShaderType::VERTEX);
-		defaultFragmentShader = new Shader("../assets/shaders/default.frag", ShaderType::FRAGMENT);
+		defaultVertexShader = new Shader("assets/shaders/default.vert", ShaderType::VERTEX);
+		defaultFragmentShader = new Shader("assets/shaders/default.frag", ShaderType::FRAGMENT);
 
 		std::vector<const char*> extensions = window->GetRequiredExtensions();
 		extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);

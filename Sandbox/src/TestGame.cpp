@@ -2,6 +2,9 @@
 
 #include "BladeEngine.hpp"
 #include "Utils/Random.hpp"
+#include "Audio/AudioClip.hpp"
+#include "Audio/AudioSource.hpp"
+#include "Audio/AudioManager.hpp"
 
 #include <sstream>
 
@@ -30,26 +33,40 @@ namespace BladeEngine
 
     BladeEngine::Entity* g_Ground;
 
+    AudioClip *jumpClip;
+    AudioSource *audioSource;
+
     // TODO: Move this to a load assets function in engine side
     void LoadTextures()
     {
-        g_TextureChickBoy = new Graphics::Texture2D("../assets/sprites/Chick-Boy Free Pack/tile000.png");
+        g_TextureChickBoy = new Graphics::Texture2D("assets/sprites/Chick-Boy Free Pack/tile000.png");
         g_TextureChickBoy->CreateGPUTexture();
 
         g_TexturePlatformBlock = new Graphics::Texture2D(
-            "../assets/Sunny-land-assets-files/PNG/environment/props/block-big.png");
+            "assets/sprites/Sunny-land-assets-files/PNG/environment/props/block-big.png");
         g_TexturePlatformBlock->CreateGPUTexture();
 
         g_BackgroundTextures.resize(6);
         for (size_t i = 0; i < 6; i++)
         {
             std::stringstream path;
-            path << "../assets/sprites/PineForestParallax/MorningLayer" << i + 1 << ".png";
+            path << "assets/sprites/PineForestParallax/MorningLayer" << i + 1 << ".png";
 
             Graphics::Texture2D* tex = new Graphics::Texture2D(path.str());
             g_BackgroundTextures[i] = tex;
             g_BackgroundTextures[i]->CreateGPUTexture();
         }
+    }
+
+    void LoadAudioClips()
+    {
+        jumpClip = LoadAudioClip("assets/audio/jump.wav");
+        audioSource = new AudioSource(jumpClip);
+    }
+
+    void UnloadAudioClips()
+    {
+        delete audioSource;
     }
 
     void UnloadTextures()
@@ -82,6 +99,7 @@ namespace BladeEngine
         if (isGrounded && Input::GetKeyDown(ctrl.Jump))
         {
             Physics2D::AddImpulse(rb, Vec2(0.0f, 1.0f), ctrl.JumpForce);
+            audioSource->Play();
         }
     }
 
@@ -113,11 +131,13 @@ namespace BladeEngine
     void TestGame::LoadGameResources()
     {
         LoadTextures();
+        LoadAudioClips();
     }
 
     void TestGame::UnloadGameResources()
     {
         UnloadTextures();
+        //UnloadAudioClips();
     }
 
     void TestGame::SetupWorld()
@@ -188,9 +208,9 @@ namespace BladeEngine
             chickBoy->SetComponent<Sprite2D>({ g_TextureChickBoy });
         }
 
-        auto pulsator = World::CreateEntity("Pulsator");
-        pulsator->SetComponent<Position>({ { 0.0f, 0.0f } });
-        pulsator->AddComponent<PulseEmitter>();
+        // auto pulsator = World::CreateEntity("Pulsator");
+        // pulsator->SetComponent<Position>({ { 0.0f, 0.0f } });
+        // pulsator->AddComponent<PulseEmitter>();
 
         auto player = World::CreateEntity("Player");
         player->SetComponent<Position>({ { 0.0f, 5.0f } });

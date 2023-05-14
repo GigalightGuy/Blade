@@ -8,6 +8,8 @@
 #include "../Physics/Physics2D.hpp"
 #include "../Graphics/Mesh.hpp"
 
+#include "../Audio/BladeAudio.hpp"
+
 #include "box2d/box2d.h"
 
 namespace BladeEngine
@@ -28,12 +30,13 @@ namespace BladeEngine
         m_Window = new Window(1200, 800, "Blade Game");
 
         Graphics::GraphicsManager::Instance()->Init(m_Window);
+        AudioManager::Init();
     }
 
     Game::~Game()
     {
         Graphics::GraphicsManager::Instance()->Shutdown();
-
+        AudioManager::Shutdown();
         delete m_Window;
     }
     
@@ -155,6 +158,7 @@ namespace BladeEngine
     void Game::Run()
     {
         BLD_CORE_DEBUG("Loading resources...");
+
         LoadResources();
 
         BLD_CORE_DEBUG("Game started Running!!");

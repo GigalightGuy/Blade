@@ -13,6 +13,11 @@ add_library(BladeEngine STATIC
     src/Core/Vec.hpp
     src/Core/Buffer.hpp
 
+    src/Audio/AudioClip.cpp src/Audio/AudioClip.hpp
+    src/Audio/AudioManager.cpp src/Audio/AudioManager.hpp
+    src/Audio/AudioSource.cpp src/Audio/AudioSource.hpp
+    src/Audio/BladeAudio.hpp
+
     src/Utils/Random.hpp src/Utils/Random.cpp
 
     src/Core/Camera.hpp src/Core/Camera.cpp
@@ -28,7 +33,11 @@ add_library(BladeEngine STATIC
     src/ECS/World.hpp src/ECS/World.cpp
     src/ECS/Entity.hpp src/ECS/Entity.cpp
     src/Components/Components.hpp
+    
     vendor/flecs/flecs.h vendor/flecs/flecs.c
+
+    vendor/miniaudio/miniaudio.h
+
     src/Physics/Physics2D.hpp src/Physics/Physics2D.cpp
     )
 
@@ -82,6 +91,7 @@ target_include_directories(BladeEngine PRIVATE
     "vendor/glm"
     "vendor/Box2D/include"
     "vendor/stb"
+    "vendor/miniaudio"
     )
 
 if(DEFINED VULKAN_SDK_PATH)

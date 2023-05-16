@@ -31,7 +31,9 @@ std::vector<Graphics::Texture2D *> g_BackgroundTextures;
 BladeEngine::Entity *g_Ground;
 
 AudioClip *jumpClip;
+AudioClip *backgroundClip;
 AudioSource *audioSource;
+AudioSource *backgroundAudioSource;
 
 // TODO: Move this to a load assets function in engine side
 void LoadTextures() {
@@ -58,9 +60,17 @@ void LoadTextures() {
 void LoadAudioClips() {
   jumpClip = LoadAudioClip("assets/audio/jump.wav");
   audioSource = new AudioSource(jumpClip);
+
+  backgroundClip = LoadAudioClip("assets/audio/backgroundmusic.mp3");
+  backgroundAudioSource = new AudioSource(backgroundClip);
+  backgroundAudioSource->SetLooping(true);
+  backgroundAudioSource->Play();
 }
 
-void UnloadAudioClips() { delete audioSource; }
+void UnloadAudioClips() {
+  delete audioSource;
+  delete backgroundAudioSource;
+}
 
 void UnloadTextures() {
   g_TextureChickBoy->DestroyGPUTexture();

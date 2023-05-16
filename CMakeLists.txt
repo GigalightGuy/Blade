@@ -12,5 +12,9 @@ add_subdirectory("BladeEngine/vendor/GLFW")
 add_subdirectory("BladeEngine/vendor/Box2D")
 add_subdirectory("BladeEngine")
 add_subdirectory("Sandbox")
-add_subdirectory("Template")
-add_subdirectory("EmptyProject")
+#add_subdirectory("Template")
+#add_subdirectory("EmptyProject")
+
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Sandbox)
+
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Configs" FORCE)

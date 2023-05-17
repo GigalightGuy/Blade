@@ -1,14 +1,18 @@
 #include "BladeVulkanGraphicsPipeline.hpp"
+
 #include "BladeVulkanUtils.hpp"
 
 #include <array>
 #include <stdexcept>
+
 using namespace BladeEngine::Graphics::Vulkan;
 
-VulkanGraphicsPipeline::VulkanGraphicsPipeline(VkPhysicalDevice physicalDevice,
+VulkanGraphicsPipeline::VulkanGraphicsPipeline(
+	VkPhysicalDevice physicalDevice,
 	VkDevice device,
 	VulkanSwapchain* swapchain,
-	VulkanShader* shader) {
+	VulkanShader* shader) 
+{
 	CreateRenderPass(device, swapchain->imageFormat,
 		swapchain->FindDepthFormat(physicalDevice));
 	CreateDescriptorSetLayout(device);
@@ -25,6 +29,7 @@ void VulkanGraphicsPipeline::CreateDescriptorPools(VkDevice device, uint32_t des
 	poolSizes[0].descriptorCount = descriptorCount;
 	poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 	poolSizes[1].descriptorCount = descriptorCount;
+
 	VkDescriptorPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
@@ -106,9 +111,11 @@ void VulkanGraphicsPipeline::UpdateDescriptorSet(
 }
 
 
-void VulkanGraphicsPipeline::CreateRenderPass(VkDevice device,
+void VulkanGraphicsPipeline::CreateRenderPass(
+	VkDevice device,
 	VkFormat swapChainImageFormat,
-	VkFormat depthImageFormat) {
+	VkFormat depthImageFormat) 
+{
 	VkAttachmentDescription colorAttachment{};
 	colorAttachment.format = swapChainImageFormat;
 	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;

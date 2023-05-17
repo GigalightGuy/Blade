@@ -1,88 +1,159 @@
-add_library(BladeEngine STATIC 
+set(BLADE_ENGINE_SOURCE_FILES
+
+    src/Core/EntryPoint.cpp
+    
+    src/Core/Game.cpp
+    src/Core/Window.cpp
+    src/Core/Log.cpp
+    src/Core/Time.cpp
+    src/Core/Input.cpp
+
+    src/Audio/AudioClip.cpp
+    src/Audio/AudioManager.cpp
+    src/Audio/AudioSource.cpp
+
+    src/Utils/Random.cpp
+
+    src/Core/Camera.cpp
+    src/Core/Utils.cpp
+
+    src/Graphics/Color.cpp
+    src/Graphics/GraphicsManager.cpp
+    src/Graphics/Mesh.cpp
+    src/Graphics/Shader.cpp
+    src/Graphics/Texture2D.cpp
+    src/Graphics/Vertex.cpp
+
+    src/ECS/World.cpp
+    src/ECS/Entity.cpp
+
+    src/Physics/Physics2D.cpp
+
+)
+
+set(BLADE_ENGINE_VENDOR_SOURCE_FILES
+
+    vendor/flecs/flecs.c
+)
+
+set(BLADE_ENGINE_HEADER_FILES
+
     src/BladeEngine.hpp
     src/Core/Base.hpp
     src/Core/Platform.hpp
-    src/Core/EntryPoint.cpp 
-    src/Core/Game.hpp src/Core/Game.cpp
-    src/Core/Window.hpp src/Core/Window.cpp
-    src/Core/Log.hpp src/Core/Log.cpp
-    src/Core/Time.hpp src/Core/Time.cpp
-    src/Core/Input.hpp src/Core/Input.cpp
+    
+    src/Core/Game.hpp
+    src/Core/Window.hpp
+    src/Core/Log.hpp
+    src/Core/Time.hpp
+    src/Core/Input.hpp
+
     src/Core/KeyCodes.hpp
     src/Core/Math.hpp
     src/Core/Vec.hpp
     src/Core/Buffer.hpp
 
-    src/Audio/AudioClip.cpp src/Audio/AudioClip.hpp
-    src/Audio/AudioManager.cpp src/Audio/AudioManager.hpp
-    src/Audio/AudioSource.cpp src/Audio/AudioSource.hpp
+    src/Audio/AudioClip.hpp
+    src/Audio/AudioManager.hpp
+    src/Audio/AudioSource.hpp
     src/Audio/BladeAudio.hpp
 
-    src/Utils/Random.hpp src/Utils/Random.cpp
+    src/Utils/Random.hpp
 
-    src/Core/Camera.hpp src/Core/Camera.cpp
-    src/Core/Utils.hpp src/Core/Utils.cpp
+    src/Core/Camera.hpp
+    src/Core/Utils.hpp
 
-    src/Graphics/Color.hpp src/Graphics/Color.cpp
-    src/Graphics/GraphicsManager.hpp src/Graphics/GraphicsManager.cpp
-    src/Graphics/Mesh.hpp src/Graphics/Mesh.cpp
-    src/Graphics/Shader.hpp src/Graphics/Shader.cpp
-    src/Graphics/Texture2D.hpp src/Graphics/Texture2D.cpp
-    src/Graphics/Vertex.hpp src/Graphics/Vertex.cpp
+    src/Graphics/Color.hpp
+    src/Graphics/GraphicsManager.hpp
+    src/Graphics/Mesh.hpp
+    src/Graphics/Shader.hpp
+    src/Graphics/Texture2D.hpp
+    src/Graphics/Vertex.hpp
 
-    src/ECS/World.hpp src/ECS/World.cpp
-    src/ECS/Entity.hpp src/ECS/Entity.cpp
+    src/ECS/World.hpp
+    src/ECS/Entity.hpp
+
     src/Components/Components.hpp
+
+    src/Physics/Physics2D.hpp
+
+)
+
+set(BLADE_ENGINE_VENDOR_HEADER_FILES
     
-    vendor/flecs/flecs.h vendor/flecs/flecs.c
+    vendor/flecs/flecs.h
 
     vendor/miniaudio/miniaudio.h
-
-    src/Physics/Physics2D.hpp src/Physics/Physics2D.cpp
-    )
-
+)
 
 if(WIN32)
-    target_compile_definitions(BladeEngine PRIVATE BLADE_VULKAN_API)
     set(USING_VULKAN_API "True")
 endif(WIN32)
 
 if(UNIX)
-    target_compile_definitions(BladeEngine PRIVATE BLADE_VULKAN_API)
     set(USING_VULKAN_API "True")
 endif(UNIX)
 
 if(USING_VULKAN_API)
-    target_sources(BladeEngine PRIVATE
-        #src/Platform/Vulkan/VulkanDevice.hpp src/Platform/Vulkan/VulkanDevice.cpp
-        #src/Platform/Vulkan/VulkanTexture.cpp
-        #src/Platform/Vulkan/VulkanSwapchain.hpp src/Platform/Vulkan/VulkanSwapchain.cpp
-        #src/Platform/Vulkan/VulkanImage.hpp src/Platform/Vulkan/VulkanImage.cpp
-        #src/Platform/Vulkan/VulkanQueue.hpp src/Platform/Vulkan/VulkanQueue.cpp
-        #src/Platform/Vulkan/VulkanRenderPass.hpp src/Platform/Vulkan/VulkanRenderPass.cpp
-        #src/Platform/Vulkan/VulkanPipeline.hpp src/Platform/Vulkan/VulkanPipeline.cpp
-        #src/Platform/Vulkan/VulkanCommandPool.hpp src/Platform/Vulkan/VulkanCommandPool.cpp
-        #src/Platform/Vulkan/VulkanGraphicsAPI.cpp
-        #src/Platform/Vulkan/VulkanValidationLayers.hpp src/Platform/Vulkan/VulkanValidationLayers.cpp
+    set(BLADE_ENGINE_GRAPHICS_API_SOURCE_FILES
 
-        src/Graphics/Platform/Vulkan/BladeVulkanUtils.cpp             src/Graphics/Platform/Vulkan/BladeVulkanUtils.hpp
-		src/Graphics/Platform/Vulkan/BladeVulkanInstance.cpp          src/Graphics/Platform/Vulkan/BladeVulkanInstance.hpp
-		src/Graphics/Platform/Vulkan/BladeVulkanQueueFamily.cpp       src/Graphics/Platform/Vulkan/BladeVulkanQueueFamily.hpp	
-		src/Graphics/Platform/Vulkan/BladeVulkanDevice.cpp            src/Graphics/Platform/Vulkan/BladeVulkanDevice.hpp
-		src/Graphics/Platform/Vulkan/BladeVulkanSwapchain.cpp         src/Graphics/Platform/Vulkan/BladeVulkanSwapchain.hpp
-		src/Graphics/Platform/Vulkan/BladeVulkanShader.cpp            src/Graphics/Platform/Vulkan/BladeVulkanShader.hpp
-        src/Graphics/Platform/Vulkan/BladeVulkanGraphicsPipeline.cpp  src/Graphics/Platform/Vulkan/BladeVulkanGraphicsPipeline.hpp
-        src/Graphics/Platform/Vulkan/BladeVulkanMesh.cpp              src/Graphics/Platform/Vulkan/BladeVulkanMesh.hpp
-        src/Graphics/Platform/Vulkan/BladeVulkanTexture.cpp           src/Graphics/Platform/Vulkan/BladeVulkanTexture.hpp
-		src/Graphics/Platform/Vulkan/BladeVulkanRenderer.cpp          src/Graphics/Platform/Vulkan/BladeVulkanRenderer.hpp
+        src/Graphics/Platform/Vulkan/BladeVulkanUtils.cpp
+		src/Graphics/Platform/Vulkan/BladeVulkanInstance.cpp
+		src/Graphics/Platform/Vulkan/BladeVulkanQueueFamily.cpp
+		src/Graphics/Platform/Vulkan/BladeVulkanDevice.cpp
+		src/Graphics/Platform/Vulkan/BladeVulkanSwapchain.cpp
+		src/Graphics/Platform/Vulkan/BladeVulkanShader.cpp
+        src/Graphics/Platform/Vulkan/BladeVulkanGraphicsPipeline.cpp
+        src/Graphics/Platform/Vulkan/BladeVulkanMesh.cpp
+        src/Graphics/Platform/Vulkan/BladeVulkanTexture.cpp
+		src/Graphics/Platform/Vulkan/BladeVulkanRenderer.cpp
+        
+    )
+
+    set(BLADE_ENGINE_GRAPHICS_API_HEADER_FILES
+
+        src/Graphics/Platform/Vulkan/BladeVulkanUtils.hpp
+		src/Graphics/Platform/Vulkan/BladeVulkanInstance.hpp
+		src/Graphics/Platform/Vulkan/BladeVulkanQueueFamily.hpp	
+		src/Graphics/Platform/Vulkan/BladeVulkanDevice.hpp
+		src/Graphics/Platform/Vulkan/BladeVulkanSwapchain.hpp
+		src/Graphics/Platform/Vulkan/BladeVulkanShader.hpp
+        src/Graphics/Platform/Vulkan/BladeVulkanGraphicsPipeline.hpp
+        src/Graphics/Platform/Vulkan/BladeVulkanMesh.hpp
+        src/Graphics/Platform/Vulkan/BladeVulkanTexture.hpp
+		src/Graphics/Platform/Vulkan/BladeVulkanRenderer.hpp
         src/Graphics/Platform/Vulkan/VulkanBuffer.hpp
-        )
+
+    )
+endif(USING_VULKAN_API)
+
+add_library(BladeEngine STATIC 
+    
+    ${BLADE_ENGINE_SOURCE_FILES} ${BLADE_ENGINE_HEADER_FILES}
+    ${BLADE_ENGINE_VENDOR_SOURCE_FILES} ${BLADE_ENGINE_VENDOR_HEADER_FILES}
+    ${BLADE_ENGINE_GRAPHICS_API_SOURCE_FILES} ${BLADE_ENGINE_GRAPHICS_API_HEADER_FILES}
+)
+
+
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" PREFIX "Source Files" FILES 
+    ${BLADE_ENGINE_SOURCE_FILES} 
+    ${BLADE_ENGINE_VENDOR_SOURCE_FILES}
+    ${BLADE_ENGINE_GRAPHICS_API_SOURCE_FILES}
+)
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" PREFIX "Header Files" FILES 
+    ${BLADE_ENGINE_HEADER_FILES}
+    ${BLADE_ENGINE_VENDOR_HEADER_FILES}
+    ${BLADE_ENGINE_GRAPHICS_API_HEADER_FILES}
+)
+
+if(USING_VULKAN_API)
+    target_compile_definitions(BladeEngine PRIVATE BLADE_VULKAN_API)
 endif(USING_VULKAN_API)
 
 target_link_libraries(BladeEngine PRIVATE 
     glfw 
     box2d
-    )
+)
 
 target_include_directories(BladeEngine PRIVATE
     "vendor/flecs"
@@ -92,7 +163,7 @@ target_include_directories(BladeEngine PRIVATE
     "vendor/Box2D/include"
     "vendor/stb"
     "vendor/miniaudio"
-    )
+)
 
 if(DEFINED VULKAN_SDK_PATH)
     set(Vulkan_INCLUDE_DIRS "${VULKAN_SDK_PATH}/Include")
@@ -114,7 +185,7 @@ endif()
 set_target_properties(BladeEngine PROPERTIES LINKER_LANGUAGE CXX)
 
 target_compile_definitions(BladeEngine PRIVATE 
+
     $<$<CONFIG:DEBUG>:BLADE_DEBUG>
     $<$<CONFIG:RELEASE>:BLADE_RELEASE>
-    $<$<CONFIG:RELWITHDEBINFO>:BLADE_DEBUG>
-    $<$<CONFIG:MINSIZEREL>:BLADE_RELEASE>)
+)

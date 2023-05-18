@@ -23,6 +23,7 @@ set(BLADE_ENGINE_SOURCE_FILES
     src/Graphics/Shader.cpp
     src/Graphics/Texture2D.cpp
     src/Graphics/Vertex.cpp
+    src/Graphics/Font.cpp
 
     src/ECS/World.cpp
     src/ECS/Entity.cpp
@@ -69,6 +70,8 @@ set(BLADE_ENGINE_HEADER_FILES
     src/Graphics/Shader.hpp
     src/Graphics/Texture2D.hpp
     src/Graphics/Vertex.hpp
+    src/Graphics/Font.hpp
+    src/Graphics/MSDFData.hpp
 
     src/ECS/World.hpp
     src/ECS/Entity.hpp
@@ -163,6 +166,8 @@ target_include_directories(BladeEngine PRIVATE
     "vendor/Box2D/include"
     "vendor/stb"
     "vendor/miniaudio"
+    "vendor/msdf-atlas-gen/msdf-atlas-gen"
+    "vendor/msdf-atlas-gen/msdfgen"
 )
 
 if(DEFINED VULKAN_SDK_PATH)

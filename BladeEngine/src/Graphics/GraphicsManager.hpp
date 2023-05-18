@@ -2,6 +2,7 @@
 
 #include "../Core/Camera.hpp"
 #include "Texture2D.hpp"
+#include "Font.hpp"
 #include "Shader.hpp"
 #include "Vertex.hpp"
 #include "Color.hpp"

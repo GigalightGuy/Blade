@@ -10,3 +10,6 @@
 [submodule "BladeEngine/vendor/Box2D"]
 	path = BladeEngine/vendor/Box2D
 	url = https://github.com/GigalightGuy/box2d.git
+[submodule "BladeEngine/vendor/msdf-atlas-gen"]
+	path = BladeEngine/vendor/msdf-atlas-gen
+	url = https://github.com/GigalightGuy/msdf-atlas-gen.git

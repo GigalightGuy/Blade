@@ -9,243 +9,246 @@
 #include <sstream>
 
 namespace BladeEngine {
-struct Controller {
-  KeyCode Left, Right;
-  KeyCode Jump;
 
-  float Movespeed;
-  float JumpForce;
-};
+	struct Controller {
+		KeyCode Left, Right;
+		KeyCode Jump;
 
-struct PulseEmitter {
-  float Strength = 10.0f;
-  float Radius = 5.0f;
-};
+		float Movespeed;
+		float JumpForce;
+	};
 
-struct Player {};
+	struct PulseEmitter {
+		float Strength = 10.0f;
+		float Radius = 5.0f;
+	};
 
-Graphics::Texture2D *g_TextureChickBoy;
-Graphics::Texture2D *g_TexturePlatformBlock;
-std::vector<Graphics::Texture2D *> g_BackgroundTextures;
+	struct Player {};
 
-BladeEngine::Entity *g_Ground;
+	Graphics::Texture2D* g_TextureChickBoy;
+	Graphics::Texture2D* g_TexturePlatformBlock;
+	std::vector<Graphics::Texture2D*> g_BackgroundTextures;
 
-AudioClip *jumpClip;
-AudioClip *backgroundClip;
-AudioSource *audioSource;
-AudioSource *backgroundAudioSource;
+	BladeEngine::Entity* g_Ground;
 
-// TODO: Move this to a load assets function in engine side
-void LoadTextures() {
-  g_TextureChickBoy =
-      new Graphics::Texture2D("assets/sprites/Chick-Boy Free Pack/tile000.png");
-  g_TextureChickBoy->CreateGPUTexture();
+	AudioClip* jumpClip;
+	AudioClip* backgroundClip;
+	AudioSource* audioSource;
+	AudioSource* backgroundAudioSource;
 
-  g_TexturePlatformBlock =
-      new Graphics::Texture2D("assets/sprites/Sunny-land-assets-files/PNG/"
-                              "environment/props/block-big.png");
-  g_TexturePlatformBlock->CreateGPUTexture();
+	// TODO: Move this to a load assets function in engine side
+	void LoadTextures() {
+		g_TextureChickBoy =
+			new Graphics::Texture2D("assets/sprites/Chick-Boy Free Pack/tile000.png");
+		g_TextureChickBoy->CreateGPUTexture();
 
-  g_BackgroundTextures.resize(6);
-  for (size_t i = 0; i < 6; i++) {
-    std::stringstream path;
-    path << "assets/sprites/PineForestParallax/MorningLayer" << i + 1 << ".png";
+		g_TexturePlatformBlock =
+			new Graphics::Texture2D("assets/sprites/Sunny-land-assets-files/PNG/"
+				"environment/props/block-big.png");
+		g_TexturePlatformBlock->CreateGPUTexture();
 
-    Graphics::Texture2D *tex = new Graphics::Texture2D(path.str());
-    g_BackgroundTextures[i] = tex;
-    g_BackgroundTextures[i]->CreateGPUTexture();
-  }
-}
+		g_BackgroundTextures.resize(6);
+		for (size_t i = 0; i < 6; i++) {
+			std::stringstream path;
+			path << "assets/sprites/PineForestParallax/MorningLayer" << i + 1 << ".png";
 
-void LoadAudioClips() {
-  jumpClip = LoadAudioClip("assets/audio/jump.wav");
-  audioSource = new AudioSource(jumpClip);
+			Graphics::Texture2D* tex = new Graphics::Texture2D(path.str());
+			g_BackgroundTextures[i] = tex;
+			g_BackgroundTextures[i]->CreateGPUTexture();
+		}
+	}
 
-  backgroundClip = LoadAudioClip("assets/audio/backgroundmusic.mp3");
-  backgroundAudioSource = new AudioSource(backgroundClip);
-  backgroundAudioSource->SetLooping(true);
-  backgroundAudioSource->Play();
-}
+	void LoadAudioClips() {
+		jumpClip = LoadAudioClip("assets/audio/jump.wav");
+		audioSource = new AudioSource(jumpClip);
 
-void UnloadAudioClips() {
-  delete audioSource;
-  delete backgroundAudioSource;
-}
+		backgroundClip = LoadAudioClip("assets/audio/backgroundmusic.mp3");
+		backgroundAudioSource = new AudioSource(backgroundClip);
+		backgroundAudioSource->SetLooping(true);
+		backgroundAudioSource->Play();
+	}
 
-void UnloadTextures() {
-  g_TextureChickBoy->DestroyGPUTexture();
+	void UnloadAudioClips() {
+		delete audioSource;
+		delete backgroundAudioSource;
+	}
 
-  g_TexturePlatformBlock->DestroyGPUTexture();
+	void UnloadTextures() {
+		g_TextureChickBoy->DestroyGPUTexture();
 
-  for (size_t i = 0; i < g_BackgroundTextures.size(); i++) {
-    g_BackgroundTextures[i]->DestroyGPUTexture();
-  }
-}
+		g_TexturePlatformBlock->DestroyGPUTexture();
 
-void Move(flecs::entity e, const Controller &ctrl, Rigidbody2D &rb,
-          const Position &pos) {
-  float desiredVel = 0.0f;
-  desiredVel += Input::GetKey(ctrl.Left) ? -ctrl.Movespeed : 0.0f;
-  desiredVel += Input::GetKey(ctrl.Right) ? ctrl.Movespeed : 0.0f;
+		for (size_t i = 0; i < g_BackgroundTextures.size(); i++) {
+			g_BackgroundTextures[i]->DestroyGPUTexture();
+		}
+	}
 
-  Vec2 currentVel = Physics2D::GetBodyVelocity(rb);
-  float velChange = desiredVel - currentVel.X;
-  float impulse = Physics2D::GetBodyMass(rb) * velChange;
+	void Move(flecs::entity e, const Controller& ctrl, Rigidbody2D& rb,
+		const Position& pos) {
+		float desiredVel = 0.0f;
+		desiredVel += Input::GetKey(ctrl.Left) ? -ctrl.Movespeed : 0.0f;
+		desiredVel += Input::GetKey(ctrl.Right) ? ctrl.Movespeed : 0.0f;
 
-  Physics2D::AddImpulse(rb, Vec2(impulse, 0.0f));
+		Vec2 currentVel = Physics2D::GetBodyVelocity(rb);
+		float velChange = desiredVel - currentVel.X;
+		float impulse = Physics2D::GetBodyMass(rb) * velChange;
 
-  RaycastHitInfo hitInfo;
-  bool isGrounded =
-      Physics2D::Raycast(*(g_Ground->GetComponent<Rigidbody2D>()), pos.Value,
-                         Vec2(0.0f, -1.0f), 0.55f, hitInfo);
+		Physics2D::AddImpulse(rb, Vec2(impulse, 0.0f));
 
-  if (isGrounded && Input::GetKeyDown(ctrl.Jump)) {
-    Physics2D::AddImpulse(rb, Vec2(0.0f, 1.0f), ctrl.JumpForce);
-    audioSource->Play();
-  }
-}
+		RaycastHitInfo hitInfo;
+		bool isGrounded =
+			Physics2D::Raycast(*(g_Ground->GetComponent<Rigidbody2D>()), pos.Value,
+				Vec2(0.0f, -1.0f), 0.55f, hitInfo);
 
-void HandleOutOfMap(Position &pos) {
-  if (pos.Value.Y < -10.0f)
-    pos.Value = Vec2(Utils::Random::NextFloat(-10.0f, 10.0f), 5.0f);
-}
+		if (isGrounded && Input::GetKeyDown(ctrl.Jump)) {
+			Physics2D::AddImpulse(rb, Vec2(0.0f, 1.0f), ctrl.JumpForce);
+			audioSource->Play();
+		}
+	}
 
-void FocusCamera(const Player &player, const Position &pos) {
-  Camera::GetMainCamera()->SetPosition({pos.Value.X, 2.0f, 10.0f});
-}
+	void HandleOutOfMap(Position& pos) {
+		if (pos.Value.Y < -10.0f)
+			pos.Value = Vec2(Utils::Random::NextFloat(-10.0f, 10.0f), 5.0f);
+	}
 
-void GeneratePulse(const PulseEmitter &emitter, const Position &pos) {
-  World::GetECSWorldHandle()->filter<Rigidbody2D, const Position>().each(
-      [&](Rigidbody2D &rb, const Position &p) {
-        Vec2 pulseVec = p.Value - pos.Value;
+	void FocusCamera(const Player& player, const Position& pos) {
+		Camera::GetMainCamera()->SetPosition({ pos.Value.X, 2.0f, 10.0f });
+	}
 
-        float distDiff = emitter.Radius - pulseVec.Length();
-        if (distDiff < 0)
-          return;
+	void GeneratePulse(const PulseEmitter& emitter, const Position& pos) {
+		World::GetECSWorldHandle()->filter<Rigidbody2D, const Position>().each(
+			[&](Rigidbody2D& rb, const Position& p) {
+				Vec2 pulseVec = p.Value - pos.Value;
 
-        float pulseForce = distDiff / emitter.Radius * emitter.Strength;
-        Physics2D::AddImpulse(rb, Vec2(Normalize(pulseVec) * pulseForce));
-      });
-}
+				float distDiff = emitter.Radius - pulseVec.Length();
+				if (distDiff < 0)
+					return;
 
-void TestGame::LoadGameResources() {
-  LoadTextures();
-  LoadAudioClips();
-}
+				float pulseForce = distDiff / emitter.Radius * emitter.Strength;
+				Physics2D::AddImpulse(rb, Vec2(Normalize(pulseVec) * pulseForce));
+			});
+	}
 
-void TestGame::UnloadGameResources() {
-  UnloadTextures();
-  // UnloadAudioClips();
-}
+	void TestGame::LoadGameResources() {
+		LoadTextures();
+		LoadAudioClips();
 
-void TestGame::SetupWorld() {
-  g_Ground = World::CreateEntity("Ground");
-  g_Ground->SetComponent<Position>({{0.0f, 0.0f}});
-  g_Ground->SetComponent<Rotation>({0.0f});
-  g_Ground->SetComponent<Scale>({{40.0f, 2.0f}});
-  g_Ground->AddComponent<Rigidbody2D>();
-  g_Ground->AddComponent<BoxCollider2D>();
-  g_Ground->GetComponent<BoxCollider2D>()->HalfExtents = {20.0f, 1.0f};
+		Graphics::Font* font = new Graphics::Font("assets/fonts/arial.ttf");
+	}
 
-  g_Ground->SetComponent<Sprite2D>({g_TexturePlatformBlock});
+	void TestGame::UnloadGameResources() {
+		UnloadTextures();
+		// UnloadAudioClips();
+	}
 
-  {
-    auto chickBoy = World::CreateEntity("Chick Boy 1");
-    chickBoy->SetComponent<Position>({{-10.0f, 20.0f}});
-    chickBoy->SetComponent<Rotation>({0.0f});
-    chickBoy->SetComponent<Scale>({{1.0f, 1.0f}});
-    chickBoy->AddComponent<Rigidbody2D>();
-    auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
-    chickBoyRB->LockRotation = true;
-    chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
-    chickBoy->AddComponent<BoxCollider2D>();
+	void TestGame::SetupWorld() {
+		g_Ground = World::CreateEntity("Ground");
+		g_Ground->SetComponent<Position>({ {0.0f, 0.0f} });
+		g_Ground->SetComponent<Rotation>({ 0.0f });
+		g_Ground->SetComponent<Scale>({ {40.0f, 2.0f} });
+		g_Ground->AddComponent<Rigidbody2D>();
+		g_Ground->AddComponent<BoxCollider2D>();
+		g_Ground->GetComponent<BoxCollider2D>()->HalfExtents = { 20.0f, 1.0f };
 
-    chickBoy->SetComponent<Sprite2D>({g_TextureChickBoy});
-  }
+		g_Ground->SetComponent<Sprite2D>({ g_TexturePlatformBlock });
 
-  {
-    auto chickBoy = World::CreateEntity("Chick Boy 2");
-    chickBoy->SetComponent<Position>({{-5.0f, 20.0f}});
-    chickBoy->SetComponent<Rotation>({0.0f});
-    chickBoy->SetComponent<Scale>({{1.0f, 1.0f}});
-    chickBoy->AddComponent<Rigidbody2D>();
-    auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
-    chickBoyRB->LockRotation = true;
-    chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
-    chickBoy->AddComponent<BoxCollider2D>();
+		{
+			auto chickBoy = World::CreateEntity("Chick Boy 1");
+			chickBoy->SetComponent<Position>({ {-10.0f, 20.0f} });
+			chickBoy->SetComponent<Rotation>({ 0.0f });
+			chickBoy->SetComponent<Scale>({ {1.0f, 1.0f} });
+			chickBoy->AddComponent<Rigidbody2D>();
+			auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
+			chickBoyRB->LockRotation = true;
+			chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
+			chickBoy->AddComponent<BoxCollider2D>();
 
-    chickBoy->SetComponent<Sprite2D>({g_TextureChickBoy});
-  }
+			chickBoy->SetComponent<Sprite2D>({ g_TextureChickBoy });
+		}
 
-  {
-    auto chickBoy = World::CreateEntity("Chick Boy 3");
-    chickBoy->SetComponent<Position>({{5.0f, 20.0f}});
-    chickBoy->SetComponent<Rotation>({0.0f});
-    chickBoy->SetComponent<Scale>({{1.0f, 1.0f}});
-    chickBoy->AddComponent<Rigidbody2D>();
-    auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
-    chickBoyRB->LockRotation = true;
-    chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
-    chickBoy->AddComponent<BoxCollider2D>();
+		{
+			auto chickBoy = World::CreateEntity("Chick Boy 2");
+			chickBoy->SetComponent<Position>({ {-5.0f, 20.0f} });
+			chickBoy->SetComponent<Rotation>({ 0.0f });
+			chickBoy->SetComponent<Scale>({ {1.0f, 1.0f} });
+			chickBoy->AddComponent<Rigidbody2D>();
+			auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
+			chickBoyRB->LockRotation = true;
+			chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
+			chickBoy->AddComponent<BoxCollider2D>();
 
-    chickBoy->SetComponent<Sprite2D>({g_TextureChickBoy});
-  }
+			chickBoy->SetComponent<Sprite2D>({ g_TextureChickBoy });
+		}
 
-  {
-    auto chickBoy = World::CreateEntity("Chick Boy 4");
-    chickBoy->SetComponent<Position>({{10.0f, 20.0f}});
-    chickBoy->SetComponent<Rotation>({0.0f});
-    chickBoy->SetComponent<Scale>({{1.0f, 1.0f}});
-    chickBoy->AddComponent<Rigidbody2D>();
-    auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
-    chickBoyRB->LockRotation = true;
-    chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
-    chickBoy->AddComponent<BoxCollider2D>();
+		{
+			auto chickBoy = World::CreateEntity("Chick Boy 3");
+			chickBoy->SetComponent<Position>({ {5.0f, 20.0f} });
+			chickBoy->SetComponent<Rotation>({ 0.0f });
+			chickBoy->SetComponent<Scale>({ {1.0f, 1.0f} });
+			chickBoy->AddComponent<Rigidbody2D>();
+			auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
+			chickBoyRB->LockRotation = true;
+			chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
+			chickBoy->AddComponent<BoxCollider2D>();
 
-    chickBoy->SetComponent<Sprite2D>({g_TextureChickBoy});
-  }
+			chickBoy->SetComponent<Sprite2D>({ g_TextureChickBoy });
+		}
 
-  // auto pulsator = World::CreateEntity("Pulsator");
-  // pulsator->SetComponent<Position>({ { 0.0f, 0.0f } });
-  // pulsator->AddComponent<PulseEmitter>();
+		{
+			auto chickBoy = World::CreateEntity("Chick Boy 4");
+			chickBoy->SetComponent<Position>({ {10.0f, 20.0f} });
+			chickBoy->SetComponent<Rotation>({ 0.0f });
+			chickBoy->SetComponent<Scale>({ {1.0f, 1.0f} });
+			chickBoy->AddComponent<Rigidbody2D>();
+			auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
+			chickBoyRB->LockRotation = true;
+			chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
+			chickBoy->AddComponent<BoxCollider2D>();
 
-  auto player = World::CreateEntity("Player");
-  player->SetComponent<Position>({{0.0f, 5.0f}});
-  player->SetComponent<Rotation>({0.0f});
-  player->SetComponent<Scale>({{1.0f, 1.0f}});
-  player->SetComponent<Controller>(
-      {KeyCode::A, KeyCode::D, KeyCode::Space, 4.0f, 5.0f});
-  player->SetComponent<Sprite2D>({g_TextureChickBoy});
-  player->AddComponent<Player>();
-  player->AddComponent<Rigidbody2D>();
-  auto playerRB = player->GetComponent<Rigidbody2D>();
-  playerRB->LockRotation = true;
-  playerRB->Type = Rigidbody2D::BodyType::Dynamic;
-  player->AddComponent<CircleCollider2D>();
+			chickBoy->SetComponent<Sprite2D>({ g_TextureChickBoy });
+		}
 
-  for (size_t i = 0; i < 6; i++) {
-    std::stringstream ss("Background Layer ");
-    ss << i + 1;
+		// auto pulsator = World::CreateEntity("Pulsator");
+		// pulsator->SetComponent<Position>({ { 0.0f, 0.0f } });
+		// pulsator->AddComponent<PulseEmitter>();
 
-    auto background = World::CreateEntity(ss.str());
-    background->SetComponent<Position>({{0.0f, 0.0f}});
-    background->SetComponent<Rotation>({0.0f});
-    background->SetComponent<Scale>({{100.0f, 50.0f}});
+		auto player = World::CreateEntity("Player");
+		player->SetComponent<Position>({ {0.0f, 5.0f} });
+		player->SetComponent<Rotation>({ 0.0f });
+		player->SetComponent<Scale>({ {1.0f, 1.0f} });
+		player->SetComponent<Controller>(
+			{ KeyCode::A, KeyCode::D, KeyCode::Space, 4.0f, 5.0f });
+		player->SetComponent<Sprite2D>({ g_TextureChickBoy });
+		player->AddComponent<Player>();
+		player->AddComponent<Rigidbody2D>();
+		auto playerRB = player->GetComponent<Rigidbody2D>();
+		playerRB->LockRotation = true;
+		playerRB->Type = Rigidbody2D::BodyType::Dynamic;
+		player->AddComponent<CircleCollider2D>();
 
-    background->SetComponent<Sprite2D>({g_BackgroundTextures[i]});
-  }
+		for (size_t i = 0; i < 6; i++) {
+			std::stringstream ss("Background Layer ");
+			ss << i + 1;
 
-  World::BindSystem<const PulseEmitter, const Position>(2.0f, "Generate Pulse",
-                                                        GeneratePulse);
+			auto background = World::CreateEntity(ss.str());
+			background->SetComponent<Position>({ {0.0f, 0.0f} });
+			background->SetComponent<Rotation>({ 0.0f });
+			background->SetComponent<Scale>({ {100.0f, 50.0f} });
 
-  World::BindSystem<const Controller, Rigidbody2D, const Position>(
-      flecs::OnUpdate, "Move", Move);
-  World::BindSystem<Position>(flecs::OnUpdate, "Handle out of Map",
-                              HandleOutOfMap);
+			background->SetComponent<Sprite2D>({ g_BackgroundTextures[i] });
+		}
 
-  World::BindSystem<const Player, const Position>(flecs::PostUpdate,
-                                                  "Focus Camera", FocusCamera);
-}
+		World::BindSystem<const PulseEmitter, const Position>(2.0f, "Generate Pulse",
+			GeneratePulse);
 
-Game *CreateGameInstance() { return new TestGame(); }
+		World::BindSystem<const Controller, Rigidbody2D, const Position>(
+			flecs::OnUpdate, "Move", Move);
+		World::BindSystem<Position>(flecs::OnUpdate, "Handle out of Map",
+			HandleOutOfMap);
+
+		World::BindSystem<const Player, const Position>(flecs::PostUpdate,
+			"Focus Camera", FocusCamera);
+	}
+
+	Game* CreateGameInstance() { return new TestGame(); }
 } // namespace BladeEngine

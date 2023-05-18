@@ -12,6 +12,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 add_subdirectory("BladeEngine/vendor/GLFW")
 add_subdirectory("BladeEngine/vendor/Box2D")
+add_subdirectory("BladeEngine/vendor/msdf-atlas-gen")
+
 add_subdirectory("BladeEngine")
 add_subdirectory("Sandbox")
 
@@ -20,6 +22,7 @@ set_target_properties(uninstall PROPERTIES FOLDER "third_party/GLFW")
 set_target_properties(update_mappings PROPERTIES FOLDER "third_party/GLFW")
 
 set_target_properties(box2d PROPERTIES FOLDER "third_party")
+set_target_properties(msdf-atlas-gen PROPERTIES FOLDER "third_party")
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Sandbox)
 

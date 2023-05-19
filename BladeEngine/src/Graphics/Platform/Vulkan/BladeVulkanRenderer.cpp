@@ -126,7 +126,7 @@ namespace BladeEngine::Graphics::Vulkan
 
 	VulkanTexture* VulkanRenderer::UploadTextureToGPU(Texture2D* texture)
 	{
-		return new VulkanTexture(vkDevice->physicalDevice, vkDevice->logicalDevice, vkDevice->graphicsQueue, vkCommandPool, vkSwapchain, texture);
+		return new VulkanTexture(vkDevice->physicalDevice, vkDevice->logicalDevice, vkDevice->graphicsQueue, vkCommandPool, texture);
 	}
 
 	void VulkanRenderer::ReleaseGPUTexture(VulkanTexture* gpuTexture)

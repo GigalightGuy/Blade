@@ -64,6 +64,11 @@ namespace BladeEngine::Graphics {
 		return 0;
 	}
 
+	void Texture2D::SetSamplerConfiguration(SamplerConfiguration samplerConfig)
+	{
+		m_SamplerConfig = samplerConfig;
+	}
+
 	void Texture2D::SetData(void* pixels, uint32_t size)
 	{
 		BLD_CORE_ASSERT(pixels, "Provided data is null");

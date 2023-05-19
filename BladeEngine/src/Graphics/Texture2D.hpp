@@ -7,6 +7,7 @@ namespace BladeEngine::Graphics {
 	enum class TextureFormat
 	{
 		None = 0,
+
 		R8,
 		RG8,
 		RGB8,
@@ -14,8 +15,33 @@ namespace BladeEngine::Graphics {
 		RGBA32F
 	};
 
+	enum class SamplerFilter
+	{
+		None = 0,
+
+		Nearest,
+		Linear
+	};
+
+	enum class SamplerAddressMode
+	{
+		None = 0,
+
+		Repeat,
+		MirroredRepeat,
+		ClampToEdges,
+		ClampToBorder,
+	};
+
 	class Texture2D
 	{
+	public:
+		struct SamplerConfiguration
+		{
+			SamplerFilter Filter = SamplerFilter::Nearest;
+			SamplerAddressMode AdressMode = SamplerAddressMode::Repeat;
+		};
+
 	public:
 		Texture2D(uint32_t width, uint32_t height, TextureFormat format = TextureFormat::RGBA8);
 		Texture2D(const char* path);
@@ -31,6 +57,9 @@ namespace BladeEngine::Graphics {
 
 		uint8_t* GetData() { return m_Pixels; }
 
+		void SetSamplerConfiguration(SamplerConfiguration samplerConfig);
+		const SamplerConfiguration* GetSamplerConfiguration() const { return &m_SamplerConfig; }
+
 		void SetData(void* pixels, uint32_t size);
 
 		void CreateGPUTexture();
@@ -43,6 +72,8 @@ namespace BladeEngine::Graphics {
 		uint32_t m_Width, m_Height;
 
 		TextureFormat m_Format;
+
+		SamplerConfiguration m_SamplerConfig;
 
 		// Texture pixel data
 		uint8_t* m_Pixels = nullptr;

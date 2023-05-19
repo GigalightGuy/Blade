@@ -36,15 +36,22 @@ namespace BladeEngine {
 	AudioSource* audioSource;
 	AudioSource* backgroundAudioSource;
 
-	// TODO: Move this to a load assets function in engine side
 	void LoadTextures() {
+		using namespace BladeEngine::Graphics;
+
+		Texture2D::SamplerConfiguration samplerConfig;
+		samplerConfig.Filter = SamplerFilter::Nearest;
+		samplerConfig.AdressMode = SamplerAddressMode::ClampToEdges;
+
 		g_TextureChickBoy =
-			new Graphics::Texture2D("assets/sprites/Chick-Boy Free Pack/tile000.png");
+			new Texture2D("assets/sprites/Chick-Boy Free Pack/tile000.png");
+		g_TextureChickBoy->SetSamplerConfiguration(samplerConfig);
 		g_TextureChickBoy->CreateGPUTexture();
 
 		g_TexturePlatformBlock =
-			new Graphics::Texture2D("assets/sprites/Sunny-land-assets-files/PNG/"
+			new Texture2D("assets/sprites/Sunny-land-assets-files/PNG/"
 				"environment/props/block-big.png");
+		g_TexturePlatformBlock->SetSamplerConfiguration(samplerConfig);
 		g_TexturePlatformBlock->CreateGPUTexture();
 
 		g_BackgroundTextures.resize(6);
@@ -52,8 +59,9 @@ namespace BladeEngine {
 			std::stringstream path;
 			path << "assets/sprites/PineForestParallax/MorningLayer" << i + 1 << ".png";
 
-			Graphics::Texture2D* tex = new Graphics::Texture2D(path.str().c_str());
+			Texture2D* tex = new Texture2D(path.str().c_str());
 			g_BackgroundTextures[i] = tex;
+			g_BackgroundTextures[i]->SetSamplerConfiguration(samplerConfig);
 			g_BackgroundTextures[i]->CreateGPUTexture();
 		}
 	}

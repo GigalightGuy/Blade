@@ -24,6 +24,12 @@ namespace BladeEngine::Graphics {
 
 		Texture2D* texture = new Texture2D(bitmap.width, bitmap.height, TextureFormat::RGB8);
 		texture->SetData((void*)bitmap.pixels, bitmap.width * bitmap.height * 3);
+
+		Texture2D::SamplerConfiguration samplerConfig;
+		samplerConfig.AdressMode = SamplerAddressMode::ClampToEdges;
+		samplerConfig.Filter = SamplerFilter::Linear;
+		texture->SetSamplerConfiguration(samplerConfig);
+
 		texture->CreateGPUTexture();
 
 		return texture;

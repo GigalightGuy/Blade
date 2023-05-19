@@ -11,7 +11,7 @@ class VulkanTexture {
 public:
   VulkanTexture(VkPhysicalDevice physicalDevice, VkDevice device,
                 VkQueue graphicsQueue, VkCommandPool commandPool,
-                VulkanSwapchain *swapchain, Texture2D *texture);
+                Texture2D *texture);
 
   ~VulkanTexture();
     
@@ -23,9 +23,11 @@ public:
 
 private:
   void CreateTextureImage(VkPhysicalDevice physicalDevice, VkDevice device,
-                          VkQueue graphicsQueue, VkCommandPool commandPool,Texture2D *texture);
-  void CreateTextureImageView(VkDevice device, VulkanSwapchain *swapchain);
-  void CreateTextureSampler(VkPhysicalDevice physicalDevice, VkDevice device);
+                          VkQueue graphicsQueue, VkCommandPool commandPool, Texture2D *texture);
+  void CreateTextureImageView(VkDevice device, VkFormat format);
+  void CreateTextureSampler(
+      VkPhysicalDevice physicalDevice, VkDevice device, 
+      const Texture2D::SamplerConfiguration* samplerConfig);
 };
 
 } // namespace Vulkan

@@ -126,6 +126,7 @@ if(USING_VULKAN_API)
         src/Graphics/Platform/Vulkan/BladeVulkanTexture.hpp
 		src/Graphics/Platform/Vulkan/BladeVulkanRenderer.hpp
         src/Graphics/Platform/Vulkan/VulkanBuffer.hpp
+        src/Graphics/Platform/Vulkan/VulkanCheck.hpp
 
     )
 endif(USING_VULKAN_API)
@@ -156,6 +157,7 @@ endif(USING_VULKAN_API)
 target_link_libraries(BladeEngine PRIVATE 
     glfw 
     box2d
+    msdf-atlas-gen
 )
 
 target_include_directories(BladeEngine PRIVATE

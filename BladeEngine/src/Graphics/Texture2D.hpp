@@ -1,35 +1,54 @@
 #pragma once
 
-#include <iostream>
-#include <string>
+#include <cstdint>
 
+namespace BladeEngine::Graphics {
 
-namespace BladeEngine {
-namespace Graphics {
-class Texture2D {
-public:
-  // Given a Texture image path, load data to instance of texture 2D
-  Texture2D(std::string path);
-  // Free loaded pixel data
-  ~Texture2D();
+	enum class TextureFormat
+	{
+		None = 0,
+		R8,
+		RG8,
+		RGB8,
+		RGBA8,
+		RGBA32F
+	};
 
-  void CreateGPUTexture();
-  void DestroyGPUTexture();
+	class Texture2D
+	{
+	public:
+		Texture2D(uint32_t width, uint32_t height, TextureFormat format = TextureFormat::RGBA8);
+		Texture2D(const char* path);
+		~Texture2D();
 
-  inline void* GetGPUTexture() const { return gpuTextureHandle; }
+		uint32_t GetWidth() const { return m_Width; }
+		uint32_t GetHeight() const { return m_Height; }
 
-  // Texture width in pixels
-  int width;
-  // Texture height in pixels
-  int height;
-  // Texture image size in all channels (R,G,B,A)
-  uint64_t imageSize;
-  // Texture pixel data
-  unsigned char* pixels;
+		TextureFormat GetFormat() const { return m_Format; }
+		uint32_t GetBPP() const;
 
-  void* gpuTextureHandle;
+		uint32_t GetSize() const { return m_Width * m_Height * GetBPP(); }
 
-private:
-};
-} // namespace Graphics
+		uint8_t* GetData() { return m_Pixels; }
+
+		void SetData(void* pixels, uint32_t size);
+
+		void CreateGPUTexture();
+		void DestroyGPUTexture();
+
+		inline void* GetGPUTexture() const { return m_GPUTextureHandle; }
+
+	private:
+		// Texture dimensions
+		uint32_t m_Width, m_Height;
+
+		TextureFormat m_Format;
+
+		// Texture pixel data
+		uint8_t* m_Pixels = nullptr;
+
+		void* m_GPUTextureHandle = nullptr;
+
+	};
+
 } // namespace BladeEngine

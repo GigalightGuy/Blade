@@ -52,7 +52,7 @@ namespace BladeEngine {
 			std::stringstream path;
 			path << "assets/sprites/PineForestParallax/MorningLayer" << i + 1 << ".png";
 
-			Graphics::Texture2D* tex = new Graphics::Texture2D(path.str());
+			Graphics::Texture2D* tex = new Graphics::Texture2D(path.str().c_str());
 			g_BackgroundTextures[i] = tex;
 			g_BackgroundTextures[i]->CreateGPUTexture();
 		}

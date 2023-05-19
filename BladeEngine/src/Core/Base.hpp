@@ -18,4 +18,4 @@
 
 #include "Log.hpp"
 
-#define BLD_DEBUG_ASSERT(check, ...) if (!check) { BLD_WARN(__VA_ARGS__); BLD_DEBUGBREAK(); }
+#define BLD_CORE_ASSERT(check, ...) if (!(check)) { BLD_CORE_CRITICAL(__VA_ARGS__); BLD_DEBUGBREAK(); }

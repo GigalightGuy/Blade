@@ -9,12 +9,14 @@ namespace BladeEngine::Graphics {
 	class Font
 	{
 	public:
-		Font(const char* font);
+		Font(const char* filepath);
 		~Font();
+
+		Texture2D* GetAtlasTexture() const { return m_AtlasTexture; }
 
 	private:
 		MSDFData* m_Data;
-		Texture2D* m_AtlasTexture;
+		Texture2D* m_AtlasTexture = nullptr;
 	};
 
 }

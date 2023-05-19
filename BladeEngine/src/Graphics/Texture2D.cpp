@@ -1,40 +1,87 @@
 #include "Texture2D.hpp"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "../Core/Base.hpp"
 
 #include "GraphicsManager.hpp"
 
-using namespace BladeEngine::Graphics;
-Texture2D::Texture2D(std::string path) {
-  int texChannels;
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
-  pixels = stbi_load(path.c_str(), &width, &height, &texChannels, STBI_rgb_alpha);
+namespace BladeEngine::Graphics {
 
-  imageSize = width * height * 4;
+	Texture2D::Texture2D(uint32_t width, uint32_t height, TextureFormat format)
+		: m_Width(width), m_Height(height), m_Format(format)
+	{
+		
+	}
 
-  if (!pixels) {
-    std::cout << "failed to load texture image at: " << path.c_str() << std::endl;
-    throw std::runtime_error("failed to load texture image!");
-  }
-}
+	Texture2D::Texture2D(const char* path)
+	{
+		int width, height, texChannels;
 
-Texture2D::~Texture2D() 
-{ 
-  stbi_image_free(pixels);
+		m_Pixels = stbi_load(path, &width, &height, &texChannels, STBI_rgb_alpha);
 
-  if (gpuTextureHandle)
-  {
-    DestroyGPUTexture();
-  }
-}
+		m_Width = width;
+		m_Height = height;
+		m_Format = TextureFormat::RGBA8;
 
-void Texture2D::CreateGPUTexture()
-{
-  gpuTextureHandle = GraphicsManager::Instance()->UploadTextureToGPU(this);
-}
+		BLD_CORE_ASSERT(m_Pixels, "Failed to load texture at {}", path);
+	}
 
-void Texture2D::DestroyGPUTexture()
-{
-  GraphicsManager::Instance()->ReleaseGPUTexture(gpuTextureHandle);
+	Texture2D::~Texture2D()
+	{
+		if (m_Pixels)
+		{
+			stbi_image_free(m_Pixels);
+		}
+
+		if (m_GPUTextureHandle)
+		{
+			DestroyGPUTexture();
+		}
+	}
+
+	uint32_t Texture2D::GetBPP() const
+	{
+		switch (m_Format)
+		{
+		case TextureFormat::None:
+			return 0;
+		case TextureFormat::R8:
+			return 1;
+		case TextureFormat::RG8:
+			return 2;
+		case TextureFormat::RGB8:
+			return 3;
+		case TextureFormat::RGBA8:
+			return 4;
+		case TextureFormat::RGBA32F:
+			return 16;
+		}
+
+		BLD_CORE_ASSERT(false, "Unknown Texture Format");
+
+		return 0;
+	}
+
+	void Texture2D::SetData(void* pixels, uint32_t size)
+	{
+		BLD_CORE_ASSERT(pixels, "Provided data is null");
+
+		uint32_t bpp = GetBPP();
+		BLD_CORE_ASSERT(size = m_Width * m_Height * bpp, "Provided data size does not match Texture2D size");
+
+		m_Pixels = (uint8_t*)pixels;
+	}
+
+	void Texture2D::CreateGPUTexture()
+	{
+		m_GPUTextureHandle = GraphicsManager::Instance()->UploadTextureToGPU(this);
+	}
+
+	void Texture2D::DestroyGPUTexture()
+	{
+		GraphicsManager::Instance()->ReleaseGPUTexture(m_GPUTextureHandle);
+	}
+
 }

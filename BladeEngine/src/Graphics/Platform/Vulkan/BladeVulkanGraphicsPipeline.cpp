@@ -79,7 +79,7 @@ void VulkanGraphicsPipeline::UpdateDescriptorSet(
 	//TODO: abstract set update to custom shaders
 	//for (size_t i = firstDescriptorSet; i < endDescriptorSet; i++) {
 	VkDescriptorBufferInfo bufferInfo{};
-	bufferInfo.buffer = uniformBuffer.BufferHandle;
+	bufferInfo.buffer = uniformBuffer.GetBuffer();
 	bufferInfo.offset = 0;
 	bufferInfo.range = sizeof(MVP);
 

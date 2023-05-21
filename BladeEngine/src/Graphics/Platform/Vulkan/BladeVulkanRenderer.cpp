@@ -1,9 +1,15 @@
 #include "BladeVulkanRenderer.hpp"
+
 #include "BladeVulkanQueueFamily.hpp"
-#include "../../Shader.hpp"
 #include "BladeVulkanUtils.hpp"
+#include "VulkanCheck.hpp"
+
+#include "../../Shader.hpp"
+#include "../../MSDFData.hpp"
+
 #include <string.h>
 #include <utility>
+
 
 namespace BladeEngine::Graphics::Vulkan
 {
@@ -15,12 +21,13 @@ namespace BladeEngine::Graphics::Vulkan
 
 	VulkanRenderer::~VulkanRenderer()
 	{
+		delete m_ResourceAllocator;
 	}
 
 	void VulkanRenderer::Init(Window* window)
 	{
-		defaultVertexShader = new Shader("assets/shaders/default.vert", ShaderType::VERTEX);
-		defaultFragmentShader = new Shader("assets/shaders/default.frag", ShaderType::FRAGMENT);
+		defaultSpriteVertexShader = new Shader("assets/shaders/default.vert", ShaderType::VERTEX);
+		defaultSpriteFragmentShader = new Shader("assets/shaders/default.frag", ShaderType::FRAGMENT);
 
 		std::vector<const char*> extensions = window->GetRequiredExtensions();
 		extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
@@ -28,6 +35,8 @@ namespace BladeEngine::Graphics::Vulkan
 		vkSurface = window->CreateWindowSurface(vkInstance->instance);
 		vkDevice = new VulkanDevice(vkInstance->instance, vkSurface,
 			{ VK_KHR_SWAPCHAIN_EXTENSION_NAME });
+
+		m_ResourceAllocator = new VulkanResourceAllocator(vkInstance->instance, vkDevice);
 
 		vkSwapchain = new VulkanSwapchain(window, vkDevice->physicalDevice,
 			vkDevice->logicalDevice, vkSurface);
@@ -39,20 +48,36 @@ namespace BladeEngine::Graphics::Vulkan
 		CreateCommandBuffers();
 		CreateSyncObjects();
 
-		VulkanShader vkDefaultShader = VulkanShader(vkDevice->logicalDevice, defaultVertexShader->data, defaultFragmentShader->data);
+		VulkanShader vkDefaultShader = VulkanShader(vkDevice->logicalDevice, defaultSpriteVertexShader->data, defaultSpriteFragmentShader->data);
 		VulkanGraphicsPipeline vkGraphicsPipeline = VulkanGraphicsPipeline(vkDevice->physicalDevice, vkDevice->logicalDevice, vkSwapchain, &vkDefaultShader);
 		vkGraphicsPipeline.CreateDescriptorPools(vkDevice->logicalDevice, 100); // :))
 		graphicsPipelines.push_back(vkGraphicsPipeline);
 
+		static const size_t maxCharCount = 1000;
+
+		Buffer textVertexBuffer, textIndexBuffer;
+		textVertexBuffer.Allocate(maxCharCount * 4 * sizeof(VertexColorTexture));
+		textIndexBuffer.Allocate(maxCharCount * 6 * sizeof(uint16_t));
 		for (int i = 0; i < FRAMES_IN_FLIGHT; i++)
 		{
 			m_UniformBuffers[i].resize(100);
 
+			m_TextIndexBuffers[i].resize(100);
+			m_TextVertexBuffers[i].resize(100);
+
 			for (int j = 0; j < 100; j++)
 			{
-				CreateUniformBuffer(vkDevice->physicalDevice, vkDevice->logicalDevice, sizeof(MVP), m_UniformBuffers[i][j]);
+				CreateUniformBuffer(vkDevice->physicalDevice, vkDevice->logicalDevice, sizeof(MVP), *m_UniformBuffers[i][j]);
+
+				CreateVertexBuffer(textVertexBuffer, vkDevice->physicalDevice, vkDevice->logicalDevice, 
+					vkDevice->graphicsQueue, vkCommandPool, *m_TextVertexBuffers[i][j]);
+
+				CreateIndexBuffer(textIndexBuffer, vkDevice->physicalDevice, vkDevice->logicalDevice,
+					vkDevice->graphicsQueue, vkCommandPool, *m_TextIndexBuffers[i][j]);
 			}
 		}
+		textVertexBuffer.Release();
+		textIndexBuffer.Release();
 	}
 
 	void VulkanRenderer::BeginDrawing()
@@ -79,7 +104,7 @@ namespace BladeEngine::Graphics::Vulkan
 	// TODO: Move this into UniformBuffer wraper class later
 	void UpdateUniformBuffer(VulkanBuffer& uniformBuffer, MVP data)
 	{
-		memcpy(uniformBuffer.MappedMemory, &data, sizeof(data));
+		memcpy(uniformBuffer.Map(), &data, sizeof(data));
 	}
 
 	void VulkanRenderer::EndDrawing()
@@ -106,7 +131,7 @@ namespace BladeEngine::Graphics::Vulkan
 			mvp.view = camera->GetViewMatrix();
 			mvp.proj = camera->GetProjectionMatrix();
 
-			UpdateUniformBuffer(m_UniformBuffers[currentFrame][i], mvp);
+			UpdateUniformBuffer(*m_UniformBuffers[currentFrame][i], mvp);
 			auto vkTexture = vkTextures[i];
 			auto vkMesh = vkMeshes[i];
 
@@ -114,7 +139,7 @@ namespace BladeEngine::Graphics::Vulkan
 				vkDevice->logicalDevice,
 				vkTexture->textureImageView,
 				vkTexture->textureSampler,
-				m_UniformBuffers[currentFrame][i], currentFrame, i);
+				*m_UniformBuffers[currentFrame][i], currentFrame, i);
 		}
 
 		DrawFrame();
@@ -122,6 +147,133 @@ namespace BladeEngine::Graphics::Vulkan
 		vkTextures.clear();
 		vkMeshes.clear();
 		vkMeshesModelData.clear();
+	}
+
+	void VulkanRenderer::DrawString(const std::string& string, Font* font, const glm::vec3 position)
+	{
+		struct TextureParams
+		{
+			glm::vec4 Color{ 1.0f };
+			float Kerning = 0.0f;
+			float LineSpacing = 0.0f;
+		};
+
+		TextureParams textParams;
+
+		const auto& fontGeometry = font->GetMSDFData()->FontGeometry;
+		const auto& metrics = fontGeometry.getMetrics();
+		Texture2D* fontAtlas = font->GetAtlasTexture();
+
+		//s_Data.FontAtlasTexture = fontAtlas;
+
+		double x = 0.0;
+		double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
+		double y = 0.0;
+
+		const float spaceGlyphAdvance = fontGeometry.getGlyph(' ')->getAdvance();
+
+		for (size_t i = 0; i < string.size(); i++)
+		{
+			char character = string[i];
+			if (character == '\r')
+				continue;
+
+			if (character == '\n')
+			{
+				x = 0;
+				y -= fsScale * metrics.lineHeight + textParams.LineSpacing;
+				continue;
+			}
+
+			if (character == ' ')
+			{
+				float advance = spaceGlyphAdvance;
+				if (i < string.size() - 1)
+				{
+					char nextCharacter = string[i + 1];
+					double dAdvance;
+					fontGeometry.getAdvance(dAdvance, character, nextCharacter);
+					advance = (float)dAdvance;
+				}
+
+				x += fsScale * advance + textParams.Kerning;
+				continue;
+			}
+
+			if (character == '\t')
+			{
+				// NOTE(Yan): is this right?
+				x += 4.0f * (fsScale * spaceGlyphAdvance + textParams.Kerning);
+				continue;
+			}
+
+			auto glyph = fontGeometry.getGlyph(character);
+			if (!glyph)
+				glyph = fontGeometry.getGlyph('?');
+			if (!glyph)
+				return;
+
+			double al, ab, ar, at;
+			glyph->getQuadAtlasBounds(al, ab, ar, at);
+			glm::vec2 texCoordMin((float)al, (float)ab);
+			glm::vec2 texCoordMax((float)ar, (float)at);
+
+			double pl, pb, pr, pt;
+			glyph->getQuadPlaneBounds(pl, pb, pr, pt);
+			glm::vec2 quadMin((float)pl, (float)pb);
+			glm::vec2 quadMax((float)pr, (float)pt);
+
+			quadMin *= fsScale, quadMax *= fsScale;
+			quadMin += glm::vec2(x, y);
+			quadMax += glm::vec2(x, y);
+
+			float texelWidth = 1.0f / fontAtlas->GetWidth();
+			float texelHeight = 1.0f / fontAtlas->GetHeight();
+			texCoordMin *= glm::vec2(texelWidth, texelHeight);
+			texCoordMax *= glm::vec2(texelWidth, texelHeight);
+
+			// render here
+			/*s_Data.TextVertexBufferPtr->Position = transform * glm::vec4(quadMin, 0.0f, 1.0f);
+			s_Data.TextVertexBufferPtr->Color = textParams.Color;
+			s_Data.TextVertexBufferPtr->TexCoord = texCoordMin;
+			s_Data.TextVertexBufferPtr->EntityID = entityID;
+			s_Data.TextVertexBufferPtr++;
+
+			s_Data.TextVertexBufferPtr->Position = transform * glm::vec4(quadMin.x, quadMax.y, 0.0f, 1.0f);
+			s_Data.TextVertexBufferPtr->Color = textParams.Color;
+			s_Data.TextVertexBufferPtr->TexCoord = { texCoordMin.x, texCoordMax.y };
+			s_Data.TextVertexBufferPtr->EntityID = entityID;
+			s_Data.TextVertexBufferPtr++;
+
+			s_Data.TextVertexBufferPtr->Position = transform * glm::vec4(quadMax, 0.0f, 1.0f);
+			s_Data.TextVertexBufferPtr->Color = textParams.Color;
+			s_Data.TextVertexBufferPtr->TexCoord = texCoordMax;
+			s_Data.TextVertexBufferPtr->EntityID = entityID;
+			s_Data.TextVertexBufferPtr++;
+
+			s_Data.TextVertexBufferPtr->Position = transform * glm::vec4(quadMax.x, quadMin.y, 0.0f, 1.0f);
+			s_Data.TextVertexBufferPtr->Color = textParams.Color;
+			s_Data.TextVertexBufferPtr->TexCoord = { texCoordMax.x, texCoordMin.y };
+			s_Data.TextVertexBufferPtr->EntityID = entityID;
+			s_Data.TextVertexBufferPtr++;
+
+			s_Data.TextIndexCount += 6;
+			s_Data.Stats.QuadCount++;*/
+
+			if (i < string.size() - 1)
+			{
+				double advance = glyph->getAdvance();
+				char nextCharacter = string[i + 1];
+				fontGeometry.getAdvance(advance, character, nextCharacter);
+
+				x += fsScale * advance + textParams.Kerning;
+			}
+		}
+	}
+
+	void VulkanRenderer::WaitDeviceIdle()
+	{
+		vkDeviceWaitIdle(vkDevice->logicalDevice);
 	}
 
 	VulkanTexture* VulkanRenderer::UploadTextureToGPU(Texture2D* texture)
@@ -137,7 +289,7 @@ namespace BladeEngine::Graphics::Vulkan
 
 	VulkanMesh* VulkanRenderer::UploadMeshToGPU(Buffer vertices, Buffer indices)
 	{
-		return LoadMesh(vkDevice->physicalDevice, vkDevice->logicalDevice, vkDevice->graphicsQueue, vkCommandPool, vertices, indices);
+		return LoadMesh(*m_ResourceAllocator, vkDevice->physicalDevice, vkDevice->logicalDevice, vkDevice->graphicsQueue, vkCommandPool, vertices, indices);
 	}
 
 	void VulkanRenderer::ReleaseGPUMesh(VulkanMesh* gpuMesh)
@@ -178,10 +330,8 @@ namespace BladeEngine::Graphics::Vulkan
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = signalSemaphores;
 
-		if (vkQueueSubmit(vkDevice->graphicsQueue, 1, &submitInfo,
-			inFlightFences[currentFrame]) != VK_SUCCESS) {
-			throw std::runtime_error("failed to submit draw command buffer!");
-		}
+		BLD_VK_CHECK(vkQueueSubmit(vkDevice->graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]),
+			"Failed to submit draw command buffer");
 
 		VkPresentInfoKHR presentInfo{};
 		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -206,9 +356,8 @@ namespace BladeEngine::Graphics::Vulkan
 		VkCommandBufferBeginInfo beginInfo{};
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-		if (vkBeginCommandBuffer(commandBuffers[currentFrame], &beginInfo) != VK_SUCCESS) {
-			throw std::runtime_error("failed to begin recording command buffer!");
-		}
+		BLD_VK_CHECK(vkBeginCommandBuffer(commandBuffers[currentFrame], &beginInfo),
+			"Failed to begin recording command buffer");
 
 		VkRenderPassBeginInfo renderPassInfo{};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -245,21 +394,20 @@ namespace BladeEngine::Graphics::Vulkan
 		scissor.extent = vkSwapchain->extent;
 		vkCmdSetScissor(commandBuffers[currentFrame], 0, 1, &scissor);
 
-		// Loop meshses draw command
+		// Loop meshes draw command
 		int i = 0;
 		for (auto& mesh : vkMeshes)
 		{
 			VkPipelineLayout& pipelineLayout = graphicsPipelines[graphicsPipelines.size() - 1].pipelineLayout;
 			VkDescriptorSet& descriptorSet = graphicsPipelines[graphicsPipelines.size() - 1].descriptorSets[currentFrame][i];
 			mesh->Draw(commandBuffers[currentFrame], pipelineLayout, descriptorSet);
-			i += 1;
+			i++;
 		}
 
 		vkCmdEndRenderPass(commandBuffers[currentFrame]);
 
-		if (vkEndCommandBuffer(commandBuffers[currentFrame]) != VK_SUCCESS) {
-			throw std::runtime_error("failed to record command buffer!");
-		}
+		BLD_VK_CHECK(vkEndCommandBuffer(commandBuffers[currentFrame]),
+			"Failed to record command buffer!");
 	}
 
 
@@ -288,9 +436,8 @@ namespace BladeEngine::Graphics::Vulkan
 		VkCommandBufferBeginInfo beginInfo{};
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-		if (vkBeginCommandBuffer(commandBuffers[currentFrame], &beginInfo) != VK_SUCCESS) {
-			throw std::runtime_error("failed to begin recording command buffer!");
-		}
+		BLD_VK_CHECK(vkBeginCommandBuffer(commandBuffers[currentFrame], &beginInfo),
+			"Failed to begin recording command buffer");
 
 		VkRenderPassBeginInfo renderPassInfo{};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -331,9 +478,8 @@ namespace BladeEngine::Graphics::Vulkan
 
 		vkCmdEndRenderPass(commandBuffers[currentFrame]);
 
-		if (vkEndCommandBuffer(commandBuffers[currentFrame]) != VK_SUCCESS) {
-			throw std::runtime_error("failed to record command buffer!");
-		}
+		BLD_VK_CHECK(vkEndCommandBuffer(commandBuffers[currentFrame]),
+			"Failed to record command buffer");
 
 		VkSubmitInfo submitInfo{};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -352,10 +498,8 @@ namespace BladeEngine::Graphics::Vulkan
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = signalSemaphores;
 
-		if (vkQueueSubmit(vkDevice->graphicsQueue, 1, &submitInfo,
-			inFlightFences[currentFrame]) != VK_SUCCESS) {
-			throw std::runtime_error("failed to submit draw command buffer!");
-		}
+		BLD_VK_CHECK(vkQueueSubmit(vkDevice->graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]),
+			"Failed to submit draw command buffer");
 
 		VkPresentInfoKHR presentInfo{};
 		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;

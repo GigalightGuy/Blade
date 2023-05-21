@@ -45,6 +45,8 @@ namespace BladeEngine::Graphics {
 		void* UploadMeshToGPU(Buffer vertices, Buffer indices);
 		void ReleaseGPUMesh(void* gpuMesh);
 
+		void WaitDeviceIdle();
+
 		inline static GraphicsManager* Instance() { return s_Instance; }
 
 	private:

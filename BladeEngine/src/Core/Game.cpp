@@ -190,6 +190,8 @@ namespace BladeEngine
             World::Step(Time::DeltaTime());
         }
 
+        Graphics::GraphicsManager::Instance()->WaitDeviceIdle();
+
         CleanUp();
     }
 

@@ -62,6 +62,7 @@ namespace BladeEngine::Graphics {
 
 		void SetData(void* pixels, uint32_t size);
 
+
 		void CreateGPUTexture();
 		void DestroyGPUTexture();
 

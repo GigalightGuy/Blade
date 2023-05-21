@@ -15,15 +15,26 @@ namespace BladeEngine::Graphics {
 		attributes.config.overlapSupport = true;
 		attributes.scanlinePass = true;
 
-		msdf_atlas::ImmediateAtlasGenerator<float, 3, msdf_atlas::msdfGenerator, msdf_atlas::BitmapAtlasStorage<uint8_t, 3>> generator(width, height);
+		msdf_atlas::ImmediateAtlasGenerator<float, 4, msdf_atlas::mtsdfGenerator, msdf_atlas::BitmapAtlasStorage<uint8_t, 4>> generator(width, height);
 		generator.setAttributes(attributes);
 		generator.setThreadCount(8);
 		generator.generate(glyphs.data(), (int)glyphs.size());
 
-		msdfgen::BitmapConstRef<uint8_t, 3> bitmap = (msdfgen::BitmapConstRef<uint8_t, 3>)generator.atlasStorage();
+		msdfgen::BitmapConstRef<uint8_t, 4> bitmap = (msdfgen::BitmapConstRef<uint8_t, 4>)generator.atlasStorage();
+		
+		// inverting image pixels on Y axis
+		// TODO(Pedro): change this into an option to flip images
+		uint8_t* pixels = new uint8_t[bitmap.width * bitmap.height * 4];
+		for (int y = 0; y < bitmap.height; y++)
+		{
+			memcpy(&pixels[bitmap.width * 4 * y], 
+				bitmap(0, bitmap.height - y - 1), 
+				4 * bitmap.width);
+		}
 
-		Texture2D* texture = new Texture2D(bitmap.width, bitmap.height, TextureFormat::RGB8);
-		texture->SetData((void*)bitmap.pixels, bitmap.width * bitmap.height * 3);
+
+		Texture2D* texture = new Texture2D(bitmap.width, bitmap.height, TextureFormat::RGBA8);
+		texture->SetData((void*)pixels, bitmap.width * bitmap.height * 4);
 
 		Texture2D::SamplerConfiguration samplerConfig;
 		samplerConfig.AdressMode = SamplerAddressMode::ClampToEdges;

@@ -11,6 +11,9 @@ namespace BladeEngine
     class Entity
     {
     public:
+        explicit Entity();
+        ~Entity();
+
         /**
          * @brief Creates and adds a new component of type T to this Entity.
          * 
@@ -65,10 +68,7 @@ namespace BladeEngine
          */
         inline const char* GetName() const { return m_FlecsEntity.name(); }
 
-    private:
-        Entity(const flecs::world& world);
-        Entity(const std::string& name, const flecs::world& world);
-        ~Entity();
+        inline void Destroy() { m_FlecsEntity.destruct(); }
 
     private:
         flecs::entity m_FlecsEntity;

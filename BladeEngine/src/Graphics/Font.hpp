@@ -13,6 +13,7 @@ namespace BladeEngine::Graphics {
 		~Font();
 
 		Texture2D* GetAtlasTexture() const { return m_AtlasTexture; }
+		const MSDFData* GetMSDFData() const { return m_Data; }
 
 	private:
 		MSDFData* m_Data;

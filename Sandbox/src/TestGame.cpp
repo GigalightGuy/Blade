@@ -1,9 +1,10 @@
 #include "TestGame.hpp"
 
+#include "BladeEngine.hpp"
+
 #include "Audio/AudioClip.hpp"
 #include "Audio/AudioManager.hpp"
 #include "Audio/AudioSource.hpp"
-#include "BladeEngine.hpp"
 #include "Utils/Random.hpp"
 
 #include <sstream>
@@ -29,15 +30,17 @@ namespace BladeEngine {
 	Graphics::Texture2D* g_TexturePlatformBlock;
 	std::vector<Graphics::Texture2D*> g_BackgroundTextures;
 
-	BladeEngine::Entity* g_Ground;
+	Entity g_Ground;
 
 	AudioClip* jumpClip;
 	AudioClip* backgroundClip;
 	AudioSource* audioSource;
 	AudioSource* backgroundAudioSource;
 
+	Graphics::Font* g_KrinkesRegularFont;
+
 	void LoadTextures() {
-		using namespace BladeEngine::Graphics;
+		using namespace Graphics;
 
 		Texture2D::SamplerConfiguration samplerConfig;
 		samplerConfig.Filter = SamplerFilter::Nearest;
@@ -105,7 +108,7 @@ namespace BladeEngine {
 
 		RaycastHitInfo hitInfo;
 		bool isGrounded =
-			Physics2D::Raycast(*(g_Ground->GetComponent<Rigidbody2D>()), pos.Value,
+			Physics2D::Raycast(*(g_Ground.GetComponent<Rigidbody2D>()), pos.Value,
 				Vec2(0.0f, -1.0f), 0.55f, hitInfo);
 
 		if (isGrounded && Input::GetKeyDown(ctrl.Jump)) {
@@ -141,7 +144,7 @@ namespace BladeEngine {
 		LoadTextures();
 		LoadAudioClips();
 
-		Graphics::Font* font = new Graphics::Font("assets/fonts/arial.ttf");
+		g_KrinkesRegularFont = new Graphics::Font("assets/fonts/KrinkesRegularPERSONAL.ttf");
 	}
 
 	void TestGame::UnloadGameResources() {
@@ -149,71 +152,73 @@ namespace BladeEngine {
 		// UnloadAudioClips();
 	}
 
-	void TestGame::SetupWorld() {
-		g_Ground = World::CreateEntity("Ground");
-		g_Ground->SetComponent<Position>({ {0.0f, 0.0f} });
-		g_Ground->SetComponent<Rotation>({ 0.0f });
-		g_Ground->SetComponent<Scale>({ {40.0f, 2.0f} });
-		g_Ground->AddComponent<Rigidbody2D>();
-		g_Ground->AddComponent<BoxCollider2D>();
-		g_Ground->GetComponent<BoxCollider2D>()->HalfExtents = { 20.0f, 1.0f };
+	void TestGame::SetupWorld() 
+	{
 
-		g_Ground->SetComponent<Sprite2D>({ g_TexturePlatformBlock });
+		g_Ground = World::CreateEntity("Ground");
+		g_Ground.SetComponent<Position>({ {0.0f, 0.0f} });
+		g_Ground.SetComponent<Rotation>({ 0.0f });
+		g_Ground.SetComponent<Scale>({ {40.0f, 2.0f} });
+		g_Ground.AddComponent<Rigidbody2D>();
+		g_Ground.AddComponent<BoxCollider2D>();
+		g_Ground.GetComponent<BoxCollider2D>()->HalfExtents = { 20.0f, 1.0f };
+
+		g_Ground.SetComponent<Sprite2D>({ g_TexturePlatformBlock });
 
 		{
 			auto chickBoy = World::CreateEntity("Chick Boy 1");
-			chickBoy->SetComponent<Position>({ {-10.0f, 20.0f} });
-			chickBoy->SetComponent<Rotation>({ 0.0f });
-			chickBoy->SetComponent<Scale>({ {1.0f, 1.0f} });
-			chickBoy->AddComponent<Rigidbody2D>();
-			auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
+			chickBoy.SetComponent<Position>({ {-10.0f, 20.0f} });
+			chickBoy.SetComponent<Rotation>({ 0.0f });
+			chickBoy.SetComponent<Scale>({ {1.0f, 1.0f} });
+			chickBoy.AddComponent<Rigidbody2D>();
+			auto chickBoyRB = chickBoy.GetComponent<Rigidbody2D>();
 			chickBoyRB->LockRotation = true;
 			chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
-			chickBoy->AddComponent<BoxCollider2D>();
+			chickBoy.AddComponent<BoxCollider2D>();
 
-			chickBoy->SetComponent<Sprite2D>({ g_TextureChickBoy });
+			chickBoy.SetComponent<Sprite2D>({ g_TextureChickBoy });
 		}
 
 		{
 			auto chickBoy = World::CreateEntity("Chick Boy 2");
-			chickBoy->SetComponent<Position>({ {-5.0f, 20.0f} });
-			chickBoy->SetComponent<Rotation>({ 0.0f });
-			chickBoy->SetComponent<Scale>({ {1.0f, 1.0f} });
-			chickBoy->AddComponent<Rigidbody2D>();
-			auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
+			chickBoy.SetComponent<Position>({ {-5.0f, 20.0f} });
+			chickBoy.SetComponent<Rotation>({ 0.0f });
+			chickBoy.SetComponent<Scale>({ {1.0f, 1.0f} });
+			chickBoy.AddComponent<Rigidbody2D>();
+			auto chickBoyRB = chickBoy.GetComponent<Rigidbody2D>();
 			chickBoyRB->LockRotation = true;
 			chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
-			chickBoy->AddComponent<BoxCollider2D>();
+			chickBoy.AddComponent<BoxCollider2D>();
 
-			chickBoy->SetComponent<Sprite2D>({ g_TextureChickBoy });
+			chickBoy.SetComponent<Sprite2D>({ g_TextureChickBoy });
 		}
 
 		{
 			auto chickBoy = World::CreateEntity("Chick Boy 3");
-			chickBoy->SetComponent<Position>({ {5.0f, 20.0f} });
-			chickBoy->SetComponent<Rotation>({ 0.0f });
-			chickBoy->SetComponent<Scale>({ {1.0f, 1.0f} });
-			chickBoy->AddComponent<Rigidbody2D>();
-			auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
+			chickBoy.SetComponent<Position>({ {5.0f, 20.0f} });
+			chickBoy.SetComponent<Rotation>({ 0.0f });
+			chickBoy.SetComponent<Scale>({ {1.0f, 1.0f} });
+			chickBoy.AddComponent<Rigidbody2D>();
+			auto chickBoyRB = chickBoy.GetComponent<Rigidbody2D>();
 			chickBoyRB->LockRotation = true;
 			chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
-			chickBoy->AddComponent<BoxCollider2D>();
+			chickBoy.AddComponent<BoxCollider2D>();
 
-			chickBoy->SetComponent<Sprite2D>({ g_TextureChickBoy });
+			chickBoy.SetComponent<Sprite2D>({ g_TextureChickBoy });
 		}
 
 		{
 			auto chickBoy = World::CreateEntity("Chick Boy 4");
-			chickBoy->SetComponent<Position>({ {10.0f, 20.0f} });
-			chickBoy->SetComponent<Rotation>({ 0.0f });
-			chickBoy->SetComponent<Scale>({ {1.0f, 1.0f} });
-			chickBoy->AddComponent<Rigidbody2D>();
-			auto chickBoyRB = chickBoy->GetComponent<Rigidbody2D>();
+			chickBoy.SetComponent<Position>({ {10.0f, 20.0f} });
+			chickBoy.SetComponent<Rotation>({ 0.0f });
+			chickBoy.SetComponent<Scale>({ {1.0f, 1.0f} });
+			chickBoy.AddComponent<Rigidbody2D>();
+			auto chickBoyRB = chickBoy.GetComponent<Rigidbody2D>();
 			chickBoyRB->LockRotation = true;
 			chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
-			chickBoy->AddComponent<BoxCollider2D>();
+			chickBoy.AddComponent<BoxCollider2D>();
 
-			chickBoy->SetComponent<Sprite2D>({ g_TextureChickBoy });
+			chickBoy.SetComponent<Sprite2D>({ g_TextureChickBoy });
 		}
 
 		// auto pulsator = World::CreateEntity("Pulsator");
@@ -221,29 +226,37 @@ namespace BladeEngine {
 		// pulsator->AddComponent<PulseEmitter>();
 
 		auto player = World::CreateEntity("Player");
-		player->SetComponent<Position>({ {0.0f, 5.0f} });
-		player->SetComponent<Rotation>({ 0.0f });
-		player->SetComponent<Scale>({ {1.0f, 1.0f} });
-		player->SetComponent<Controller>(
+		player.SetComponent<Position>({ {0.0f, 5.0f} });
+		player.SetComponent<Rotation>({ 0.0f });
+		player.SetComponent<Scale>({ {1.0f, 1.0f} });
+		player.SetComponent<Controller>(
 			{ KeyCode::A, KeyCode::D, KeyCode::Space, 4.0f, 5.0f });
-		player->SetComponent<Sprite2D>({ g_TextureChickBoy });
-		player->AddComponent<Player>();
-		player->AddComponent<Rigidbody2D>();
-		auto playerRB = player->GetComponent<Rigidbody2D>();
+		player.SetComponent<Sprite2D>({ g_TextureChickBoy });
+		player.AddComponent<Player>();
+		player.AddComponent<Rigidbody2D>();
+		auto playerRB = player.GetComponent<Rigidbody2D>();
 		playerRB->LockRotation = true;
 		playerRB->Type = Rigidbody2D::BodyType::Dynamic;
-		player->AddComponent<CircleCollider2D>();
+		player.AddComponent<CircleCollider2D>();
+
+
+		auto someText = World::CreateEntity("My First Text");
+		someText.SetComponent<Position>({ { 0.0f, 0.0f } });
+		someText.SetComponent<Rotation>({ 0.0f });
+		someText.SetComponent<Scale>({ { 20.0f, 20.0f } });
+		someText.SetComponent<Sprite2D>({ g_KrinkesRegularFont->GetAtlasTexture() });
+
 
 		for (size_t i = 0; i < 6; i++) {
 			std::stringstream ss("Background Layer ");
 			ss << i + 1;
 
 			auto background = World::CreateEntity(ss.str());
-			background->SetComponent<Position>({ {0.0f, 0.0f} });
-			background->SetComponent<Rotation>({ 0.0f });
-			background->SetComponent<Scale>({ {100.0f, 50.0f} });
+			background.SetComponent<Position>({ {0.0f, 0.0f} });
+			background.SetComponent<Rotation>({ 0.0f });
+			background.SetComponent<Scale>({ {100.0f, 50.0f} });
 
-			background->SetComponent<Sprite2D>({ g_BackgroundTextures[i] });
+			background.SetComponent<Sprite2D>({ g_BackgroundTextures[i] });
 		}
 
 		World::BindSystem<const PulseEmitter, const Position>(2.0f, "Generate Pulse",

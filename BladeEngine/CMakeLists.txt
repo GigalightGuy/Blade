@@ -87,6 +87,8 @@ set(BLADE_ENGINE_VENDOR_HEADER_FILES
     vendor/flecs/flecs.h
 
     vendor/miniaudio/miniaudio.h
+
+    vendor/vma/vk_mem_alloc.h
 )
 
 if(WIN32)
@@ -110,6 +112,10 @@ if(USING_VULKAN_API)
         src/Graphics/Platform/Vulkan/BladeVulkanMesh.cpp
         src/Graphics/Platform/Vulkan/BladeVulkanTexture.cpp
 		src/Graphics/Platform/Vulkan/BladeVulkanRenderer.cpp
+        src/Graphics/Platform/Vulkan/VulkanResourceAllocator.cpp
+        src/Graphics/Platform/Vulkan/VulkanBuffer.cpp
+
+        src/Graphics/Platform/Vulkan/VmaImpl.cpp
         
     )
 
@@ -125,7 +131,9 @@ if(USING_VULKAN_API)
         src/Graphics/Platform/Vulkan/BladeVulkanMesh.hpp
         src/Graphics/Platform/Vulkan/BladeVulkanTexture.hpp
 		src/Graphics/Platform/Vulkan/BladeVulkanRenderer.hpp
+        src/Graphics/Platform/Vulkan/VulkanResourceAllocator.hpp
         src/Graphics/Platform/Vulkan/VulkanBuffer.hpp
+
         src/Graphics/Platform/Vulkan/VulkanCheck.hpp
 
     )
@@ -170,6 +178,7 @@ target_include_directories(BladeEngine PRIVATE
     "vendor/miniaudio"
     "vendor/msdf-atlas-gen/msdf-atlas-gen"
     "vendor/msdf-atlas-gen/msdfgen"
+    "vendor/vma"
 )
 
 if(DEFINED VULKAN_SDK_PATH)

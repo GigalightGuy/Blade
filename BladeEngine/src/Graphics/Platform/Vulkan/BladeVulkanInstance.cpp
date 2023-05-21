@@ -1,7 +1,12 @@
 #include "BladeVulkanInstance.hpp"
+
+#include "../../../Core/Base.hpp"
+
 #include <stdexcept>
 
 using namespace BladeEngine::Graphics::Vulkan;
+
+#define BLD_VK_VALIDATION_LAYERS
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL
 debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -9,7 +14,23 @@ debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
               const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
               void *pUserData)
 {
-  std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+
+    if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+    {
+        BLD_CORE_WARN("Vulkan Validation Layer: {}", pCallbackData->pMessage);
+    }
+    else if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+    {
+        BLD_CORE_ERROR("Vulkan Validation Layer: {}", pCallbackData->pMessage);
+    }
+    else if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
+    {
+        BLD_CORE_INFO("Vulkan Validation Layer: {}", pCallbackData->pMessage);
+    }
+    else if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT)
+    {
+        BLD_CORE_TRACE("Vulkan Validation Layer: {}", pCallbackData->pMessage);
+    }
 
   return VK_FALSE;
 }
@@ -61,7 +82,7 @@ void VulkanInstance::PopulateDebugMessengerCreateInfo(
 {
   createInfo = {};
   createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-  createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+  createInfo.messageSeverity = //VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
                                VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
                                VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
   createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |

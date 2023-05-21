@@ -103,3 +103,8 @@ void BladeEngine::Graphics::GraphicsManager::ReleaseGPUMesh(void* gpuMesh)
 {
     vkRenderer->ReleaseGPUMesh((Vulkan::VulkanMesh*)gpuMesh);
 }
+
+void BladeEngine::Graphics::GraphicsManager::WaitDeviceIdle()
+{
+    vkRenderer->WaitDeviceIdle();
+}

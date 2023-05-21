@@ -18,7 +18,12 @@ namespace BladeEngine
          * 
          * @return created Entity. 
          */
-        inline static Entity* CreateEntity() { return new Entity(s_FlecsWorld); }
+        inline static Entity CreateEntity() 
+        { 
+            Entity e = Entity(); 
+            e.m_FlecsEntity = s_FlecsWorld.entity();
+            return e;
+        }
 
         /**
          * @brief Creates a new Entity in the World with a name.
@@ -27,7 +32,12 @@ namespace BladeEngine
          * 
          * @return created Entity.
          */
-        inline static Entity* CreateEntity(const std::string& entityName) { return new Entity(entityName, s_FlecsWorld); }
+        inline static Entity CreateEntity(const std::string& entityName) 
+        { 
+            Entity e = Entity(); 
+            e.m_FlecsEntity = s_FlecsWorld.entity(entityName.c_str());
+            return e;
+        }
 
         /**
          * @brief Destroys entity and removes it from World.
@@ -35,7 +45,7 @@ namespace BladeEngine
          * @param entity the Entity do be destroyed.
          * 
          */
-        inline static void DestroyEntity(Entity* entity) { delete entity; }
+        inline static void DestroyEntity(Entity& entity) { entity.Destroy(); }
 
         /**
          * @brief Creates and binds a system to the World.

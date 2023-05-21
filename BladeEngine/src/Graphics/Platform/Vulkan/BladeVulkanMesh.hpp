@@ -14,9 +14,9 @@ namespace BladeEngine::Graphics::Vulkan
 {
 	struct VulkanMesh
 	{
-		VulkanBuffer VertexBuffer;
+		VulkanBuffer* VertexBuffer;
 
-		VulkanBuffer IndexBuffer;
+		VulkanBuffer* IndexBuffer;
 
 		uint32_t IndicesCount;
 
@@ -28,6 +28,7 @@ namespace BladeEngine::Graphics::Vulkan
 	};
 
 	VulkanMesh* LoadMesh(
+		VulkanResourceAllocator& allocator,
 		VkPhysicalDevice physicalDevice, VkDevice device, 
 		VkQueue graphicsQueue, VkCommandPool commandPool, 
 		Buffer vertices, 

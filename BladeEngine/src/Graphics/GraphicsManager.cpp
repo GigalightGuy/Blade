@@ -23,6 +23,8 @@ GraphicsManager::~GraphicsManager()
 void GraphicsManager::Init(Window* window)
 {
     s_Instance = new GraphicsManager(window);
+
+    s_Instance->vkRenderer->CreateDebugResources();
 }
 
 void GraphicsManager::Shutdown()

@@ -40,6 +40,7 @@ namespace BladeEngine {
 	Graphics::Font* g_KrinkesRegularFont;
 	Graphics::Font* g_AdmirationPainsFont;
 	Graphics::Font* g_ZerafocFont;
+	Graphics::Font* g_OpenSansRegular;
 
 	void LoadTextures() {
 		using namespace Graphics;
@@ -148,7 +149,8 @@ namespace BladeEngine {
 
 		//g_KrinkesRegularFont = new Graphics::Font("assets/fonts/KrinkesRegularPERSONAL.ttf");
 		//g_AdmirationPainsFont = new Graphics::Font("assets/fonts/Admiration Pains.ttf");
-		g_ZerafocFont = new Graphics::Font("assets/fonts/Zerafoc.ttf");
+		//g_ZerafocFont = new Graphics::Font("assets/fonts/Zerafoc.ttf");
+		g_OpenSansRegular = new Graphics::Font("assets/fonts/open-sans/OpenSans-Regular.ttf");
 	}
 
 	void TestGame::UnloadGameResources() {
@@ -247,9 +249,9 @@ namespace BladeEngine {
 		auto someText = World::CreateEntity("My First Text");
 		someText.SetComponent<Position>({ { -15.0f, 0.0f } });
 		someText.SetComponent<Rotation>({ 0.0f });
-		someText.SetComponent<Scale>({ { 3.0f, 3.0f } });
+		someText.SetComponent<Scale>({ { 30.0f, 30.0f } });
 		//someText.SetComponent<Sprite2D>({ g_ZerafocFont->GetAtlasTexture() });
-		someText.SetComponent<TextRenderer>({ g_ZerafocFont, "Hello, World!" });
+		someText.SetComponent<TextRenderer>({ g_OpenSansRegular, "Hello, World!" });
 
 
 		/*for (size_t i = 0; i < 6; i++) {

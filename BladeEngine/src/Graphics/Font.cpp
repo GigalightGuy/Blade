@@ -2,8 +2,8 @@
 
 #include "../Core/Base.hpp"
 
-
 #include "MSDFData.hpp"
+
 
 namespace BladeEngine::Graphics {
 
@@ -88,7 +88,7 @@ namespace BladeEngine::Graphics {
 		atlasPacker.setPixelRange(2.0);
 		atlasPacker.setMiterLimit(1.0);
 		atlasPacker.setPadding(0);
-		atlasPacker.setScale(emSize);
+		atlasPacker.setMinimumScale(emSize);
 		int remaining = atlasPacker.pack(m_Data->Glyphs.data(), (int)m_Data->Glyphs.size());
 		BLD_CORE_ASSERT(remaining == 0, "Atlas packer failed to pack glyphs");
 

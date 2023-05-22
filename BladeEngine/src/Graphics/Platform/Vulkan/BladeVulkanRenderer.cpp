@@ -24,6 +24,12 @@ namespace BladeEngine::Graphics::Vulkan
 		delete m_ResourceAllocator;
 	}
 
+	void VulkanRenderer::CreateDebugResources()
+	{
+		m_UVDebugTexture = new Texture2D("assets/sprites/tex_DebugUVTiles.png");
+		m_UVDebugTexture->CreateGPUTexture();
+	}
+
 	void VulkanRenderer::Init(Window* window)
 	{
 		defaultSpriteVertexShader = new Shader("assets/shaders/default.vert", ShaderType::VERTEX);
@@ -142,9 +148,8 @@ namespace BladeEngine::Graphics::Vulkan
 		const auto renderPass = m_RenderPasses[0];
 		auto currentPipeline = m_GraphicsPipelinesMap[renderPass][0];
 
-		vkWaitForFences(vkDevice->logicalDevice, 1, &inFlightFences[currentFrame], VK_TRUE,
-			UINT64_MAX);
-		// vkWaitForFences should come before freeing descriptor sets
+		vkWaitForFences(vkDevice->logicalDevice, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+		
 		if (currentPipeline->descriptorSets[currentFrame].size() > 0)
 			currentPipeline->FreeDescriptorSets(vkDevice->logicalDevice, currentFrame);
 
@@ -182,6 +187,8 @@ namespace BladeEngine::Graphics::Vulkan
 			currentPipeline->FreeDescriptorSets(vkDevice->logicalDevice, currentFrame);
 
 		currentPipeline->CreateDescriptorSets(vkDevice->logicalDevice, m_TextCount, currentFrame);
+
+		// auto debugTexture = (VulkanTexture*)m_UVDebugTexture->GetGPUTexture();
 
 		for (uint32_t j = 0; j < m_TextCount; j++, i++)
 		{

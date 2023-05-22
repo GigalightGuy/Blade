@@ -30,6 +30,8 @@ namespace BladeEngine::Graphics::Vulkan {
 		VulkanRenderer(BladeEngine::Camera* camera, Window* window);
 		~VulkanRenderer();
 
+		void CreateDebugResources();
+
 		void Dispose();
 
 		void Clear(BladeEngine::Graphics::Color color);
@@ -108,6 +110,8 @@ namespace BladeEngine::Graphics::Vulkan {
 		std::vector<uint32_t> m_TextQuadCounts;
 		std::vector<VulkanBuffer*> m_TextIndexBuffers[FRAMES_IN_FLIGHT];
 		std::vector<VulkanBuffer*> m_TextVertexBuffers[FRAMES_IN_FLIGHT];
+
+		Texture2D* m_UVDebugTexture = nullptr;
 
 		//Draw
 		VkCommandPool vkCommandPool;

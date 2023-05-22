@@ -66,7 +66,7 @@ namespace BladeEngine::Graphics {
 		void CreateGPUTexture();
 		void DestroyGPUTexture();
 
-		inline void* GetGPUTexture() const { return m_GPUTextureHandle; }
+		void* GetGPUTexture() const { return m_GPUTextureHandle; }
 
 	private:
 		// Texture dimensions

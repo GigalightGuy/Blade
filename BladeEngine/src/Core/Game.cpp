@@ -150,9 +150,16 @@ namespace BladeEngine
 
     void DrawSprite(const Sprite2D& sprite, const Position& pos, const Rotation& rot, const Scale& scale)
     {
-        Graphics::GraphicsManager::Instance()->Draw(
+        Graphics::GraphicsManager::Instance()->DrawSprite(
                 sprite.Texture, glm::vec3(pos.Value.X, pos.Value.Y, 0.0f), 
                 glm::vec3(0.0f, 0.0f, rot.Angle), glm::vec3(scale.Value.X, scale.Value.Y, 1.0f));
+    }
+
+    void DrawString(const TextRenderer& text, const Position& pos, const Rotation& rot, const Scale& scale)
+    {
+        Graphics::GraphicsManager::Instance()->DrawString(
+            text.Text, text.Font, glm::vec3(pos.Value.X, pos.Value.Y, 0.0f),
+            glm::vec3(0.0f, 0.0f, rot.Angle), glm::vec3(scale.Value.X, scale.Value.Y, 1.0f));
     }
 
     void Game::Run()
@@ -177,6 +184,7 @@ namespace BladeEngine
         // Render
         World::BindSystemNoQuery(flecs::PreStore, "Start Drawing", BeginDrawing);
         World::BindSystem<const Sprite2D, const Position, const Rotation, const Scale>(flecs::PreStore, "Draw Sprite", DrawSprite);
+        World::BindSystem<const TextRenderer, const Position, const Rotation, const Scale>(flecs::PreStore, "Draw Text", DrawString);
         World::BindSystemNoQuery(flecs::PreStore, "End Drawing", EndDrawing);
 
         SetupWorld();

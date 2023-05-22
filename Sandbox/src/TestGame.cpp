@@ -38,6 +38,8 @@ namespace BladeEngine {
 	AudioSource* backgroundAudioSource;
 
 	Graphics::Font* g_KrinkesRegularFont;
+	Graphics::Font* g_AdmirationPainsFont;
+	Graphics::Font* g_ZerafocFont;
 
 	void LoadTextures() {
 		using namespace Graphics;
@@ -123,7 +125,7 @@ namespace BladeEngine {
 	}
 
 	void FocusCamera(const Player& player, const Position& pos) {
-		Camera::GetMainCamera()->SetPosition({ pos.Value.X, 2.0f, 10.0f });
+		Camera::GetMainCamera()->SetPosition({ pos.Value.X, 0.0f, 10.0f });
 	}
 
 	void GeneratePulse(const PulseEmitter& emitter, const Position& pos) {
@@ -144,7 +146,9 @@ namespace BladeEngine {
 		LoadTextures();
 		LoadAudioClips();
 
-		g_KrinkesRegularFont = new Graphics::Font("assets/fonts/KrinkesRegularPERSONAL.ttf");
+		//g_KrinkesRegularFont = new Graphics::Font("assets/fonts/KrinkesRegularPERSONAL.ttf");
+		//g_AdmirationPainsFont = new Graphics::Font("assets/fonts/Admiration Pains.ttf");
+		g_ZerafocFont = new Graphics::Font("assets/fonts/Zerafoc.ttf");
 	}
 
 	void TestGame::UnloadGameResources() {
@@ -156,7 +160,7 @@ namespace BladeEngine {
 	{
 
 		g_Ground = World::CreateEntity("Ground");
-		g_Ground.SetComponent<Position>({ {0.0f, 0.0f} });
+		g_Ground.SetComponent<Position>({ {0.0f, -5.0f} });
 		g_Ground.SetComponent<Rotation>({ 0.0f });
 		g_Ground.SetComponent<Scale>({ {40.0f, 2.0f} });
 		g_Ground.AddComponent<Rigidbody2D>();
@@ -241,13 +245,14 @@ namespace BladeEngine {
 
 
 		auto someText = World::CreateEntity("My First Text");
-		someText.SetComponent<Position>({ { 0.0f, 0.0f } });
+		someText.SetComponent<Position>({ { -15.0f, 0.0f } });
 		someText.SetComponent<Rotation>({ 0.0f });
-		someText.SetComponent<Scale>({ { 20.0f, 20.0f } });
-		someText.SetComponent<Sprite2D>({ g_KrinkesRegularFont->GetAtlasTexture() });
+		someText.SetComponent<Scale>({ { 3.0f, 3.0f } });
+		//someText.SetComponent<Sprite2D>({ g_ZerafocFont->GetAtlasTexture() });
+		someText.SetComponent<TextRenderer>({ g_ZerafocFont, "Hello, World!" });
 
 
-		for (size_t i = 0; i < 6; i++) {
+		/*for (size_t i = 0; i < 6; i++) {
 			std::stringstream ss("Background Layer ");
 			ss << i + 1;
 
@@ -257,7 +262,7 @@ namespace BladeEngine {
 			background.SetComponent<Scale>({ {100.0f, 50.0f} });
 
 			background.SetComponent<Sprite2D>({ g_BackgroundTextures[i] });
-		}
+		}*/
 
 		World::BindSystem<const PulseEmitter, const Position>(2.0f, "Generate Pulse",
 			GeneratePulse);

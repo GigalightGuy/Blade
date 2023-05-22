@@ -82,31 +82,23 @@ namespace BladeEngine::Graphics::Vulkan
 	);
 
 
-	void CreateVertexBuffer(
+	VulkanBuffer* CreateVertexBuffer(
+		VulkanResourceAllocator& allocator,
 		Buffer vertices,
-		VkPhysicalDevice physicalDevice,
 		VkDevice device,
 		VkQueue graphicsQueue,
-		VkCommandPool commandPool,
-		VulkanBuffer& vertexBuffer
-	);
+		VkCommandPool commandPool);
 
-	void CreateIndexBuffer(
-		Buffer elements,
-		VkPhysicalDevice physicalDevice,
+	VulkanBuffer* CreateIndexBuffer(
+		VulkanResourceAllocator& allocator,
+		Buffer indices,
 		VkDevice device,
 		VkQueue graphicsQueue,
-		VkCommandPool commandPool,
-		VulkanBuffer& indexBuffer
-	);
+		VkCommandPool commandPool);
 
-	void CreateUniformBuffer(
-		VkPhysicalDevice physicalDevice,
-		VkDevice device,
-		VkDeviceSize size,
-		VulkanBuffer& uniformBuffer
-	);
-
+	VulkanBuffer* CreateUniformBuffer(
+		VulkanResourceAllocator& allocator,
+		uint64_t size);
 
 
 	template<typename T>

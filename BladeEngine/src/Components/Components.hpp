@@ -3,11 +3,14 @@
 #include "../Core/Vec.hpp"
 #include "../Physics/Physics2D.hpp"
 
+#include <string>
+
 class b2Body;
 
 namespace BladeEngine::Graphics
 {
     class Texture2D;
+    class Font;
 }
 
 class BladeEngine::Graphics::Texture2D;
@@ -31,9 +34,15 @@ namespace BladeEngine
 
     struct Sprite2D
     {
-        Graphics::Texture2D* Texture;
+        Graphics::Texture2D* Texture = nullptr;
         Vec2 UVStartPos;
         Vec2 UVDimensions;
+    };
+
+    struct TextRenderer
+    {
+        Graphics::Font* Font;
+        std::string Text;
     };
 
     struct Rigidbody2D

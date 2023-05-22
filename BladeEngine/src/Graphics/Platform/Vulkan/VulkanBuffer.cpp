@@ -41,7 +41,7 @@ namespace BladeEngine::Graphics::Vulkan {
 		vmaUnmapMemory(m_Allocator, m_Allocation);
 	}
 
-	void VulkanBuffer::Resize(size_t size)
+	void VulkanBuffer::Resize(uint64_t size)
 	{
 		m_Size = size;
 		CreateBuffer({ m_Size, nullptr, m_Usage, m_AllocationUsage, m_KeepMapped });
@@ -70,14 +70,14 @@ namespace BladeEngine::Graphics::Vulkan {
 			{
 				allocationFlags |= VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
 			}
-
-			if (((uint32_t)m_AllocationUsage & (uint32_t)BufferAllocationUsage::HostRead) ==
-				(uint32_t)BufferAllocationUsage::HostRead) {
+			else if (((uint32_t)m_AllocationUsage & (uint32_t)BufferAllocationUsage::HostRead) ==
+				(uint32_t)BufferAllocationUsage::HostRead) 
+			{
 				allocationFlags |= VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT;
 			}
 		}
 
-		VkBufferUsageFlags bufferUsage = VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
+		VkBufferUsageFlags bufferUsage = 0;
 		if (((uint32_t)description.Usage & (uint32_t)BufferUsage::Vertex) ==
 			(uint32_t)BufferUsage::Vertex)
 		{

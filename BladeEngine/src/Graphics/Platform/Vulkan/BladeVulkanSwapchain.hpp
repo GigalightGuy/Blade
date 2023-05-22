@@ -37,7 +37,7 @@ public:
   VkImageView depthImageView;
 
   //Add new Framebuffer set on Begin Drawing
-  std::map<VkRenderPass,std::vector<VkFramebuffer>> renderPassFramebuffersMap;
+  std::unordered_map<VkRenderPass, std::vector<VkFramebuffer>> m_FramebuffersMap;
 
   
   VkFormat FindDepthFormat(VkPhysicalDevice physicalDevice);
@@ -46,7 +46,7 @@ public:
                               VkImageAspectFlags aspectFlags);
   
 
-  void AddFramebuffers(VkDevice device, VkRenderPass renderPass);
+  void CreateFramebuffers(VkDevice device, VkRenderPass renderPass);
 
 private:
   VkFormat FindSupportedFormat(VkPhysicalDevice physicalDevice,

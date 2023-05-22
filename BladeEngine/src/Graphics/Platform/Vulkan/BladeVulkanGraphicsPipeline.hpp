@@ -13,16 +13,16 @@ namespace BladeEngine {
 namespace Graphics {
 namespace Vulkan {
     
-class VulkanGraphicsPipeline {
+class VulkanGraphicsPipeline 
+{
 public:
-  VulkanGraphicsPipeline(VkPhysicalDevice physicalDevice, VkDevice device,
-                         VulkanSwapchain *swapchain, VulkanShader *shader);
+  VulkanGraphicsPipeline(VkDevice device, VkRenderPass renderPass, VulkanShader* shader);
   ~VulkanGraphicsPipeline();
 
   void Dispose(VkDevice device);
   
   //Init
-  VkRenderPass renderPass;
+  VkRenderPass m_RenderPass;
   VkDescriptorSetLayout descriptorSetLayout;
   VkPipelineLayout pipelineLayout;
   VkPipeline graphicsPipeline;
@@ -37,8 +37,6 @@ public:
   void UpdateDescriptorSet(VkDevice device,VkImageView imageView, VkSampler sampler, VulkanBuffer& uniformBuffer, uint32_t frameIndex, int descriptorSetIndex);
   
 private:
-  void CreateRenderPass(VkDevice device, VkFormat swapChainImageFormat,
-                        VkFormat depthImageFormat);
   
   void CreateDescriptorSetLayout(VkDevice device);
   void CreateGraphicsPipeline(VkDevice device, VulkanShader *shader);

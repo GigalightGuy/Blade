@@ -29,6 +29,9 @@ namespace BladeEngine::Graphics::Vulkan
 		defaultSpriteVertexShader = new Shader("assets/shaders/default.vert", ShaderType::VERTEX);
 		defaultSpriteFragmentShader = new Shader("assets/shaders/default.frag", ShaderType::FRAGMENT);
 
+		defaultTextVertexShader = new Shader("assets/shaders/defaultText.vert", ShaderType::VERTEX);
+		defaultTextFragmentShader = new Shader("assets/shaders/defaultText.frag", ShaderType::FRAGMENT);
+
 		std::vector<const char*> extensions = window->GetRequiredExtensions();
 		extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 		vkInstance = new VulkanInstance("Blade GDK Program", VK_MAKE_VERSION(1, 0, 0), extensions, { "VK_LAYER_KHRONOS_validation" });
@@ -41,6 +44,7 @@ namespace BladeEngine::Graphics::Vulkan
 		vkSwapchain = new VulkanSwapchain(window, vkDevice->physicalDevice,
 			vkDevice->logicalDevice, vkSurface);
 
+
 		CreateClearRenderPass();
 		CreateClearFramebuffer();
 
@@ -48,44 +52,70 @@ namespace BladeEngine::Graphics::Vulkan
 		CreateCommandBuffers();
 		CreateSyncObjects();
 
-		VulkanShader vkDefaultShader = VulkanShader(vkDevice->logicalDevice, defaultSpriteVertexShader->data, defaultSpriteFragmentShader->data);
-		VulkanGraphicsPipeline vkGraphicsPipeline = VulkanGraphicsPipeline(vkDevice->physicalDevice, vkDevice->logicalDevice, vkSwapchain, &vkDefaultShader);
-		vkGraphicsPipeline.CreateDescriptorPools(vkDevice->logicalDevice, 100); // :))
-		graphicsPipelines.push_back(vkGraphicsPipeline);
+		VulkanRenderPass* renderPass = new VulkanRenderPass(
+			vkDevice, vkSwapchain->imageFormat, 
+			vkSwapchain->FindDepthFormat(vkDevice->physicalDevice));
+		m_RenderPasses.push_back(renderPass);
 
+		static const size_t maxQuadCount = 100;
 		static const size_t maxCharCount = 1000;
 
-		Buffer textVertexBuffer, textIndexBuffer;
-		textVertexBuffer.Allocate(maxCharCount * 4 * sizeof(VertexColorTexture));
-		textIndexBuffer.Allocate(maxCharCount * 6 * sizeof(uint16_t));
+		VulkanShader vkDefaultSpriteShader = VulkanShader(vkDevice->logicalDevice, defaultSpriteVertexShader->data, defaultSpriteFragmentShader->data);
+		VulkanGraphicsPipeline* vkSpriteGraphicsPipeline = new VulkanGraphicsPipeline(
+			vkDevice->logicalDevice, renderPass->GetRenderPass(), &vkDefaultSpriteShader);
+		vkSpriteGraphicsPipeline->CreateDescriptorPools(vkDevice->logicalDevice, maxQuadCount); // :))
+		m_GraphicsPipelinesMap[renderPass].push_back(vkSpriteGraphicsPipeline);
+
+		VulkanShader vkDefaultTextShader = VulkanShader(vkDevice->logicalDevice, defaultTextVertexShader->data, defaultTextFragmentShader->data);
+		VulkanGraphicsPipeline* vkTextGraphicsPipeline = new VulkanGraphicsPipeline(
+			vkDevice->logicalDevice, renderPass->GetRenderPass(), &vkDefaultTextShader);
+		vkTextGraphicsPipeline->CreateDescriptorPools(vkDevice->logicalDevice, maxQuadCount); // :))
+		m_GraphicsPipelinesMap[renderPass].push_back(vkTextGraphicsPipeline);
+
+		vkSwapchain->CreateFramebuffers(vkDevice->logicalDevice, renderPass->GetRenderPass());
+
+
+		m_TextQuadCounts.resize(maxQuadCount);
+
+		BufferDescription textVertexBufferDescription;
+		textVertexBufferDescription.Usage = BufferUsage::Vertex;
+		textVertexBufferDescription.AllocationUsage = BufferAllocationUsage::HostWrite;
+		textVertexBufferDescription.KeepMapped = true;
+		textVertexBufferDescription.Size = maxCharCount * 4 * sizeof(VertexColorTexture);
+
+		BufferDescription textIndexBufferDescription;
+		textIndexBufferDescription.Usage = BufferUsage::Index;
+		textIndexBufferDescription.AllocationUsage = BufferAllocationUsage::HostWrite;
+		textIndexBufferDescription.KeepMapped = true;
+		textIndexBufferDescription.Size = maxCharCount * 6 * sizeof(uint16_t);
+
 		for (int i = 0; i < FRAMES_IN_FLIGHT; i++)
 		{
-			m_UniformBuffers[i].resize(100);
+			m_UniformBuffers[i].resize(2 * maxQuadCount);
 
-			m_TextIndexBuffers[i].resize(100);
-			m_TextVertexBuffers[i].resize(100);
+			m_TextIndexBuffers[i].resize(maxQuadCount);
+			m_TextVertexBuffers[i].resize(maxQuadCount);
 
-			for (int j = 0; j < 100; j++)
+			for (int j = 0; j < maxQuadCount; j++)
 			{
-				CreateUniformBuffer(vkDevice->physicalDevice, vkDevice->logicalDevice, sizeof(MVP), *m_UniformBuffers[i][j]);
+				m_UniformBuffers[i][j * 2 + 0] = CreateUniformBuffer(*m_ResourceAllocator, sizeof(MVP));
+				m_UniformBuffers[i][j * 2 + 1] = CreateUniformBuffer(*m_ResourceAllocator, sizeof(MVP));
 
-				CreateVertexBuffer(textVertexBuffer, vkDevice->physicalDevice, vkDevice->logicalDevice, 
-					vkDevice->graphicsQueue, vkCommandPool, *m_TextVertexBuffers[i][j]);
-
-				CreateIndexBuffer(textIndexBuffer, vkDevice->physicalDevice, vkDevice->logicalDevice,
-					vkDevice->graphicsQueue, vkCommandPool, *m_TextIndexBuffers[i][j]);
+				m_TextVertexBuffers[i][j] = new VulkanBuffer(textVertexBufferDescription, *m_ResourceAllocator);
+				m_TextIndexBuffers[i][j] = new VulkanBuffer(textIndexBufferDescription, *m_ResourceAllocator);
 			}
 		}
-		textVertexBuffer.Release();
-		textIndexBuffer.Release();
 	}
 
 	void VulkanRenderer::BeginDrawing()
 	{
-		vkSwapchain->AddFramebuffers(vkDevice->logicalDevice, graphicsPipelines.at(graphicsPipelines.size() - 1).renderPass);
+	
+		m_TextCount = 0;
+		m_UniformBufferCount = 0;
 	}
 
-	void VulkanRenderer::DrawSprite(Texture2D* texture, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+	void VulkanRenderer::DrawSprite(Texture2D* texture, 
+		const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale)
 	{
 		VulkanTexture* vkTexture = (VulkanTexture*)texture->GetGPUTexture();
 
@@ -109,14 +139,19 @@ namespace BladeEngine::Graphics::Vulkan
 
 	void VulkanRenderer::EndDrawing()
 	{
-		auto& currentPipeline = graphicsPipelines[graphicsPipelines.size() - 1];
+		const auto renderPass = m_RenderPasses[0];
+		auto currentPipeline = m_GraphicsPipelinesMap[renderPass][0];
 
-		if (currentPipeline.descriptorSets[currentFrame].size() > 0)
-			currentPipeline.FreeDescriptorSets(vkDevice->logicalDevice, currentFrame);
+		vkWaitForFences(vkDevice->logicalDevice, 1, &inFlightFences[currentFrame], VK_TRUE,
+			UINT64_MAX);
+		// vkWaitForFences should come before freeing descriptor sets
+		if (currentPipeline->descriptorSets[currentFrame].size() > 0)
+			currentPipeline->FreeDescriptorSets(vkDevice->logicalDevice, currentFrame);
 
-		currentPipeline.CreateDescriptorSets(vkDevice->logicalDevice, vkMeshes.size(), currentFrame);
+		currentPipeline->CreateDescriptorSets(vkDevice->logicalDevice, vkMeshes.size(), currentFrame);
 
-		for (int i = 0; i < vkMeshes.size(); i++)
+		uint32_t i;
+		for (i = 0; i < vkMeshes.size(); i++)
 		{
 			MVP mvp{};
 			auto data = vkMeshesModelData[i];
@@ -133,13 +168,44 @@ namespace BladeEngine::Graphics::Vulkan
 
 			UpdateUniformBuffer(*m_UniformBuffers[currentFrame][i], mvp);
 			auto vkTexture = vkTextures[i];
-			auto vkMesh = vkMeshes[i];
 
-			currentPipeline.UpdateDescriptorSet(
+			currentPipeline->UpdateDescriptorSet(
 				vkDevice->logicalDevice,
 				vkTexture->textureImageView,
 				vkTexture->textureSampler,
 				*m_UniformBuffers[currentFrame][i], currentFrame, i);
+		}
+
+		currentPipeline = m_GraphicsPipelinesMap[renderPass][1];
+
+		if (currentPipeline->descriptorSets[currentFrame].size() > 0)
+			currentPipeline->FreeDescriptorSets(vkDevice->logicalDevice, currentFrame);
+
+		currentPipeline->CreateDescriptorSets(vkDevice->logicalDevice, m_TextCount, currentFrame);
+
+		for (uint32_t j = 0; j < m_TextCount; j++, i++)
+		{
+			MVP mvp{};
+			auto data = vkMeshesModelData[i];
+
+			mvp.model = glm::scale(
+				glm::rotate(
+					glm::translate(glm::mat4(1), data.position),
+					data.rotation.z,
+					glm::vec3(0, 0, 1)),
+				data.scale);
+
+			mvp.view = camera->GetViewMatrix();
+			mvp.proj = camera->GetProjectionMatrix();
+
+			UpdateUniformBuffer(*m_UniformBuffers[currentFrame][i], mvp);
+			auto vkTexture = vkTextures[i];
+
+			currentPipeline->UpdateDescriptorSet(
+				vkDevice->logicalDevice,
+				vkTexture->textureImageView,
+				vkTexture->textureSampler,
+				*m_UniformBuffers[currentFrame][i], currentFrame, j);
 		}
 
 		DrawFrame();
@@ -149,13 +215,24 @@ namespace BladeEngine::Graphics::Vulkan
 		vkMeshesModelData.clear();
 	}
 
-	void VulkanRenderer::DrawString(const std::string& string, Font* font, const glm::vec3 position)
+	void VulkanRenderer::DrawString(const std::string& string, Font* font, 
+		const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale)
 	{
+		Buffer vertexBuffer;
+		vertexBuffer.Allocate(4 * string.size() * sizeof(VertexColorTexture));
+
+		VertexColorTexture* vertexBufferData = vertexBuffer.As<VertexColorTexture>();
+
+		Buffer indexBuffer;
+		indexBuffer.Allocate(6 * string.size() * sizeof(uint16_t));
+
+		uint16_t* indexBufferData = indexBuffer.As<uint16_t>();
+
 		struct TextureParams
 		{
 			glm::vec4 Color{ 1.0f };
-			float Kerning = 0.0f;
-			float LineSpacing = 0.0f;
+			float Kerning = 0.1f;
+			float LineSpacing = 0.1f;
 		};
 
 		TextureParams textParams;
@@ -164,13 +241,15 @@ namespace BladeEngine::Graphics::Vulkan
 		const auto& metrics = fontGeometry.getMetrics();
 		Texture2D* fontAtlas = font->GetAtlasTexture();
 
-		//s_Data.FontAtlasTexture = fontAtlas;
+		vkTextures.push_back((VulkanTexture*)fontAtlas->GetGPUTexture());
 
 		double x = 0.0;
 		double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
 		double y = 0.0;
 
 		const float spaceGlyphAdvance = fontGeometry.getGlyph(' ')->getAdvance();
+
+		uint32_t quadCount = 0;
 
 		for (size_t i = 0; i < string.size(); i++)
 		{
@@ -202,7 +281,6 @@ namespace BladeEngine::Graphics::Vulkan
 
 			if (character == '\t')
 			{
-				// NOTE(Yan): is this right?
 				x += 4.0f * (fsScale * spaceGlyphAdvance + textParams.Kerning);
 				continue;
 			}
@@ -213,13 +291,16 @@ namespace BladeEngine::Graphics::Vulkan
 			if (!glyph)
 				return;
 
+			float atlasWidth = (float)(fontAtlas->GetWidth()), atlasHeight = (float)(fontAtlas->GetHeight());
+
 			double al, ab, ar, at;
 			glyph->getQuadAtlasBounds(al, ab, ar, at);
-			glm::vec2 texCoordMin((float)al, (float)ab);
-			glm::vec2 texCoordMax((float)ar, (float)at);
+			glm::vec2 texCoordMin((float)al, atlasHeight - (float)at);
+			glm::vec2 texCoordMax((float)ar, atlasHeight - (float)ab);
 
+			// switched bottom and top bounds
 			double pl, pb, pr, pt;
-			glyph->getQuadPlaneBounds(pl, pb, pr, pt);
+			glyph->getQuadPlaneBounds(pl, pt, pr, pb);
 			glm::vec2 quadMin((float)pl, (float)pb);
 			glm::vec2 quadMax((float)pr, (float)pt);
 
@@ -227,38 +308,41 @@ namespace BladeEngine::Graphics::Vulkan
 			quadMin += glm::vec2(x, y);
 			quadMax += glm::vec2(x, y);
 
-			float texelWidth = 1.0f / fontAtlas->GetWidth();
-			float texelHeight = 1.0f / fontAtlas->GetHeight();
+			float texelWidth = 1.0f / atlasWidth;
+			float texelHeight = 1.0f / atlasHeight;
 			texCoordMin *= glm::vec2(texelWidth, texelHeight);
 			texCoordMax *= glm::vec2(texelWidth, texelHeight);
 
-			// render here
-			/*s_Data.TextVertexBufferPtr->Position = transform * glm::vec4(quadMin, 0.0f, 1.0f);
-			s_Data.TextVertexBufferPtr->Color = textParams.Color;
-			s_Data.TextVertexBufferPtr->TexCoord = texCoordMin;
-			s_Data.TextVertexBufferPtr->EntityID = entityID;
-			s_Data.TextVertexBufferPtr++;
 
-			s_Data.TextVertexBufferPtr->Position = transform * glm::vec4(quadMin.x, quadMax.y, 0.0f, 1.0f);
-			s_Data.TextVertexBufferPtr->Color = textParams.Color;
-			s_Data.TextVertexBufferPtr->TexCoord = { texCoordMin.x, texCoordMax.y };
-			s_Data.TextVertexBufferPtr->EntityID = entityID;
-			s_Data.TextVertexBufferPtr++;
+			vertexBufferData[quadCount * 4 + 0].position = glm::vec3(quadMin, 0.0f);
+			vertexBufferData[quadCount * 4 + 0].color = textParams.Color;
+			vertexBufferData[quadCount * 4 + 0].textureCoordinate = texCoordMin;
 
-			s_Data.TextVertexBufferPtr->Position = transform * glm::vec4(quadMax, 0.0f, 1.0f);
-			s_Data.TextVertexBufferPtr->Color = textParams.Color;
-			s_Data.TextVertexBufferPtr->TexCoord = texCoordMax;
-			s_Data.TextVertexBufferPtr->EntityID = entityID;
-			s_Data.TextVertexBufferPtr++;
+			vertexBufferData[quadCount * 4 + 1].position = glm::vec3(quadMin.x, quadMax.y, 0.0f);
+			vertexBufferData[quadCount * 4 + 1].color = textParams.Color;
+			vertexBufferData[quadCount * 4 + 1].textureCoordinate = { texCoordMin.x, texCoordMax.y };
 
-			s_Data.TextVertexBufferPtr->Position = transform * glm::vec4(quadMax.x, quadMin.y, 0.0f, 1.0f);
-			s_Data.TextVertexBufferPtr->Color = textParams.Color;
-			s_Data.TextVertexBufferPtr->TexCoord = { texCoordMax.x, texCoordMin.y };
-			s_Data.TextVertexBufferPtr->EntityID = entityID;
-			s_Data.TextVertexBufferPtr++;
+			vertexBufferData[quadCount * 4 + 2].position = glm::vec3(quadMax, 0.0f);
+			vertexBufferData[quadCount * 4 + 2].color = textParams.Color;
+			vertexBufferData[quadCount * 4 + 2].textureCoordinate = texCoordMax;
 
-			s_Data.TextIndexCount += 6;
-			s_Data.Stats.QuadCount++;*/
+			vertexBufferData[quadCount * 4 + 3].position = glm::vec3(quadMax.x, quadMin.y, 0.0f);
+			vertexBufferData[quadCount * 4 + 3].color = textParams.Color;
+			vertexBufferData[quadCount * 4 + 3].textureCoordinate = { texCoordMax.x, texCoordMin.y };
+
+			static const uint16_t indices[6] {
+				0, 1, 2,
+				2, 3, 0
+			};
+
+			indexBufferData[quadCount * 6 + 0] = indices[0] + quadCount * 4;
+			indexBufferData[quadCount * 6 + 1] = indices[1] + quadCount * 4;
+			indexBufferData[quadCount * 6 + 2] = indices[2] + quadCount * 4;
+			indexBufferData[quadCount * 6 + 3] = indices[3] + quadCount * 4;
+			indexBufferData[quadCount * 6 + 4] = indices[4] + quadCount * 4;
+			indexBufferData[quadCount * 6 + 5] = indices[5] + quadCount * 4;
+
+			quadCount++;
 
 			if (i < string.size() - 1)
 			{
@@ -269,6 +353,24 @@ namespace BladeEngine::Graphics::Vulkan
 				x += fsScale * advance + textParams.Kerning;
 			}
 		}
+
+		memcpy(m_TextVertexBuffers[currentFrame][m_TextCount]->Map(), vertexBufferData,
+			quadCount * 4 * sizeof(VertexColorTexture));
+		memcpy(m_TextIndexBuffers[currentFrame][m_TextCount]->Map(), indexBufferData,
+			quadCount * 6 * sizeof(uint16_t));
+
+		ModelData modelData;
+		modelData.position = position;
+		modelData.rotation = rotation;
+		modelData.scale = scale;
+		vkMeshesModelData.push_back(modelData);
+
+		m_TextQuadCounts[m_TextCount] = quadCount;
+		m_TextCount++;
+
+		vertexBuffer.Release();
+		indexBuffer.Release();
+
 	}
 
 	void VulkanRenderer::WaitDeviceIdle()
@@ -289,7 +391,7 @@ namespace BladeEngine::Graphics::Vulkan
 
 	VulkanMesh* VulkanRenderer::UploadMeshToGPU(Buffer vertices, Buffer indices)
 	{
-		return LoadMesh(*m_ResourceAllocator, vkDevice->physicalDevice, vkDevice->logicalDevice, vkDevice->graphicsQueue, vkCommandPool, vertices, indices);
+		return LoadMesh(*m_ResourceAllocator, vkDevice->logicalDevice, vkDevice->graphicsQueue, vkCommandPool, vertices, indices);
 	}
 
 	void VulkanRenderer::ReleaseGPUMesh(VulkanMesh* gpuMesh)
@@ -300,8 +402,8 @@ namespace BladeEngine::Graphics::Vulkan
 
 	void VulkanRenderer::DrawFrame()
 	{
-		vkWaitForFences(vkDevice->logicalDevice, 1, &inFlightFences[currentFrame], VK_TRUE,
-			UINT64_MAX);
+		/*vkWaitForFences(vkDevice->logicalDevice, 1, &inFlightFences[currentFrame], VK_TRUE,
+			UINT64_MAX);*/
 
 		VkResult result = vkAcquireNextImageKHR(
 			vkDevice->logicalDevice, vkSwapchain->swapchain, UINT64_MAX, imageAvailableSemaphores[currentFrame],
@@ -361,8 +463,8 @@ namespace BladeEngine::Graphics::Vulkan
 
 		VkRenderPassBeginInfo renderPassInfo{};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		renderPassInfo.renderPass = graphicsPipelines[graphicsPipelines.size() - 1].renderPass;
-		renderPassInfo.framebuffer = vkSwapchain->renderPassFramebuffersMap[graphicsPipelines[graphicsPipelines.size() - 1].renderPass][imageIndex];
+		renderPassInfo.renderPass = m_RenderPasses[0]->GetRenderPass();
+		renderPassInfo.framebuffer = vkSwapchain->m_FramebuffersMap[m_RenderPasses[0]->GetRenderPass()][imageIndex];
 		renderPassInfo.renderArea.offset = { 0, 0 };
 		renderPassInfo.renderArea.extent = vkSwapchain->extent;
 
@@ -378,7 +480,7 @@ namespace BladeEngine::Graphics::Vulkan
 			VK_SUBPASS_CONTENTS_INLINE);
 
 		vkCmdBindPipeline(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS,
-			graphicsPipelines[graphicsPipelines.size() - 1].graphicsPipeline);
+			m_GraphicsPipelinesMap[m_RenderPasses[0]][0]->graphicsPipeline);
 
 		VkViewport viewport{};
 		viewport.x = 0.0f;
@@ -398,10 +500,37 @@ namespace BladeEngine::Graphics::Vulkan
 		int i = 0;
 		for (auto& mesh : vkMeshes)
 		{
-			VkPipelineLayout& pipelineLayout = graphicsPipelines[graphicsPipelines.size() - 1].pipelineLayout;
-			VkDescriptorSet& descriptorSet = graphicsPipelines[graphicsPipelines.size() - 1].descriptorSets[currentFrame][i];
+			const auto& renderPass = m_RenderPasses[0];
+			const auto& graphicsPipeline = m_GraphicsPipelinesMap[renderPass][0];
+
+			VkPipelineLayout& pipelineLayout = graphicsPipeline->pipelineLayout;
+			VkDescriptorSet& descriptorSet = graphicsPipeline->descriptorSets[currentFrame][i];
 			mesh->Draw(commandBuffers[currentFrame], pipelineLayout, descriptorSet);
 			i++;
+		}
+
+		vkCmdBindPipeline(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS,
+			m_GraphicsPipelinesMap[m_RenderPasses[0]][1]->graphicsPipeline);
+
+		for (uint32_t j = 0; j < m_TextCount; j++, i++)
+		{
+			VkPipelineLayout& pipelineLayout = m_GraphicsPipelinesMap[m_RenderPasses[0]][1]->pipelineLayout;
+			VkDescriptorSet& descriptorSet = m_GraphicsPipelinesMap[m_RenderPasses[0]][1]->descriptorSets[currentFrame][j];
+
+			VkBuffer vertexBuffers[] = { m_TextVertexBuffers[currentFrame][j]->GetBuffer() };
+			VkDeviceSize offsets[] = { 0 };
+
+			vkCmdBindVertexBuffers(commandBuffers[currentFrame], 0, 1, vertexBuffers, offsets);
+
+			vkCmdBindIndexBuffer(commandBuffers[currentFrame], 
+				m_TextIndexBuffers[currentFrame][j]->GetBuffer(), 
+				0, VK_INDEX_TYPE_UINT16);
+
+			vkCmdBindDescriptorSets(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS,
+				pipelineLayout, 0, 1, &descriptorSet,
+				0, nullptr);
+
+			vkCmdDrawIndexed(commandBuffers[currentFrame], m_TextQuadCounts[j] * 6, 1, 0, 0, 0);
 		}
 
 		vkCmdEndRenderPass(commandBuffers[currentFrame]);
@@ -417,8 +546,9 @@ namespace BladeEngine::Graphics::Vulkan
 		vkWaitForFences(vkDevice->logicalDevice, 1, &inFlightFences[currentFrame], VK_TRUE,
 			UINT64_MAX);
 
-		if (graphicsPipelines.size() > 0 && graphicsPipelines[graphicsPipelines.size() - 1].descriptorSets[currentFrame].size() > 0)
-			graphicsPipelines[graphicsPipelines.size() - 1].FreeDescriptorSets(vkDevice->logicalDevice, currentFrame);
+		if (m_GraphicsPipelinesMap[m_RenderPasses[0]].size() > 0 
+			&& m_GraphicsPipelinesMap[m_RenderPasses[0]][0]->descriptorSets[currentFrame].size() > 0)
+			m_GraphicsPipelinesMap[m_RenderPasses[0]][0]->FreeDescriptorSets(vkDevice->logicalDevice, currentFrame);
 
 		//uint32_t imageIndex;
 		VkResult result = vkAcquireNextImageKHR(

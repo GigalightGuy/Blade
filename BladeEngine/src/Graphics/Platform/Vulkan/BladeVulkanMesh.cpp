@@ -8,52 +8,16 @@ namespace BladeEngine::Graphics::Vulkan
 {
 	VulkanMesh* LoadMesh(
 		VulkanResourceAllocator& allocator,
-		VkPhysicalDevice physicalDevice, VkDevice device, 
-		VkQueue graphicsQueue, VkCommandPool commandPool,
+		VkDevice device, 
+		VkQueue graphicsQueue, 
+		VkCommandPool commandPool,
 		Buffer vertices,
 		Buffer indices)
 	{
 		VulkanMesh* mesh = new VulkanMesh();
 
-		BufferDescription bufferDescription;
-		bufferDescription.AllocationUsage = BufferAllocationUsage::HostWrite;
-		bufferDescription.KeepMapped = true;
-		bufferDescription.Usage = BufferUsage::TransferSource;
-
-		bufferDescription.Data = vertices.Data;
-		bufferDescription.Size = vertices.Size;
-		VulkanBuffer vertexStagingBuffer = VulkanBuffer(bufferDescription, allocator);
-
-		bufferDescription.Data = indices.Data;
-		bufferDescription.Size = indices.Size;
-		VulkanBuffer indexStagingBuffer = VulkanBuffer(bufferDescription, allocator);
-
-
-		bufferDescription.AllocationUsage = BufferAllocationUsage::DeviceLocal;
-		bufferDescription.KeepMapped = false;
-		
-		bufferDescription.Usage = BufferUsage::Vertex | BufferUsage::TransferDestination;
-		bufferDescription.Data = nullptr;
-		bufferDescription.Size = vertices.Size;
-		mesh->VertexBuffer = new VulkanBuffer(bufferDescription, allocator);
-
-		CopyBuffer(device, graphicsQueue, commandPool, 
-			vertexStagingBuffer.GetBuffer(), mesh->VertexBuffer->GetBuffer(),
-			vertices.Size);
-		
-
-		bufferDescription.Usage = BufferUsage::Index | BufferUsage::TransferDestination;
-		bufferDescription.Data = nullptr;
-		bufferDescription.Size = indices.Size;
-		mesh->IndexBuffer = new VulkanBuffer(bufferDescription, allocator);
-
-		CopyBuffer(device, graphicsQueue, commandPool,
-			indexStagingBuffer.GetBuffer(), mesh->IndexBuffer->GetBuffer(),
-			vertices.Size);
-
-		//CreateVertexBuffer(vertices, physicalDevice, device, graphicsQueue, commandPool, mesh->VertexBuffer);
-		//CreateIndexBuffer(indices, physicalDevice, device, graphicsQueue, commandPool, mesh->IndexBuffer);
-
+		mesh->VertexBuffer = CreateVertexBuffer(allocator, vertices, device, graphicsQueue, commandPool);
+		mesh->IndexBuffer = CreateIndexBuffer(allocator, indices, device, graphicsQueue, commandPool);
 		mesh->IndicesCount = indices.Size / sizeof(uint16_t);
 		
 		return mesh;

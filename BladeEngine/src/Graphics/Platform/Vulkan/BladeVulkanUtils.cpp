@@ -223,92 +223,80 @@ namespace BladeEngine::Graphics::Vulkan {
 	}
 
 
-	void CreateVertexBuffer(
+	VulkanBuffer* CreateVertexBuffer(
+		VulkanResourceAllocator& allocator,
 		Buffer vertices,
-		VkPhysicalDevice physicalDevice,
 		VkDevice device,
 		VkQueue graphicsQueue,
-		VkCommandPool commandPool,
-		VulkanBuffer& vertexBuffer)
+		VkCommandPool commandPool)
 	{
+		VulkanBuffer* vertexBuffer;
 
-		VkDeviceSize bufferSize = vertices.Size;
+		BufferDescription bufferDescription;
+		bufferDescription.Usage = BufferUsage::TransferSource;
+		bufferDescription.AllocationUsage = BufferAllocationUsage::HostWrite;
+		bufferDescription.KeepMapped = true;
+		bufferDescription.Data = vertices.Data;
+		bufferDescription.Size = vertices.Size;
+		VulkanBuffer vertexStagingBuffer = VulkanBuffer(bufferDescription, allocator);
 
-		VkBuffer stagingBuffer;
-		VkDeviceMemory stagingBufferMemory;
-		CreateBuffer(physicalDevice, device,
-			bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			stagingBuffer, stagingBufferMemory);
+		bufferDescription.Usage = BufferUsage::Vertex | BufferUsage::TransferDestination;
+		bufferDescription.AllocationUsage = BufferAllocationUsage::DeviceLocal;
+		bufferDescription.KeepMapped = false;
+		bufferDescription.Data = nullptr;
+		bufferDescription.Size = vertices.Size;
+		vertexBuffer = new VulkanBuffer(bufferDescription, allocator);
 
-		void* data;
-		vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0,
-			&data);
-		memcpy(data, vertices.Data, (size_t)bufferSize);
-		vkUnmapMemory(device, stagingBufferMemory);
+		CopyBuffer(device, graphicsQueue, commandPool,
+			vertexStagingBuffer.GetBuffer(), vertexBuffer->GetBuffer(),
+			vertices.Size);
 
-		/*CreateBuffer(
-			physicalDevice, device, bufferSize,
-			VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer.BufferHandle, vertexBuffer.MemoryHandle);
-
-		CopyBuffer(device, graphicsQueue, commandPool, stagingBuffer, vertexBuffer.BufferHandle, bufferSize);*/
-
-		vkDestroyBuffer(device, stagingBuffer, nullptr);
-		vkFreeMemory(device, stagingBufferMemory, nullptr);
+		return vertexBuffer;
 	}
 
-	void CreateIndexBuffer(
-		Buffer elements,
-		VkPhysicalDevice physicalDevice,
+	VulkanBuffer* CreateIndexBuffer(
+		VulkanResourceAllocator& allocator,
+		Buffer indices,
 		VkDevice device,
 		VkQueue graphicsQueue,
-		VkCommandPool commandPool,
-		VulkanBuffer& indexBuffer)
+		VkCommandPool commandPool)
 	{
+		VulkanBuffer* indexBuffer;
 
-		VkDeviceSize bufferSize = elements.Size;
+		BufferDescription bufferDescription;
+		bufferDescription.Usage = BufferUsage::TransferSource;
+		bufferDescription.AllocationUsage = BufferAllocationUsage::HostWrite;
+		bufferDescription.KeepMapped = true;
+		bufferDescription.Data = indices.Data;
+		bufferDescription.Size = indices.Size;
+		VulkanBuffer indexStagingBuffer = VulkanBuffer(bufferDescription, allocator);
 
-		VkBuffer stagingBuffer;
-		VkDeviceMemory stagingBufferMemory;
-		CreateBuffer(physicalDevice, device,
-			bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			stagingBuffer, stagingBufferMemory);
+		bufferDescription.Usage = BufferUsage::Index | BufferUsage::TransferDestination;
+		bufferDescription.AllocationUsage = BufferAllocationUsage::DeviceLocal;
+		bufferDescription.KeepMapped = false;
+		bufferDescription.Data = nullptr;
+		bufferDescription.Size = indices.Size;
+		indexBuffer = new VulkanBuffer(bufferDescription, allocator);
 
-		void* data;
-		vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-		memcpy(data, elements.Data, (size_t)bufferSize);
-		vkUnmapMemory(device, stagingBufferMemory);
+		CopyBuffer(device, graphicsQueue, commandPool,
+			indexStagingBuffer.GetBuffer(), indexBuffer->GetBuffer(),
+			indices.Size);
 
-		// TODO(Pedro): Move stuff from LoadMesh to here
-
-		/*CreateBuffer(
-			physicalDevice, device, bufferSize,
-			VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer.BufferHandle, indexBuffer.MemoryHandle);
-
-		CopyBuffer(device, graphicsQueue, commandPool, stagingBuffer, indexBuffer.BufferHandle, bufferSize);*/
-
-		vkDestroyBuffer(device, stagingBuffer, nullptr);
-		vkFreeMemory(device, stagingBufferMemory, nullptr);
+		return indexBuffer;
 	}
 
-	void CreateUniformBuffer(
-		VkPhysicalDevice physicalDevice,
-		VkDevice device,
-		VkDeviceSize size,
-		VulkanBuffer& uniformBuffer)
+	VulkanBuffer* CreateUniformBuffer(
+		VulkanResourceAllocator& allocator,
+		uint64_t size)
 	{
-		/*CreateBuffer(physicalDevice, device, size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-			VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			uniformBuffer.BufferHandle, uniformBuffer.MemoryHandle);
+		BufferDescription bufferDescription;
+		bufferDescription.KeepMapped = true;
+		bufferDescription.AllocationUsage = BufferAllocationUsage::HostWrite;
+		bufferDescription.Usage = BufferUsage::Uniform;
+		bufferDescription.Size = size;
+		bufferDescription.Data = nullptr;
 
-		vkMapMemory(device, uniformBuffer.MemoryHandle, 0, size, 0,
-			&uniformBuffer.MappedMemory);*/
+		return new VulkanBuffer(bufferDescription, allocator);
 	}
 
 	template<>

@@ -35,7 +35,8 @@ namespace BladeEngine::Graphics {
 		/*Begins Drawing commands with custom shader*/
 		void BeginDrawing(Shader* vertexShader, Shader* fragmentShader);
 		/*Draws a Quad with the selected texture and the current active shader program*/
-		void Draw(Texture2D* texture, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
+		void DrawSprite(Texture2D* texture, const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale);
+		void DrawString(const std::string& string, Font* font, const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale);
 		/*Stops the rendering*/
 		void EndDrawing();
 

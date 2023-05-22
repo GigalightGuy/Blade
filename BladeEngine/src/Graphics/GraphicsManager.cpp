@@ -70,13 +70,23 @@ void BladeEngine::Graphics::GraphicsManager::BeginDrawing(
     
 }
 
-void BladeEngine::Graphics::GraphicsManager::Draw(
-    BladeEngine::Graphics::Texture2D *texture, 
-    glm::vec3 position, 
-    glm::vec3 rotation, 
-    glm::vec3 scale)
+void BladeEngine::Graphics::GraphicsManager::DrawSprite(
+    Texture2D *texture, 
+    const glm::vec3& position,
+    const glm::vec3& rotation,
+    const glm::vec3& scale)
 {
     vkRenderer->DrawSprite(texture,position,rotation,scale);
+}
+
+void BladeEngine::Graphics::GraphicsManager::DrawString(
+    const std::string& string, 
+    Font* font, 
+    const glm::vec3& position, 
+    const glm::vec3& rotation, 
+    const glm::vec3& scale)
+{
+    vkRenderer->DrawString(string, font, position, rotation, scale);
 }
 
 void BladeEngine::Graphics::GraphicsManager::EndDrawing()

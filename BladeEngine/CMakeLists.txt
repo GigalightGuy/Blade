@@ -114,6 +114,7 @@ if(USING_VULKAN_API)
 		src/Graphics/Platform/Vulkan/BladeVulkanRenderer.cpp
         src/Graphics/Platform/Vulkan/VulkanResourceAllocator.cpp
         src/Graphics/Platform/Vulkan/VulkanBuffer.cpp
+        src/Graphics/Platform/Vulkan/VulkanRenderPass.cpp
 
         src/Graphics/Platform/Vulkan/VmaImpl.cpp
         
@@ -133,6 +134,7 @@ if(USING_VULKAN_API)
 		src/Graphics/Platform/Vulkan/BladeVulkanRenderer.hpp
         src/Graphics/Platform/Vulkan/VulkanResourceAllocator.hpp
         src/Graphics/Platform/Vulkan/VulkanBuffer.hpp
+        src/Graphics/Platform/Vulkan/VulkanRenderPass.hpp
 
         src/Graphics/Platform/Vulkan/VulkanCheck.hpp
 

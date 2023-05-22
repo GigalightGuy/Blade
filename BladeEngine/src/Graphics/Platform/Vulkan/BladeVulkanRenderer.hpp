@@ -10,6 +10,7 @@
 #include "BladeVulkanGraphicsPipeline.hpp"
 #include "BladeVulkanMesh.hpp"
 #include "BladeVulkanTexture.hpp"
+#include "VulkanRenderPass.hpp"
 
 //#define BLADE_VULKAN_API true
 #include "../../../Core/Window.hpp"
@@ -23,7 +24,8 @@
 
 namespace BladeEngine::Graphics::Vulkan {
 
-	class VulkanRenderer {
+	class VulkanRenderer 
+	{
 	public:
 		VulkanRenderer(BladeEngine::Camera* camera, Window* window);
 		~VulkanRenderer();
@@ -35,11 +37,11 @@ namespace BladeEngine::Graphics::Vulkan {
 		// Creates Graphics pipeline for default shaders to be used during draw calls
 		void BeginDrawing();
 		// Create and store Vulkan Texture, store model data, store quad mesh, create and allocate descriptor pools and sets
-		void DrawSprite(BladeEngine::Graphics::Texture2D* texture, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
+		void DrawSprite(BladeEngine::Graphics::Texture2D* texture, const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale);
 		// Create Descriptor Pool, Descriptor sets, update descriptor sets, uniform buffers, drawindexed
 		void EndDrawing();
 
-		void DrawString(const std::string& string, Font* font, const glm::vec3 position);
+		void DrawString(const std::string& string, Font* font, const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale);
 
 		void WaitDeviceIdle();
 
@@ -95,12 +97,15 @@ namespace BladeEngine::Graphics::Vulkan {
 		Shader* defaultTextFragmentShader;
 
 		//Render Loop
-		std::vector<VulkanGraphicsPipeline> graphicsPipelines;
+		std::vector<VulkanRenderPass*> m_RenderPasses;
+		std::unordered_map<VulkanRenderPass*, std::vector<VulkanGraphicsPipeline*>> m_GraphicsPipelinesMap;
 
 		std::vector<VulkanTexture*> vkTextures;
 		std::vector<VulkanMesh*> vkMeshes;
 		std::vector<ModelData> vkMeshesModelData;
 
+		uint32_t m_TextCount = 0;
+		std::vector<uint32_t> m_TextQuadCounts;
 		std::vector<VulkanBuffer*> m_TextIndexBuffers[FRAMES_IN_FLIGHT];
 		std::vector<VulkanBuffer*> m_TextVertexBuffers[FRAMES_IN_FLIGHT];
 
@@ -112,7 +117,7 @@ namespace BladeEngine::Graphics::Vulkan {
 		std::vector<VkSemaphore> renderFinishedSemaphores;
 		std::vector<VkFence> inFlightFences;
 
-
+		uint32_t m_UniformBufferCount = 0;
 		std::vector<VulkanBuffer*> m_UniformBuffers[FRAMES_IN_FLIGHT];
 	};
 

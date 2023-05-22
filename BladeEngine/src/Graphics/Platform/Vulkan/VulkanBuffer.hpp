@@ -5,25 +5,25 @@
 #include "vulkan/vulkan.hpp"
 
 // TODO(Pedro): Move this into base engine header
-#define BITWISE_ENUM(T)								\
-	T operator|(T a, T b)							\
-	{												\
-		return (T)((uint32_t)a | (uint32_t)b);		\
-	}												\
-													\
-	T& operator|=(T& a, T b)						\
-	{												\
-		return a = (T)((uint32_t)a | (uint32_t)b);	\
-	}												\
-													\
-	T operator&(T a, T b)							\
-	{												\
-		return (T)((uint32_t)a & (uint32_t)b);		\
-	}												\
-													\
-	T& operator&=(T& a, T b)						\
-	{												\
-		return a = (T)((uint32_t)a & (uint32_t)b);	\
+#define BITWISE_ENUM(T)									\
+	inline T operator|(T a, T b)						\
+	{													\
+		return (T)((uint32_t)a | (uint32_t)b);			\
+	}													\
+														\
+	inline T& operator|=(T& a, T b)						\
+	{													\
+		return a = (T)((uint32_t)a | (uint32_t)b);		\
+	}													\
+														\
+	inline T operator&(T a, T b)						\
+	{													\
+		return (T)((uint32_t)a & (uint32_t)b);			\
+	}													\
+														\
+	inline T& operator&=(T& a, T b)						\
+	{													\
+		return a = (T)((uint32_t)a & (uint32_t)b);		\
 	}
 
 namespace BladeEngine::Graphics {
@@ -54,9 +54,11 @@ namespace BladeEngine::Graphics {
 		DeviceLocal = 1 << 2
 	};
 
+	BITWISE_ENUM(BufferAllocationUsage);
+
 	struct BufferDescription
 	{
-		size_t Size = 0;
+		uint64_t Size = 0;
 		const void* Data = nullptr;
 		BufferUsage Usage = BufferUsage::Vertex;
 		BufferAllocationUsage AllocationUsage = BufferAllocationUsage::HostWrite;
@@ -82,11 +84,11 @@ namespace BladeEngine::Graphics::Vulkan {
 		void* Map();
 		void Unmap();
 
-		void Resize(size_t size);
+		void Resize(uint64_t size);
 
 		VkBuffer GetBuffer() { return m_Buffer; }
 
-		size_t GetSize() const { return m_Size; }
+		uint64_t GetSize() const { return m_Size; }
 
 	private:
 		void CreateBuffer(const BufferDescription& description);
@@ -101,7 +103,7 @@ namespace BladeEngine::Graphics::Vulkan {
 		VmaAllocation m_Allocation = VK_NULL_HANDLE;
 
 		bool m_KeepMapped = false;
-		size_t m_Size = 0;
+		uint64_t m_Size = 0;
 		void* m_MappedData = nullptr;
 	
 	};

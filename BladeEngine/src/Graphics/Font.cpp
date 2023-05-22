@@ -98,6 +98,7 @@ namespace BladeEngine::Graphics {
 
 #define DEFAULT_ANGLE_THRESHOLD 3.0
 #define LCG_MULTIPLIER 6364136223846793005ull
+#define LCG_INCREMENT 1442695040888963407ull
 
 		unsigned long long glyphSeed = 0;
 		for (msdf_atlas::GlyphGeometry& glyph : m_Data->Glyphs)
@@ -107,6 +108,7 @@ namespace BladeEngine::Graphics {
 		}
 
 		m_AtlasTexture = CreateAndCacheAtlas(m_Data->Glyphs, width, height);
+
 
 		msdfgen::destroyFont(font);
 		msdfgen::deinitializeFreetype(ft);

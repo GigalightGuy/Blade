@@ -76,9 +76,10 @@ void BladeEngine::Graphics::GraphicsManager::DrawSprite(
     Texture2D *texture, 
     const glm::vec3& position,
     const glm::vec3& rotation,
-    const glm::vec3& scale)
+    const glm::vec3& scale, 
+    const glm::vec4& uvTransform)
 {
-    vkRenderer->DrawSprite(texture,position,rotation,scale);
+    vkRenderer->DrawSprite(texture, position, rotation, scale, uvTransform);
 }
 
 void BladeEngine::Graphics::GraphicsManager::DrawString(

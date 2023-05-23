@@ -4,8 +4,12 @@ layout(binding = 0) uniform MVP{
   mat4 model;
   mat4 view;
   mat4 proj;
-}
-mvp;
+} mvp;
+
+layout (push_constant) uniform PushConstantData
+{
+  vec4 uvTransform;
+} extraData;
 
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inColor;
@@ -16,6 +20,7 @@ layout(location = 1) out vec2 fragmentTextureCoordinate;
 
 void main() {
   gl_Position = mvp.proj * mvp.view * mvp.model * vec4(inPosition, 1.0);
+
   fragmentColor = inColor;
-  fragmentTextureCoordinate = inTextureCoordinate;
+  fragmentTextureCoordinate = (inTextureCoordinate + extraData.uvTransform.xy) * extraData.uvTransform.zw;
 }

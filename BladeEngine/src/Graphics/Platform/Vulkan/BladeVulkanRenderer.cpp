@@ -121,7 +121,8 @@ namespace BladeEngine::Graphics::Vulkan
 	}
 
 	void VulkanRenderer::DrawSprite(Texture2D* texture, 
-		const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale)
+		const glm::vec3& position, const glm::vec3& rotation, 
+		const glm::vec3& scale, const glm::vec4& uvTransform)
 	{
 		VulkanTexture* vkTexture = (VulkanTexture*)texture->GetGPUTexture();
 
@@ -132,9 +133,13 @@ namespace BladeEngine::Graphics::Vulkan
 		modelData.rotation = rotation;
 		modelData.scale = scale;
 
+		PushConstantData pushConstant{};
+		pushConstant.UVTransform = uvTransform;
+
 		vkTextures.push_back(vkTexture);
 		vkMeshes.push_back(vkMesh);
 		vkMeshesModelData.push_back(modelData);
+		m_PushConstantsData.push_back(pushConstant);
 	}
 
 	// TODO: Move this into UniformBuffer wraper class later
@@ -235,14 +240,14 @@ namespace BladeEngine::Graphics::Vulkan
 
 		uint16_t* indexBufferData = indexBuffer.As<uint16_t>();
 
-		struct TextureParams
+		struct TextParams
 		{
 			glm::vec4 Color{ 1.0f };
-			float Kerning = 0.1f;
-			float LineSpacing = 0.1f;
+			float Kerning = 0.0f;
+			float LineSpacing = 0.0f;
 		};
 
-		TextureParams textParams;
+		TextParams textParams;
 
 		const auto& fontGeometry = font->GetMSDFData()->FontGeometry;
 		const auto& metrics = fontGeometry.getMetrics();
@@ -509,6 +514,9 @@ namespace BladeEngine::Graphics::Vulkan
 		{
 			const auto& renderPass = m_RenderPasses[0];
 			const auto& graphicsPipeline = m_GraphicsPipelinesMap[renderPass][0];
+
+			vkCmdPushConstants(commandBuffers[currentFrame], m_GraphicsPipelinesMap[m_RenderPasses[0]][0]->pipelineLayout,
+				VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstantData), &m_PushConstantsData[i]);
 
 			VkPipelineLayout& pipelineLayout = graphicsPipeline->pipelineLayout;
 			VkDescriptorSet& descriptorSet = graphicsPipeline->descriptorSets[currentFrame][i];

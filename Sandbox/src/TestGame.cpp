@@ -169,7 +169,7 @@ namespace BladeEngine {
 		g_Ground.AddComponent<BoxCollider2D>();
 		g_Ground.GetComponent<BoxCollider2D>()->HalfExtents = { 20.0f, 1.0f };
 
-		g_Ground.SetComponent<Sprite2D>({ g_TexturePlatformBlock });
+		g_Ground.SetComponent<SpriteRenderer>({ g_TexturePlatformBlock });
 
 		{
 			auto chickBoy = World::CreateEntity("Chick Boy 1");
@@ -182,7 +182,7 @@ namespace BladeEngine {
 			chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
 			chickBoy.AddComponent<BoxCollider2D>();
 
-			chickBoy.SetComponent<Sprite2D>({ g_TextureChickBoy });
+			chickBoy.SetComponent<SpriteRenderer>({ g_TextureChickBoy });
 		}
 
 		{
@@ -196,7 +196,7 @@ namespace BladeEngine {
 			chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
 			chickBoy.AddComponent<BoxCollider2D>();
 
-			chickBoy.SetComponent<Sprite2D>({ g_TextureChickBoy });
+			chickBoy.SetComponent<SpriteRenderer>({ g_TextureChickBoy });
 		}
 
 		{
@@ -210,7 +210,7 @@ namespace BladeEngine {
 			chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
 			chickBoy.AddComponent<BoxCollider2D>();
 
-			chickBoy.SetComponent<Sprite2D>({ g_TextureChickBoy });
+			chickBoy.SetComponent<SpriteRenderer>({ g_TextureChickBoy });
 		}
 
 		{
@@ -224,7 +224,7 @@ namespace BladeEngine {
 			chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
 			chickBoy.AddComponent<BoxCollider2D>();
 
-			chickBoy.SetComponent<Sprite2D>({ g_TextureChickBoy });
+			chickBoy.SetComponent<SpriteRenderer>({ g_TextureChickBoy });
 		}
 
 		// auto pulsator = World::CreateEntity("Pulsator");
@@ -237,7 +237,6 @@ namespace BladeEngine {
 		player.SetComponent<Scale>({ {1.0f, 1.0f} });
 		player.SetComponent<Controller>(
 			{ KeyCode::A, KeyCode::D, KeyCode::Space, 4.0f, 5.0f });
-		player.SetComponent<Sprite2D>({ g_TextureChickBoy });
 		player.AddComponent<Player>();
 		player.AddComponent<Rigidbody2D>();
 		auto playerRB = player.GetComponent<Rigidbody2D>();
@@ -245,11 +244,24 @@ namespace BladeEngine {
 		playerRB->Type = Rigidbody2D::BodyType::Dynamic;
 		player.AddComponent<CircleCollider2D>();
 
+		player.SetComponent<SpriteRenderer>({ g_TextureChickBoy });
+
+
+		player.AddComponent<SpriteAnimator>();
+		auto anim = player.GetComponent<SpriteAnimator>();
+		
+		SpriteAnimation idle;
+		idle.Frames.push_back({ g_TextureChickBoy });
+		idle.Frames.push_back({ g_TexturePlatformBlock });
+
+		anim->AnimationsMap["Idle"] = idle;
+		anim->CurrentAnimation = &anim->AnimationsMap["Idle"];
+
 
 		auto someText = World::CreateEntity("My First Text");
-		someText.SetComponent<Position>({ { -15.0f, 0.0f } });
+		someText.SetComponent<Position>({ { -10.0f, 5.0f } });
 		someText.SetComponent<Rotation>({ 0.0f });
-		someText.SetComponent<Scale>({ { 30.0f, 30.0f } });
+		someText.SetComponent<Scale>({ { 2.0f, 2.0f } });
 		//someText.SetComponent<Sprite2D>({ g_ZerafocFont->GetAtlasTexture() });
 		someText.SetComponent<TextRenderer>({ g_OpenSansRegular, "Hello, World!" });
 

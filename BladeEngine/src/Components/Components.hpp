@@ -3,6 +3,8 @@
 #include "../Core/Vec.hpp"
 #include "../Physics/Physics2D.hpp"
 
+#include <vector>
+#include <unordered_map>
 #include <string>
 
 class b2Body;
@@ -32,11 +34,28 @@ namespace BladeEngine
         Vec2 Value;
     };
 
-    struct Sprite2D
+    struct SpriteRenderer
     {
         Graphics::Texture2D* Texture = nullptr;
-        Vec2 UVStartPos;
-        Vec2 UVDimensions;
+        Vec2 UVStartPos{ 0.0f, 0.0f };
+        Vec2 UVDimensions{ 1.0f, 1.0f };
+    };
+
+    struct SpriteAnimation
+    {
+        std::vector<SpriteRenderer> Frames;
+        float FrameDuration = 1 / 12.0f;
+    };
+
+    struct SpriteAnimator
+    {
+        float Time = 0.0f;
+        float Speed = 1.0f;
+
+        size_t CurrentFrame = 0;
+        SpriteAnimation* CurrentAnimation = nullptr;
+
+        std::unordered_map<std::string, SpriteAnimation> AnimationsMap;
     };
 
     struct TextRenderer

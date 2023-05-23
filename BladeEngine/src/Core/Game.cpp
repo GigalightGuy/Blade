@@ -144,15 +144,37 @@ namespace BladeEngine
         pos.Value.Y = rb.RuntimeBody->GetPosition().y;
     }
 
+    void AnimateSprite(flecs::entity e, SpriteAnimator& animator, SpriteRenderer& sprite)
+    {
+        if (!animator.CurrentAnimation || animator.CurrentAnimation->Frames.size() < 2) return;
+        
+        float dt = e.delta_time();
+
+        animator.Time += dt * animator.Speed;
+
+        if (animator.Time > animator.CurrentAnimation->FrameDuration)
+        {
+            size_t frameIndex = (animator.CurrentFrame + 1) % animator.CurrentAnimation->Frames.size();
+            sprite = animator.CurrentAnimation->Frames[frameIndex];
+            animator.CurrentFrame = frameIndex;
+            animator.Time -= animator.CurrentAnimation->FrameDuration;
+        }
+        
+    }
+
     void BeginDrawing(flecs::iter it) { Graphics::GraphicsManager::Instance()->BeginDrawing(); }
 
     void EndDrawing(flecs::iter it) { Graphics::GraphicsManager::Instance()->EndDrawing(); }
 
-    void DrawSprite(const Sprite2D& sprite, const Position& pos, const Rotation& rot, const Scale& scale)
+    void DrawSprite(const SpriteRenderer& sprite, const Position& pos, const Rotation& rot, const Scale& scale)
     {
         Graphics::GraphicsManager::Instance()->DrawSprite(
-                sprite.Texture, glm::vec3(pos.Value.X, pos.Value.Y, 0.0f), 
-                glm::vec3(0.0f, 0.0f, rot.Angle), glm::vec3(scale.Value.X, scale.Value.Y, 1.0f));
+            sprite.Texture,
+            glm::vec3(pos.Value.X, pos.Value.Y, 0.0f),
+            glm::vec3(0.0f, 0.0f, rot.Angle),
+            glm::vec3(scale.Value.X, scale.Value.Y, 1.0f),
+            glm::vec4(sprite.UVStartPos.X, sprite.UVStartPos.Y, sprite.UVDimensions.X, sprite.UVDimensions.Y)
+        );
     }
 
     void DrawString(const TextRenderer& text, const Position& pos, const Rotation& rot, const Scale& scale)
@@ -181,9 +203,11 @@ namespace BladeEngine
         World::BindSystemNoQuery(flecs::PostUpdate, "Physics Step", PhysicsStep);
         World::BindSystem<Position, const Rigidbody2D>(flecs::PostUpdate, "Post Physics Step", PostPhysicsStep);
 
+        World::BindSystem<SpriteAnimator, SpriteRenderer>(flecs::PostUpdate, "Animate Sprite", AnimateSprite);
+
         // Render
         World::BindSystemNoQuery(flecs::PreStore, "Start Drawing", BeginDrawing);
-        World::BindSystem<const Sprite2D, const Position, const Rotation, const Scale>(flecs::PreStore, "Draw Sprite", DrawSprite);
+        World::BindSystem<const SpriteRenderer, const Position, const Rotation, const Scale>(flecs::PreStore, "Draw Sprite", DrawSprite);
         World::BindSystem<const TextRenderer, const Position, const Rotation, const Scale>(flecs::PreStore, "Draw Text", DrawString);
         World::BindSystemNoQuery(flecs::PreStore, "End Drawing", EndDrawing);
 

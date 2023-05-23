@@ -17,7 +17,7 @@ namespace BladeEngine::Graphics {
 
 		msdf_atlas::ImmediateAtlasGenerator<float, 4, msdf_atlas::mtsdfGenerator, msdf_atlas::BitmapAtlasStorage<uint8_t, 4>> generator(width, height);
 		generator.setAttributes(attributes);
-		generator.setThreadCount(8);
+		generator.setThreadCount(4);
 		generator.generate(glyphs.data(), (int)glyphs.size());
 
 		msdfgen::BitmapConstRef<uint8_t, 4> bitmap = (msdfgen::BitmapConstRef<uint8_t, 4>)generator.atlasStorage();
@@ -82,7 +82,7 @@ namespace BladeEngine::Graphics {
 		BLD_CORE_INFO("Loaded {} glyphs from font (out of {})", glyphsLoaded, charset.size());
 
 
-		double emSize = 40.0;
+		double emSize = 80.0;
 
 		msdf_atlas::TightAtlasPacker atlasPacker;
 		atlasPacker.setPixelRange(2.0);

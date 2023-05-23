@@ -24,6 +24,7 @@ set(BLADE_ENGINE_SOURCE_FILES
     src/Graphics/Texture2D.cpp
     src/Graphics/Vertex.cpp
     src/Graphics/Font.cpp
+    src/Graphics/SpriteSheet.cpp
 
     src/ECS/World.cpp
     src/ECS/Entity.cpp
@@ -71,6 +72,8 @@ set(BLADE_ENGINE_HEADER_FILES
     src/Graphics/Texture2D.hpp
     src/Graphics/Vertex.hpp
     src/Graphics/Font.hpp
+    src/Graphics/SpriteSheet.hpp
+
     src/Graphics/MSDFData.hpp
 
     src/ECS/World.hpp

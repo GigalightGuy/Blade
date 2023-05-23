@@ -12,10 +12,16 @@
 namespace BladeEngine::Graphics::Vulkan
 {
 
-	struct MVP {
+	struct MVP 
+	{
 		alignas(16) glm::mat4 model;
 		alignas(16) glm::mat4 view;
 		alignas(16) glm::mat4 proj;
+	};
+
+	struct PushConstantData
+	{
+		glm::vec4 UVTransform;
 	};
 
 	void CreateBuffer(

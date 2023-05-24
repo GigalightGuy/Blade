@@ -22,5 +22,5 @@ void main() {
   gl_Position = mvp.proj * mvp.view * mvp.model * vec4(inPosition, 1.0);
 
   fragmentColor = inColor;
-  fragmentTextureCoordinate = (inTextureCoordinate + extraData.uvTransform.xy) * extraData.uvTransform.zw;
+  fragmentTextureCoordinate = inTextureCoordinate * extraData.uvTransform.zw + extraData.uvTransform.xy;
 }

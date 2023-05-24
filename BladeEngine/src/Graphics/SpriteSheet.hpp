@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Core/Vec.hpp"
+#include "../Components/Components.hpp"
 #include "Texture2D.hpp"
 
 #include <vector>
@@ -23,6 +24,10 @@ namespace BladeEngine::Graphics {
 		void Subdivide(uint32_t spriteWidth, uint32_t spriteHeight);
 
 		Texture2D* GetTexture() { return m_Texture; }
+
+		std::vector<SpriteRenderer> GetFrames();
+		std::vector<SpriteRenderer> GetFrames(uint32_t first, uint32_t last);
+		std::vector<SpriteRenderer> GetFrames(std::vector<uint32_t> indices);
 
 	private:
 		Texture2D* m_Texture = nullptr;

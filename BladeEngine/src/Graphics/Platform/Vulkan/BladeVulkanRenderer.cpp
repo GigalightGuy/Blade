@@ -225,6 +225,7 @@ namespace BladeEngine::Graphics::Vulkan
 		vkTextures.clear();
 		vkMeshes.clear();
 		vkMeshesModelData.clear();
+		m_PushConstantsData.clear();
 	}
 
 	void VulkanRenderer::DrawString(const std::string& string, Font* font, 

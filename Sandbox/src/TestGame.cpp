@@ -2,6 +2,7 @@
 
 #include "BladeEngine.hpp"
 
+#include "Graphics/SpriteSheet.hpp"
 #include "Audio/AudioClip.hpp"
 #include "Audio/AudioManager.hpp"
 #include "Audio/AudioSource.hpp"
@@ -29,6 +30,9 @@ namespace BladeEngine {
 	Graphics::Texture2D* g_TextureChickBoy;
 	Graphics::Texture2D* g_TexturePlatformBlock;
 	std::vector<Graphics::Texture2D*> g_BackgroundTextures;
+
+	Graphics::Texture2D* g_TexturePlayerIdle;
+	Graphics::SpriteSheet* g_SpriteSheetPlayerIdle;
 
 	Entity g_Ground;
 
@@ -60,6 +64,12 @@ namespace BladeEngine {
 		g_TexturePlatformBlock->SetSamplerConfiguration(samplerConfig);
 		g_TexturePlatformBlock->CreateGPUTexture();
 
+		g_TexturePlayerIdle = new Texture2D("assets/sprites/Sunny-land-assets-files/PNG/spritesheets/player-idle.png");
+		g_TexturePlayerIdle->SetSamplerConfiguration(samplerConfig);
+		g_TexturePlayerIdle->CreateGPUTexture();
+
+		g_SpriteSheetPlayerIdle = new SpriteSheet(g_TexturePlayerIdle, 33, 32);
+
 		g_BackgroundTextures.resize(6);
 		for (size_t i = 0; i < 6; i++) {
 			std::stringstream path;
@@ -82,19 +92,24 @@ namespace BladeEngine {
 		backgroundAudioSource->Play();
 	}
 
-	void UnloadAudioClips() {
+	void UnloadAudioClips() 
+	{
 		delete audioSource;
 		delete backgroundAudioSource;
 	}
 
-	void UnloadTextures() {
-		g_TextureChickBoy->DestroyGPUTexture();
+	void UnloadTextures() 
+	{
+		delete g_TextureChickBoy;
+		g_TextureChickBoy = nullptr;
 
-		g_TexturePlatformBlock->DestroyGPUTexture();
+		delete g_TexturePlatformBlock;
+		g_TexturePlatformBlock = nullptr;
 
-		for (size_t i = 0; i < g_BackgroundTextures.size(); i++) {
-			g_BackgroundTextures[i]->DestroyGPUTexture();
-		}
+		delete g_TexturePlayerIdle;
+		g_TexturePlayerIdle = nullptr;
+
+		g_BackgroundTextures.clear();
 	}
 
 	void Move(flecs::entity e, const Controller& ctrl, Rigidbody2D& rb,
@@ -251,8 +266,8 @@ namespace BladeEngine {
 		auto anim = player.GetComponent<SpriteAnimator>();
 		
 		SpriteAnimation idle;
-		idle.Frames.push_back({ g_TextureChickBoy });
-		idle.Frames.push_back({ g_TexturePlatformBlock });
+		idle.Frames = g_SpriteSheetPlayerIdle->GetFrames();
+		idle.FrameDuration = 1 / 6.0f;
 
 		anim->AnimationsMap["Idle"] = idle;
 		anim->CurrentAnimation = &anim->AnimationsMap["Idle"];

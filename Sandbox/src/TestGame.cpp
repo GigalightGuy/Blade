@@ -260,7 +260,7 @@ namespace BladeEngine {
 		player.AddComponent<CircleCollider2D>();
 
 		player.SetComponent<SpriteRenderer>({ g_TextureChickBoy });
-
+		player.GetComponent<SpriteRenderer>()->FlipX = true;
 
 		player.AddComponent<SpriteAnimator>();
 		auto anim = player.GetComponent<SpriteAnimator>();

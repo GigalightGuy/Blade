@@ -155,7 +155,11 @@ namespace BladeEngine
         if (animator.Time > animator.CurrentAnimation->FrameDuration)
         {
             size_t frameIndex = (animator.CurrentFrame + 1) % animator.CurrentAnimation->Frames.size();
+
+            bool flipX = sprite.FlipX, flipY = sprite.FlipY;
             sprite = animator.CurrentAnimation->Frames[frameIndex];
+            sprite.FlipX = flipX;
+            sprite.FlipY = flipY;
             animator.CurrentFrame = frameIndex;
             animator.Time -= animator.CurrentAnimation->FrameDuration;
         }
@@ -173,7 +177,12 @@ namespace BladeEngine
             glm::vec3(pos.Value.X, pos.Value.Y, 0.0f),
             glm::vec3(0.0f, 0.0f, rot.Angle),
             glm::vec3(scale.Value.X, scale.Value.Y, 1.0f),
-            glm::vec4(sprite.UVStartPos.X, sprite.UVStartPos.Y, sprite.UVDimensions.X, sprite.UVDimensions.Y)
+            glm::vec4(
+                sprite.FlipX ? sprite.UVDimensions.X + sprite.UVStartPos.X : sprite.UVStartPos.X,
+                sprite.FlipY ? sprite.UVDimensions.Y + sprite.UVStartPos.Y : sprite.UVStartPos.Y,
+                sprite.FlipX ? -sprite.UVDimensions.X : sprite.UVDimensions.X, 
+                sprite.FlipY ? -sprite.UVDimensions.Y : sprite.UVDimensions.Y
+            )
         );
     }
 

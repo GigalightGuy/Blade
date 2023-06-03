@@ -33,6 +33,10 @@ namespace BladeEngine
          */
 		inline uint32_t GetHeight() const { return m_WindowData.Height; }
 
+        bool SwapchainNeedsResize() const { return m_WindowData.SwapchainNeedsResize; }
+
+        void GotResized() { m_WindowData.SwapchainNeedsResize = false; }
+
         static inline float GetViewportAspectRatio() { return s_ViewportAspectRatio; }
 
         void PollEvents();
@@ -61,6 +65,7 @@ namespace BladeEngine
         struct WindowData
         {
             uint32_t Width, Height;
+            bool SwapchainNeedsResize = false;
         };
 
         WindowData m_WindowData;

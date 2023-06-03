@@ -112,8 +112,12 @@ namespace BladeEngine {
 		g_BackgroundTextures.clear();
 	}
 
-	void Move(flecs::entity e, const Controller& ctrl, Rigidbody2D& rb,
-		const Position& pos) {
+	void Move(
+		flecs::entity e, 
+		const Controller& ctrl, 
+		Rigidbody2D& rb,
+		const Position& pos) 
+	{
 		float desiredVel = 0.0f;
 		desiredVel += Input::GetKey(ctrl.Left) ? -ctrl.Movespeed : 0.0f;
 		desiredVel += Input::GetKey(ctrl.Right) ? ctrl.Movespeed : 0.0f;
@@ -132,6 +136,16 @@ namespace BladeEngine {
 		if (isGrounded && Input::GetKeyDown(ctrl.Jump)) {
 			Physics2D::AddImpulse(rb, Vec2(0.0f, 1.0f), ctrl.JumpForce);
 			audioSource->Play();
+		}
+
+		if (e.has<SpriteRenderer>())
+		{
+			auto sprite = e.get_mut<SpriteRenderer>();
+
+			if (desiredVel < -0.01f)
+				sprite->FlipX = true;
+			else if (desiredVel > 0.01f)
+				sprite->FlipX = false;
 		}
 	}
 
@@ -260,7 +274,6 @@ namespace BladeEngine {
 		player.AddComponent<CircleCollider2D>();
 
 		player.SetComponent<SpriteRenderer>({ g_TextureChickBoy });
-		player.GetComponent<SpriteRenderer>()->FlipX = true;
 
 		player.AddComponent<SpriteAnimator>();
 		auto anim = player.GetComponent<SpriteAnimator>();

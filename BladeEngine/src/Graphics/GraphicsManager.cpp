@@ -9,15 +9,15 @@ using namespace BladeEngine::Graphics;
 
 GraphicsManager* GraphicsManager::s_Instance;
 
-BladeEngine::Graphics::GraphicsManager::GraphicsManager(Window* window)
+GraphicsManager::GraphicsManager(Window* window)
 {
-    mainCamera = new BladeEngine::Camera(20.0f, glm::vec2(0.0f, 0.0f), 0, 0.1f, 100.0f, CameraType::ORTHOGRAPHIC);   
+    mainCamera = new Camera(20.0f, glm::vec2(0.0f, 0.0f), 0, 0.1f, 100.0f, CameraType::ORTHOGRAPHIC);   
     InitRenderer(window);
 }
 
 GraphicsManager::~GraphicsManager()
 {
-    
+
 }
 
 void GraphicsManager::Init(Window* window)
@@ -33,46 +33,46 @@ void GraphicsManager::Shutdown()
     s_Instance = nullptr;
 }
 
-void BladeEngine::Graphics::GraphicsManager::SetMainCamera(BladeEngine::Camera* camera)
+void GraphicsManager::SetMainCamera(Camera* camera)
 {
     delete mainCamera;
     mainCamera = camera;
 }
 
 
-void BladeEngine::Graphics::GraphicsManager::InitRenderer(Window* window)
+void GraphicsManager::InitRenderer(Window* window)
 {
     //#if BLADE_VULKAN_API
-    vkRenderer = new BladeEngine::Graphics::Vulkan::VulkanRenderer(mainCamera, window);
+    vkRenderer = new Vulkan::VulkanRenderer(mainCamera, window);
     //#endif
 }
 
-void BladeEngine::Graphics::GraphicsManager::Dispose()
+void GraphicsManager::Dispose()
 {
     //#if BLADE_VULKAN_API
     //vkRenderer->Dispose();
     //#endif
 }
 
-void BladeEngine::Graphics::GraphicsManager::Clear(BladeEngine::Graphics::Color color)
+void GraphicsManager::Clear(Color color)
 {
     vkRenderer->Clear(color);
 }
 
 
-void BladeEngine::Graphics::GraphicsManager::BeginDrawing()
+void GraphicsManager::BeginDrawing()
 {
     vkRenderer->BeginDrawing();
 }
 
-void BladeEngine::Graphics::GraphicsManager::BeginDrawing(
+void GraphicsManager::BeginDrawing(
     BladeEngine::Graphics::Shader *vertexShader,
     BladeEngine::Graphics::Shader * fragmentShader)
 {
     
 }
 
-void BladeEngine::Graphics::GraphicsManager::DrawSprite(
+void GraphicsManager::DrawSprite(
     Texture2D *texture, 
     const glm::vec3& position,
     const glm::vec3& rotation,
@@ -82,7 +82,7 @@ void BladeEngine::Graphics::GraphicsManager::DrawSprite(
     vkRenderer->DrawSprite(texture, position, rotation, scale, uvTransform);
 }
 
-void BladeEngine::Graphics::GraphicsManager::DrawString(
+void GraphicsManager::DrawString(
     const std::string& string, 
     Font* font, 
     const glm::vec3& position, 
@@ -92,7 +92,7 @@ void BladeEngine::Graphics::GraphicsManager::DrawString(
     vkRenderer->DrawString(string, font, position, rotation, scale);
 }
 
-void BladeEngine::Graphics::GraphicsManager::EndDrawing()
+void GraphicsManager::EndDrawing()
 {
     vkRenderer->EndDrawing();
 }
@@ -107,17 +107,22 @@ void GraphicsManager::ReleaseGPUTexture(void* gpuTexture)
     vkRenderer->ReleaseGPUTexture((Vulkan::VulkanTexture*)gpuTexture);
 }
 
-void* BladeEngine::Graphics::GraphicsManager::UploadMeshToGPU(Buffer vertices, Buffer indices)
+void* GraphicsManager::UploadMeshToGPU(Buffer vertices, Buffer indices)
 {
     return vkRenderer->UploadMeshToGPU(vertices, indices);
 }
 
-void BladeEngine::Graphics::GraphicsManager::ReleaseGPUMesh(void* gpuMesh)
+void GraphicsManager::ReleaseGPUMesh(void* gpuMesh)
 {
     vkRenderer->ReleaseGPUMesh((Vulkan::VulkanMesh*)gpuMesh);
 }
 
-void BladeEngine::Graphics::GraphicsManager::WaitDeviceIdle()
+void GraphicsManager::WaitDeviceIdle()
 {
     vkRenderer->WaitDeviceIdle();
+}
+
+void GraphicsManager::RecreateSwapchain(uint32_t width, uint32_t height)
+{
+    vkRenderer->RecreateSwapchain(width, height);
 }

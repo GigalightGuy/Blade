@@ -48,6 +48,8 @@ namespace BladeEngine::Graphics {
 
 		void WaitDeviceIdle();
 
+		void RecreateSwapchain(uint32_t width, uint32_t height);
+
 		inline static GraphicsManager* Instance() { return s_Instance; }
 
 	private:

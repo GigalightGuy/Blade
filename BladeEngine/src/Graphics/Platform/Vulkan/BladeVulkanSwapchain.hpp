@@ -12,9 +12,10 @@ namespace Vulkan {
 
 class VulkanSwapchain {
 public:
-  VulkanSwapchain(BladeEngine::Window *window, VkPhysicalDevice physicalDevice,
+  VulkanSwapchain(uint32_t width, uint32_t height, VkPhysicalDevice physicalDevice,
                   VkDevice device, VkSurfaceKHR surface);
-  ~VulkanSwapchain();
+
+  ~VulkanSwapchain() { }
 
   void Dispose(VkDevice device);
 
@@ -23,7 +24,7 @@ public:
   static VkPresentModeKHR ChooseSwapPresentMode(
       const std::vector<VkPresentModeKHR> &availablePresentModes);
   static VkExtent2D
-  ChooseSwapExtent(Window *window, const VkSurfaceCapabilitiesKHR &capabilities);
+  ChooseSwapExtent(uint32_t width, uint32_t height, const VkSurfaceCapabilitiesKHR &capabilities);
 
   //init
   VkSwapchainKHR swapchain;
@@ -47,6 +48,7 @@ public:
   
 
   void CreateFramebuffers(VkDevice device, VkRenderPass renderPass);
+  void DestroyFramebuffers(VkDevice device, VkRenderPass renderPass);
 
 private:
   VkFormat FindSupportedFormat(VkPhysicalDevice physicalDevice,
@@ -55,7 +57,7 @@ private:
                                VkFormatFeatureFlags features);
   void CreateDepthResources(VkPhysicalDevice physicalDevice, VkDevice device);
 
-  void CreateSwapchain(BladeEngine::Window *window,
+  void CreateSwapchain(uint32_t width, uint32_t height,
                        VkPhysicalDevice physicalDevice, VkDevice device,
                        VkSurfaceKHR surface);
   void CreateImageViews(VkDevice device);

@@ -92,6 +92,8 @@ namespace BladeEngine
 
             data->Width = width;
             data->Height = height;
+
+            data->SwapchainNeedsResize = true;
         });
 
         glfwSetKeyCallback(m_WindowHandle, [](GLFWwindow* window, int key, int scancode, int action, int mods)

@@ -21,6 +21,7 @@ namespace BladeEngine::Graphics::Vulkan
 
 	VulkanRenderer::~VulkanRenderer()
 	{
+
 		delete m_ResourceAllocator;
 	}
 
@@ -47,7 +48,7 @@ namespace BladeEngine::Graphics::Vulkan
 
 		m_ResourceAllocator = new VulkanResourceAllocator(vkInstance->instance, vkDevice);
 
-		vkSwapchain = new VulkanSwapchain(window, vkDevice->physicalDevice,
+		vkSwapchain = new VulkanSwapchain(window->GetWidth(), window->GetHeight(), vkDevice->physicalDevice,
 			vkDevice->logicalDevice, vkSurface);
 
 
@@ -389,6 +390,27 @@ namespace BladeEngine::Graphics::Vulkan
 	void VulkanRenderer::WaitDeviceIdle()
 	{
 		vkDeviceWaitIdle(vkDevice->logicalDevice);
+	}
+
+	void VulkanRenderer::RecreateSwapchain(uint32_t width, uint32_t height)
+	{
+		WaitDeviceIdle();
+
+		for (auto renderPass : m_RenderPasses)
+		{
+			vkSwapchain->DestroyFramebuffers(vkDevice->logicalDevice, renderPass->GetRenderPass());
+		}
+		
+		vkSwapchain->Dispose(vkDevice->logicalDevice);
+
+		delete vkSwapchain;
+
+		vkSwapchain = new VulkanSwapchain(width, height, vkDevice->physicalDevice, vkDevice->logicalDevice, vkSurface);
+
+		for (auto renderPass : m_RenderPasses)
+		{
+			vkSwapchain->CreateFramebuffers(vkDevice->logicalDevice, renderPass->GetRenderPass());
+		}
 	}
 
 	VulkanTexture* VulkanRenderer::UploadTextureToGPU(Texture2D* texture)

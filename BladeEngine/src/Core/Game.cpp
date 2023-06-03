@@ -27,7 +27,7 @@ namespace BladeEngine
 
         s_Instance = this;
 
-        m_Window = new Window(1200, 800, "Blade Game");
+        m_Window = new Window(1920, 1080, "Blade Game");
 
         Graphics::GraphicsManager::Instance()->Init(m_Window);
         AudioManager::Init();
@@ -224,6 +224,13 @@ namespace BladeEngine
 
         while (!m_ShouldExit)
         {
+            if (m_Window->SwapchainNeedsResize())
+            {
+                Graphics::GraphicsManager::Instance()->RecreateSwapchain(m_Window->GetWidth(), m_Window->GetHeight());
+
+                m_Window->GotResized();
+            }
+
             m_Window->InputTick();
             
             Time::Update();

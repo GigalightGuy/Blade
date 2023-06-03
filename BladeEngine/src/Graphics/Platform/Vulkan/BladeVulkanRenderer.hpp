@@ -47,6 +47,8 @@ namespace BladeEngine::Graphics::Vulkan {
 
 		void WaitDeviceIdle();
 
+		void RecreateSwapchain(uint32_t width, uint32_t height);
+
 		VulkanTexture* UploadTextureToGPU(Texture2D* texture);
 		void ReleaseGPUTexture(VulkanTexture* gpuTexture);
 

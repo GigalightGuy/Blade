@@ -35,6 +35,14 @@ namespace BladeEngine::Graphics::Vulkan {
 		m_FramebuffersMap[renderPass] = framebuffers;
 	}
 
+	void VulkanSwapchain::DestroyFramebuffers(VkDevice device, VkRenderPass renderPass)
+	{
+		for (auto framebuffer : m_FramebuffersMap[renderPass])
+		{
+			vkDestroyFramebuffer(device, framebuffer, nullptr);
+		}
+	}
+
 
 	VkFormat VulkanSwapchain::FindSupportedFormat(
 		VkPhysicalDevice physicalDevice, const std::vector<VkFormat>& candidates,
@@ -101,14 +109,15 @@ namespace BladeEngine::Graphics::Vulkan {
 	}
 
 	VkExtent2D VulkanSwapchain::ChooseSwapExtent(
-		Window* window, const VkSurfaceCapabilitiesKHR& capabilities) {
+		uint32_t width, uint32_t height, const VkSurfaceCapabilitiesKHR& capabilities) 
+	{
 		if (capabilities.currentExtent.width !=
 			std::numeric_limits<uint32_t>::max()) {
 			return capabilities.currentExtent;
 		}
 		else {
 
-			VkExtent2D actualExtent = { window->GetWidth(), window->GetHeight() };
+			VkExtent2D actualExtent = { width, height };
 
 			actualExtent.width =
 				std::clamp(actualExtent.width, capabilities.minImageExtent.width,
@@ -121,15 +130,18 @@ namespace BladeEngine::Graphics::Vulkan {
 		}
 	}
 
-	VulkanSwapchain::VulkanSwapchain(BladeEngine::Window* window,
+	VulkanSwapchain::VulkanSwapchain(
+		uint32_t width, uint32_t height,
 		VkPhysicalDevice physicalDevice,
-		VkDevice device, VkSurfaceKHR surface) {
-		CreateSwapchain(window, physicalDevice, device, surface);
+		VkDevice device, VkSurfaceKHR surface) 
+	{
+		CreateSwapchain(width, height, physicalDevice, device, surface);
 		CreateImageViews(device);
 		CreateDepthResources(physicalDevice, device);
 	}
 
-	void VulkanSwapchain::CreateSwapchain(BladeEngine::Window* window,
+	void VulkanSwapchain::CreateSwapchain(
+		uint32_t width, uint32_t height,
 		VkPhysicalDevice physicalDevice,
 		VkDevice device, VkSurfaceKHR surface) {
 		SwapChainSupportDetails swapChainSupport =
@@ -139,7 +151,7 @@ namespace BladeEngine::Graphics::Vulkan {
 			ChooseSwapSurfaceFormat(swapChainSupport.formats);
 		VkPresentModeKHR presentMode =
 			ChooseSwapPresentMode(swapChainSupport.presentModes);
-		VkExtent2D extent = ChooseSwapExtent(window,
+		VkExtent2D extent = ChooseSwapExtent(width, height,
 			swapChainSupport.capabilities);
 
 		this->imageFormat = surfaceFormat.format;
@@ -223,7 +235,7 @@ namespace BladeEngine::Graphics::Vulkan {
 		}
 	}
 
-	void BladeEngine::Graphics::Vulkan::VulkanSwapchain::Dispose(VkDevice device)
+	void VulkanSwapchain::Dispose(VkDevice device)
 	{
 		vkDestroyImage(device, depthImage, nullptr);
 		vkDestroyImageView(device, depthImageView, nullptr);

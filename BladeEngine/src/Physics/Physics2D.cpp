@@ -7,6 +7,20 @@
 
 namespace BladeEngine
 {
+    class BaseContactListener : public b2ContactListener
+    {
+        virtual void BeginContact(b2Contact* contact) override
+        {
+
+        }
+
+        virtual void EndContact(b2Contact* contact) override
+        {
+
+        }
+    };
+
+
     int Physics2D::s_VelocityIterations = 6;
     int Physics2D::s_PositionIterations = 2;
 

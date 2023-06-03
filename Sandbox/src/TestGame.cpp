@@ -200,65 +200,42 @@ namespace BladeEngine {
 
 		g_Ground.SetComponent<SpriteRenderer>({ g_TexturePlatformBlock });
 
-		{
-			auto chickBoy = World::CreateEntity("Chick Boy 1");
-			chickBoy.SetComponent<Position>({ {-10.0f, 20.0f} });
-			chickBoy.SetComponent<Rotation>({ 0.0f });
-			chickBoy.SetComponent<Scale>({ {1.0f, 1.0f} });
-			chickBoy.AddComponent<Rigidbody2D>();
-			auto chickBoyRB = chickBoy.GetComponent<Rigidbody2D>();
-			chickBoyRB->LockRotation = true;
-			chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
-			chickBoy.AddComponent<BoxCollider2D>();
+		auto blockPrefab = World::GetECSWorldHandle()->prefab("Platform Block")
+			.set<Rotation>({ 0.0f })
+			.set<Scale>({ { 1.0f, 1.0f } })
+			.add<Rigidbody2D>()
+			.add<BoxCollider2D>()
+			.set<SpriteRenderer>({ g_TexturePlatformBlock });
 
-			chickBoy.SetComponent<SpriteRenderer>({ g_TextureChickBoy });
+		blockPrefab.get_mut<BoxCollider2D>()->HalfExtents = { 0.5f, 0.5f };
+
+		for (int i = 0; i < 10; i++)
+		{
+			auto block = World::GetECSWorldHandle()->entity().is_a(blockPrefab);
+			block.set<Position>({ { -5.0f + i, 2.0f } });
+			block.set<Rigidbody2D>({ });
 		}
 
+		auto chickBoyPrefab = World::GetECSWorldHandle()->prefab("Chick Boy")
+			.set<Position>({ { 0.0f, 0.0f } })
+			.set<Rotation>({ 0.0f })
+			.set<Scale>({ { 1.0f, 1.0f } })
+			.set<SpriteRenderer>({ g_TextureChickBoy })
+			.add<Rigidbody2D>()
+			.add<BoxCollider2D>();
+
+		auto chickBoyRB = chickBoyPrefab.get_mut<Rigidbody2D>();
+		chickBoyRB->LockRotation = true;
+		chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
+		chickBoyPrefab.get_mut<BoxCollider2D>()->HalfExtents = { 0.25f, 0.5f };
+
+		for (int i = 0; i < 6; i++)
 		{
-			auto chickBoy = World::CreateEntity("Chick Boy 2");
-			chickBoy.SetComponent<Position>({ {-5.0f, 20.0f} });
-			chickBoy.SetComponent<Rotation>({ 0.0f });
-			chickBoy.SetComponent<Scale>({ {1.0f, 1.0f} });
-			chickBoy.AddComponent<Rigidbody2D>();
-			auto chickBoyRB = chickBoy.GetComponent<Rigidbody2D>();
-			chickBoyRB->LockRotation = true;
-			chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
-			chickBoy.AddComponent<BoxCollider2D>();
-
-			chickBoy.SetComponent<SpriteRenderer>({ g_TextureChickBoy });
+			auto chickBoy = World::GetECSWorldHandle()->entity().is_a(chickBoyPrefab);
+			chickBoy.set<Position>({ { -12.0f + i * 4.0f, 20.0f } });
+			chickBoy.set<Rigidbody2D>(*chickBoy.get<Rigidbody2D>());
 		}
-
-		{
-			auto chickBoy = World::CreateEntity("Chick Boy 3");
-			chickBoy.SetComponent<Position>({ {5.0f, 20.0f} });
-			chickBoy.SetComponent<Rotation>({ 0.0f });
-			chickBoy.SetComponent<Scale>({ {1.0f, 1.0f} });
-			chickBoy.AddComponent<Rigidbody2D>();
-			auto chickBoyRB = chickBoy.GetComponent<Rigidbody2D>();
-			chickBoyRB->LockRotation = true;
-			chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
-			chickBoy.AddComponent<BoxCollider2D>();
-
-			chickBoy.SetComponent<SpriteRenderer>({ g_TextureChickBoy });
-		}
-
-		{
-			auto chickBoy = World::CreateEntity("Chick Boy 4");
-			chickBoy.SetComponent<Position>({ {10.0f, 20.0f} });
-			chickBoy.SetComponent<Rotation>({ 0.0f });
-			chickBoy.SetComponent<Scale>({ {1.0f, 1.0f} });
-			chickBoy.AddComponent<Rigidbody2D>();
-			auto chickBoyRB = chickBoy.GetComponent<Rigidbody2D>();
-			chickBoyRB->LockRotation = true;
-			chickBoyRB->Type = Rigidbody2D::BodyType::Dynamic;
-			chickBoy.AddComponent<BoxCollider2D>();
-
-			chickBoy.SetComponent<SpriteRenderer>({ g_TextureChickBoy });
-		}
-
-		// auto pulsator = World::CreateEntity("Pulsator");
-		// pulsator->SetComponent<Position>({ { 0.0f, 0.0f } });
-		// pulsator->AddComponent<PulseEmitter>();
+		
 
 		auto player = World::CreateEntity("Player");
 		player.SetComponent<Position>({ {0.0f, 5.0f} });
@@ -290,7 +267,6 @@ namespace BladeEngine {
 		someText.SetComponent<Position>({ { -10.0f, 5.0f } });
 		someText.SetComponent<Rotation>({ 0.0f });
 		someText.SetComponent<Scale>({ { 2.0f, 2.0f } });
-		//someText.SetComponent<Sprite2D>({ g_ZerafocFont->GetAtlasTexture() });
 		someText.SetComponent<TextRenderer>({ g_OpenSansRegular, "Hello, World!" });
 
 
@@ -305,9 +281,6 @@ namespace BladeEngine {
 
 			background.SetComponent<Sprite2D>({ g_BackgroundTextures[i] });
 		}*/
-
-		World::BindSystem<const PulseEmitter, const Position>(2.0f, "Generate Pulse",
-			GeneratePulse);
 
 		World::BindSystem<const Controller, Rigidbody2D, const Position>(
 			flecs::OnUpdate, "Move", Move);

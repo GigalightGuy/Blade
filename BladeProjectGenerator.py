@@ -1,10 +1,15 @@
 import os
 import git
-import shutil 
+import shutil
 
 def MoveShadersToProject(projectName):
     source = "temp/Sandbox/assets/shaders"
     destination = os.path.join(projectName,"assets")
+    shutil.move(source,destination)
+
+def MoveDebugUVTexture(projectName):
+    source = "temp/Sandbox/assets/sprites/tex_DebugUVTiles.png"
+    destination = os.path.join(projectName,"assets/sprites")
     shutil.move(source,destination)
 
 def MoveBladeEngineToProject(projectName):
@@ -16,7 +21,7 @@ def GenerateBaseDirectories(projectName):
     src = os.path.join(projectName,"src")
     components = os.path.join(projectName,"src/components")
     systems = os.path.join(projectName,"src/systems")
-    
+
     assets = os.path.join(projectName,"assets")
     sprites = os.path.join(projectName,"assets/sprites")
     audios = os.path.join(projectName,"assets/audio")
@@ -38,7 +43,7 @@ def GenerateBaseFiles(projectName):
 
     cppPath = os.path.join(projectName,"src")
     hppPath = os.path.join(projectName,"src")
-    
+
     open(projectName+"/CMakeLists.txt","x")
     open(cppPath+"/"+projectName+".cpp","x")
     open(hppPath+"/"+projectName+".hpp","x")
@@ -97,12 +102,12 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
     $<$<CONFIG:DEBUG>:BLADE_DEBUG>
     $<$<CONFIG:RELEASE>:BLADE_RELEASE>
     $<$<CONFIG:RELWITHDEBINFO>:BLADE_DEBUG>
-    $<$<CONFIG:MINSIZEREL>:BLADE_RELEASE>)""") 
+    $<$<CONFIG:MINSIZEREL>:BLADE_RELEASE>)""")
 
     cmakeFile = open(projectName+"/CMakeLists.txt","a")
     cmakeFile.write(cmake)
     cmakeFile.close()
-    
+
     hpp = (
     """#pragma once
 
@@ -143,23 +148,23 @@ f"void {projectName}::SetupWorld()"\
 f"{projectName}();"\
 "}\n"\
 "}"
-    
+
     cppFile = open(projectName+"/src/"+f"{projectName}.cpp","a")
     cppFile.write(cpp)
     cppFile.close()
 
 title = """\
-______  _             _        ______             _              _   
-| ___ \| |           | |       | ___ \           (_)            | |  
-| |_/ /| |  __ _   __| |  ___  | |_/ /_ __  ___   _   ___   ___ | |_ 
+______  _             _        ______             _              _
+| ___ \| |           | |       | ___ \           (_)            | |
+| |_/ /| |  __ _   __| |  ___  | |_/ /_ __  ___   _   ___   ___ | |_
 | ___ \| | / _` | / _` | / _ \ |  __/| '__|/ _ \ | | / _ \ / __|| __|
-| |_/ /| || (_| || (_| ||  __/ | |   | |  | (_) || ||  __/| (__ | |_ 
+| |_/ /| || (_| || (_| ||  __/ | |   | |  | (_) || ||  __/| (__ | |_
 \____/ |_| \__,_| \__,_| \___| \_|   |_|   \___/ | | \___| \___| \__|
-|  __ \                               | |       _/ |                 
-| |  \/  ___  _ __    ___  _ __  __ _ | |_  ___|__/ __               
-| | __  / _ \| '_ \  / _ \| '__|/ _` || __|/ _ \ | '__|              
-| |_\ \|  __/| | | ||  __/| |  | (_| || |_| (_) || |                 
- \____/ \___||_| |_| \___||_|   \__,_| \__|\___/ |_|"""                                                                    
+|  __ \                               | |       _/ |
+| |  \/  ___  _ __    ___  _ __  __ _ | |_  ___|__/ __
+| | __  / _ \| '_ \  / _ \| '__|/ _` || __|/ _ \ | '__|
+| |_\ \|  __/| | | ||  __/| |  | (_| || |_| (_) || |
+ \____/ \___||_| |_| \___||_|   \__,_| \__|\___/ |_|"""
 
 menu = """\
 
@@ -167,7 +172,7 @@ menu = """\
                 | (1) - Empty Project   |
                 | (0) - QUIT            |
                  -----------------------
-            
+
         """
 print(title)
 print(menu)
@@ -175,7 +180,7 @@ print(menu)
 projectType = input("Select a template or type 0 to quit: ")
 
 if projectType != '0':
-    
+
     projectName = input("Project Name: ")
     os.mkdir(projectName)
 
@@ -186,9 +191,8 @@ if projectType != '0':
         LoadEmptyBaseFiles(projectName)
         MoveShadersToProject(projectName)
         MoveBladeEngineToProject(projectName)
+        MoveDebugUVTexture(projectName)
         shutil.rmtree("temp")
         print("Empty Project Generation\n")
 else:
     print("Quit Project Generator")
-
-

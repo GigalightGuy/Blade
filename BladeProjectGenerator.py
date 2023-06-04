@@ -1,4 +1,16 @@
 import os
+import git
+import shutil 
+
+def MoveShadersToProject(projectName):
+    source = "temp/Sandbox/assets/shaders"
+    destination = os.path.join(projectName,"assets")
+    shutil.move(source,destination)
+
+def MoveBladeEngineToProject(projectName):
+    source = "temp/BladeEngine"
+    destination = projectName
+    shutil.move(source,destination)
 
 def GenerateBaseDirectories(projectName):
     src = os.path.join(projectName,"src")
@@ -6,10 +18,20 @@ def GenerateBaseDirectories(projectName):
     systems = os.path.join(projectName,"src/systems")
     
     assets = os.path.join(projectName,"assets")
-    
+    sprites = os.path.join(projectName,"assets/sprites")
+    audios = os.path.join(projectName,"assets/audio")
+    fonts = os.path.join(projectName,"assets/fonts")
+#    shaders = os.path.join(projectName,"assets/shaders")
+
     os.mkdir(src)
     os.mkdir(components)
     os.mkdir(systems)
+
+    os.mkdir(assets)
+    os.mkdir(sprites)
+    os.mkdir(audios)
+    os.mkdir(fonts)
+#   os.mkdir(shaders)
 
 def GenerateBaseFiles(projectName):
     cmakePath = projectName
@@ -23,6 +45,20 @@ def GenerateBaseFiles(projectName):
 
 def LoadEmptyBaseFiles(projectName):
     cmake = (
+"cmake_minimum_required(VERSION 3.12)\n"
+f"project({projectName})\n"
+"""
+set(CMAKE_CXX_STANDARD 17)
+
+if(MSVC)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+endif(MSVC)
+
+add_subdirectory("BladeEngine/vendor/GLFW")
+add_subdirectory("BladeEngine/vendor/Box2D")
+add_subdirectory("BladeEngine/vendor/msdf-atlas-gen")
+add_subdirectory("BladeEngine")
+"""
 f"add_executable({projectName} src/{projectName}.cpp src/{projectName}.hpp)"
 """
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE BladeEngine)
@@ -39,6 +75,10 @@ file(COPY ${ASSETS_SPRITES_DIR}
 
 set(ASSETS_AUDIOS_DIR assets/audio)
 file(COPY ${ASSETS_AUDIOS_DIR}
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/assets)
+
+set(ASSETS_FONTS_DIR assets/fonts)
+file(COPY ${ASSETS_FONTS_DIR}
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/assets)
 
 set(ASSETS_SHADERS_DIR assets/shaders)
@@ -84,7 +124,7 @@ namespace BladeEngine
     hppFile.write(hpp)
     hppFile.close()
 
-    cpp = f"#include {projectName}.hpp\n"\
+    cpp = f'#include "{projectName}.hpp"\n'\
         """#include "Audio/AudioClip.hpp"
 #include "Audio/AudioManager.hpp"
 #include "Audio/AudioSource.hpp"
@@ -140,9 +180,13 @@ if projectType != '0':
     os.mkdir(projectName)
 
     if projectType == '1':
+        git.Repo.clone_from("https://github.com/GigalightGuy/Blade.git","temp",recursive=True)
         GenerateBaseDirectories(projectName)
         GenerateBaseFiles(projectName)
         LoadEmptyBaseFiles(projectName)
+        MoveShadersToProject(projectName)
+        MoveBladeEngineToProject(projectName)
+        shutil.rmtree("temp")
         print("Empty Project Generation\n")
 else:
     print("Quit Project Generator")

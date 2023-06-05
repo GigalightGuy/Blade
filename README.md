@@ -336,22 +336,22 @@ void TemplateGame::SetupWorld()
   LoadContent()
 
   auto raindrop = World::CreateEntity("Raindrop");
-  raindrop->SetComponent<Position>({{0.0f, 10.0f}});
-  raindrop->SetComponent<Rotation>({0.0f});
-  raindrop->SetComponent<Scale>({{1.0f, 1.0f}});
-  raindrop->SetComponent<Sprite2D>({rainDropTexture});
+  raindrop.SetComponent<Position>({{0.0f, 10.0f}});
+  raindrop.SetComponent<Rotation>({0.0f});
+  raindrop.SetComponent<Scale>({{1.0f, 1.0f}});
+  raindrop.SetComponent<Sprite2D>({rainDropTexture});
 
   auto player = World::CreateEntity("Player");
-  player->SetComponent<Position>({{0.0f, -5.0f}});
-  player->SetComponent<Rotation>({0.0f});
-  player->SetComponent<Scale>({{1.0f, 1.0f}});
-  player->SetComponent<Sprite2D>({bucketTexture});
+  player.SetComponent<Position>({{0.0f, -5.0f}});
+  player.SetComponent<Rotation>({0.0f});
+  player.SetComponent<Scale>({{1.0f, 1.0f}});
+  player.SetComponent<Sprite2D>({bucketTexture});
 
   auto waterBar = World::CreateEntity("WaterBar");
-  waterBar->SetComponent<Position>({{0.0f, -8.0f}});
-  waterBar->SetComponent<Rotation>({0.0f});
-  waterBar->SetComponent<Scale>({{1.0f, 1.0f}});
-  waterBar->SetComponent<Sprite2D>({waterBarTexture});
+  waterBar.SetComponent<Position>({{0.0f, -8.0f}});
+  waterBar.SetComponent<Rotation>({0.0f});
+  waterBar.SetComponent<Scale>({{1.0f, 1.0f}});
+  waterBar.SetComponent<Sprite2D>({waterBarTexture});
 }
 
 Game *CreateGameInstance() 
@@ -450,18 +450,18 @@ void Move(flecs::entity e, const Controller &ctrl, BladeEngine::Rigidbody2D &rb,
 ExampleGame.cpp
 ```cpp
   auto player = World::CreateEntity("Player");
-  player->SetComponent<Position>({{0.0f, -5.0f}});
-  player->SetComponent<Rotation>({0.0f});
-  player->SetComponent<Scale>({{1.0f, 1.0f}});
-  player->SetComponent<Sprite2D>({bucketTexture});
-  player->SetComponent<Controller>(
+  player.SetComponent<Position>({{0.0f, -5.0f}});
+  player.SetComponent<Rotation>({0.0f});
+  player.SetComponent<Scale>({{1.0f, 1.0f}});
+  player.SetComponent<Sprite2D>({bucketTexture});
+  player.SetComponent<Controller>(
       {KeyCode::A, KeyCode::D, 5.0f});
-  player->SetComponent<Player>({0});
-  player->AddComponent<Rigidbody2D>();
-  auto playerRB = player->GetComponent<Rigidbody2D>();
+  player.SetComponent<Player>({0});
+  player.AddComponent<Rigidbody2D>();
+  auto playerRB = player.GetComponent<Rigidbody2D>();
   playerRB->LockRotation = true;
   playerRB->Type = Rigidbody2D::BodyType::Dynamic;
-  player->AddComponent<CircleCollider2D>();
+  player.AddComponent<CircleCollider2D>();
 
   World::BindSystem<const Controller, Rigidbody2D, const Position>(flecs::OnUpdate, "Move", Move);
 ```
@@ -471,28 +471,28 @@ ExampleGame.cpp
 ExampleGame.cpp
 ```cpp
   auto player = World::CreateEntity("Player");
-  player->SetComponent<Position>({{0.0f, -5.0f}});
-  player->SetComponent<Rotation>({0.0f});
-  player->SetComponent<Scale>({{1.0f, 1.0f}});
-  player->SetComponent<Sprite2D>({bucketTexture});
-  player->SetComponent<Controller>(
+  player.SetComponent<Position>({{0.0f, -5.0f}});
+  player.SetComponent<Rotation>({0.0f});
+  player-.SetComponent<Scale>({{1.0f, 1.0f}});
+  player.SetComponent<Sprite2D>({bucketTexture});
+  player.SetComponent<Controller>(
       {KeyCode::A, KeyCode::D, 5.0f});
-  player->SetComponent<Player>({0});
-  player->AddComponent<Rigidbody2D>();
-  auto playerRB = player->GetComponent<Rigidbody2D>();
+  player.SetComponent<Player>({0});
+  player.AddComponent<Rigidbody2D>();
+  auto playerRB = player.GetComponent<Rigidbody2D>();
   playerRB->LockRotation = true;
   playerRB->Type = Rigidbody2D::BodyType::Dynamic;
-  player->AddComponent<CircleCollider2D>();
+  player.AddComponent<CircleCollider2D>();
 
   World::BindSystem<const Controller, Rigidbody2D, const Position>(flecs::OnUpdate, "Move", Move);
 
   auto ground = World::CreateEntity("Ground");
-  ground->SetComponent<Position>({{0.0f, -6.0f}});
-  ground->SetComponent<Rotation>({0.0f});
-  ground->SetComponent<Scale>({{40.0f, 2.0f}});
-  ground->AddComponent<Rigidbody2D>();
-  ground->AddComponent<BoxCollider2D>();
-  ground->GetComponent<BoxCollider2D>()->HalfExtents = {20.0f, 1.0f};
+  ground.SetComponent<Position>({{0.0f, -6.0f}});
+  ground.SetComponent<Rotation>({0.0f});
+  ground.SetComponent<Scale>({{40.0f, 2.0f}});
+  ground.AddComponent<Rigidbody2D>();
+  ground.AddComponent<BoxCollider2D>();
+  ground.GetComponent<BoxCollider2D>()->HalfExtents = {20.0f, 1.0f};
 ```
 
 ### **Rain Drops**
@@ -601,46 +601,46 @@ void TemplateGame::SetupWorld()
   LoadContent();
 
   auto raindrop = World::CreateEntity("Raindrop");
-  raindrop->SetComponent<Position>({{0.0f, 10.0f}});
-  raindrop->SetComponent<Rotation>({0.0f});
-  raindrop->SetComponent<Scale>({{1.0f, 1.0f}});
-  raindrop->SetComponent<Sprite2D>({rainDropTexture});
-  raindrop->SetComponent<Raindrop>({10,false});
-  raindrop->AddComponent<Rigidbody2D>();
-  auto raindropRB = raindrop->GetComponent<Rigidbody2D>();
+  raindrop.SetComponent<Position>({{0.0f, 10.0f}});
+  raindrop.SetComponent<Rotation>({0.0f});
+  raindrop.SetComponent<Scale>({{1.0f, 1.0f}});
+  raindrop.SetComponent<Sprite2D>({rainDropTexture});
+  raindrop.SetComponent<Raindrop>({10,false});
+  raindrop.AddComponent<Rigidbody2D>();
+  auto raindropRB = raindrop.GetComponent<Rigidbody2D>();
   raindropRB->LockRotation = true;
   raindropRB->Type = Rigidbody2D::BodyType::Dynamic;
-  raindrop->AddComponent<CircleCollider2D>();
+  raindrop.AddComponent<CircleCollider2D>();
 
   auto ground = World::CreateEntity("Ground");
-  ground->SetComponent<Position>({{0.0f, -6.0f}});
-  ground->SetComponent<Rotation>({0.0f});
-  ground->SetComponent<Scale>({{40.0f, 2.0f}});
-  ground->AddComponent<Ground>();
-  ground->AddComponent<Rigidbody2D>();
-  ground->AddComponent<BoxCollider2D>();
-  ground->GetComponent<BoxCollider2D>()->HalfExtents = {20.0f, 1.0f};
+  ground.SetComponent<Position>({{0.0f, -6.0f}});
+  ground.SetComponent<Rotation>({0.0f});
+  ground.SetComponent<Scale>({{40.0f, 2.0f}});
+  ground.AddComponent<Ground>();
+  ground.AddComponent<Rigidbody2D>();
+  ground.AddComponent<BoxCollider2D>();
+  ground.GetComponent<BoxCollider2D>()->HalfExtents = {20.0f, 1.0f};
 
   auto player = World::CreateEntity("Player");
-  player->SetComponent<Position>({{0.0f, -5.0f}});
-  player->SetComponent<Rotation>({0.0f});
-  player->SetComponent<Scale>({{1.0f, 1.0f}});
-  player->SetComponent<Controller>(
+  player.SetComponent<Position>({{0.0f, -5.0f}});
+  player.SetComponent<Rotation>({0.0f});
+  player.SetComponent<Scale>({{1.0f, 1.0f}});
+  player.SetComponent<Controller>(
       {KeyCode::A, KeyCode::D, 5.0f});
-  player->SetComponent<Player>({0});
-  player->SetComponent<Sprite2D>({bucketTexture});
-  player->AddComponent<Rigidbody2D>();
-  auto playerRB = player->GetComponent<Rigidbody2D>();
+  player.SetComponent<Player>({0});
+  player.SetComponent<Sprite2D>({bucketTexture});
+  player.AddComponent<Rigidbody2D>();
+  auto playerRB = player.GetComponent<Rigidbody2D>();
   playerRB->LockRotation = true;
   playerRB->Type = Rigidbody2D::BodyType::Dynamic;
-  player->AddComponent<CircleCollider2D>();
+  player.AddComponent<CircleCollider2D>();
 
   auto waterBar = World::CreateEntity("WaterBar");
-  waterBar->SetComponent<Position>({{0.0f, -8.0f}});
-  waterBar->SetComponent<Rotation>({0.0f});
-  waterBar->SetComponent<Scale>({{1.0f, 1.0f}});
-  waterBar->SetComponent<Sprite2D>({waterBarTexture});
-  waterBar->AddComponent<WaterBar>();
+  waterBar.SetComponent<Position>({{0.0f, -8.0f}});
+  waterBar.SetComponent<Rotation>({0.0f});
+  waterBar.SetComponent<Scale>({{1.0f, 1.0f}});
+  waterBar.SetComponent<Sprite2D>({waterBarTexture});
+  waterBar.AddComponent<WaterBar>();
 
   World::BindSystem<const Controller, Rigidbody2D, const Position>(flecs::OnUpdate, "Move", Move);
 

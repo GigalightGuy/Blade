@@ -9,7 +9,7 @@ namespace BladeEngine
     Camera::Camera(float size, glm::vec2 position, float rotation, float nearPlane,float farPlane,BladeEngine::CameraType cameraType)
     {
         this->rotation = glm::vec3(0,0,rotation);
-        this->position = glm::vec3(position,10);
+        this->position = glm::vec3(position,100);
         this->type = cameraType;
         this->nearPlane = nearPlane;
         this->farPlane = farPlane;

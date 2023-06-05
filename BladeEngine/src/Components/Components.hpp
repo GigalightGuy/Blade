@@ -19,6 +19,7 @@ class BladeEngine::Graphics::Texture2D;
 
 namespace BladeEngine
 {
+
     struct Position
     {
         Vec2 Value;
@@ -32,6 +33,16 @@ namespace BladeEngine
     struct Scale
     {
         Vec2 Value;
+    };
+
+    struct DepthSorting
+    {
+        float ZPos = 0.0f;
+    };
+
+    struct LocalToWorld
+    {
+        float Matrix[16];
     };
 
     struct SpriteRenderer
@@ -72,6 +83,8 @@ namespace BladeEngine
 
         BodyType Type = BodyType::Static;
         bool LockRotation = false;
+
+        class BaseBodyContactListener* ContactListener = nullptr;
 
         b2Body* RuntimeBody = nullptr;
     };

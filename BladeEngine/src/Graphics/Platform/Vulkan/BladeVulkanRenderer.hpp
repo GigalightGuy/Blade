@@ -39,11 +39,11 @@ namespace BladeEngine::Graphics::Vulkan {
 		// Creates Graphics pipeline for default shaders to be used during draw calls
 		void BeginDrawing();
 		// Create and store Vulkan Texture, store model data, store quad mesh, create and allocate descriptor pools and sets
-		void DrawSprite(BladeEngine::Graphics::Texture2D* texture, const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale, const glm::vec4& uvTransform);
+		void DrawSprite(BladeEngine::Graphics::Texture2D* texture, const glm::mat4& transform, const glm::vec4& uvTransform);
 		// Create Descriptor Pool, Descriptor sets, update descriptor sets, uniform buffers, drawindexed
 		void EndDrawing();
 
-		void DrawString(const std::string& string, Font* font, const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale);
+		void DrawString(const std::string& string, Font* font, const glm::mat4& transform);
 
 		void WaitDeviceIdle();
 
@@ -106,7 +106,7 @@ namespace BladeEngine::Graphics::Vulkan {
 
 		std::vector<VulkanTexture*> vkTextures;
 		std::vector<VulkanMesh*> vkMeshes;
-		std::vector<ModelData> vkMeshesModelData;
+		std::vector<glm::mat4> vkMeshesModelData;
 		std::vector<PushConstantData> m_PushConstantsData;
 
 		uint32_t m_TextCount = 0;

@@ -11,7 +11,7 @@ GraphicsManager* GraphicsManager::s_Instance;
 
 GraphicsManager::GraphicsManager(Window* window)
 {
-    mainCamera = new Camera(20.0f, glm::vec2(0.0f, 0.0f), 0, 0.1f, 100.0f, CameraType::ORTHOGRAPHIC);   
+    mainCamera = new Camera(20.0f, glm::vec2(0.0f, 0.0f), 0, 0.1f, 1000.0f, CameraType::ORTHOGRAPHIC);   
     InitRenderer(window);
 }
 
@@ -74,22 +74,18 @@ void GraphicsManager::BeginDrawing(
 
 void GraphicsManager::DrawSprite(
     Texture2D *texture, 
-    const glm::vec3& position,
-    const glm::vec3& rotation,
-    const glm::vec3& scale, 
+    const glm::mat4& transform, 
     const glm::vec4& uvTransform)
 {
-    vkRenderer->DrawSprite(texture, position, rotation, scale, uvTransform);
+    vkRenderer->DrawSprite(texture, transform, uvTransform);
 }
 
 void GraphicsManager::DrawString(
     const std::string& string, 
     Font* font, 
-    const glm::vec3& position, 
-    const glm::vec3& rotation, 
-    const glm::vec3& scale)
+    const glm::mat4& transform)
 {
-    vkRenderer->DrawString(string, font, position, rotation, scale);
+    vkRenderer->DrawString(string, font, transform);
 }
 
 void GraphicsManager::EndDrawing()

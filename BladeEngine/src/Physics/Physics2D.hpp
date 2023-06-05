@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Core/Vec.hpp"
+#include "../ECS/World.hpp"
 
 class b2World;
 
@@ -20,6 +21,21 @@ namespace BladeEngine
     {
         Vec2 Point;
         Vec2 Normal;
+    };
+
+    class BaseBodyContactListener
+    {
+    public:
+        virtual ~BaseBodyContactListener() { }
+
+        virtual void BeginContact(BaseBodyContactListener* other) = 0;
+        virtual void EndContact(BaseBodyContactListener* other) = 0;
+
+        flecs::entity GetEntity() { return m_Entity; }
+        void SetEntity(flecs::entity entity) { m_Entity = entity; }
+
+    private:
+        flecs::entity m_Entity;
     };
 
     class Physics2D

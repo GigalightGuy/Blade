@@ -18,12 +18,23 @@ namespace BladeEngine {
 
 		float Movespeed;
 		float JumpForce;
+
+		bool IsGrounded = false;
 	};
 
-	struct PulseEmitter {
-		float Strength = 10.0f;
-		float Radius = 5.0f;
+	struct MovingPlatform
+	{
+		Vec2 Anchor;
+		Vec2 Movement;
+		float Frequency = 1.0f;
 	};
+
+	struct OutOfMapCounter
+	{
+		int Count = 0;
+	};
+
+	struct FallCountText {};
 
 	struct Player {};
 
@@ -33,8 +44,6 @@ namespace BladeEngine {
 
 	Graphics::Texture2D* g_TexturePlayerIdle;
 	Graphics::SpriteSheet* g_SpriteSheetPlayerIdle;
-
-	Entity g_Ground;
 
 	AudioClip* jumpClip;
 	AudioClip* backgroundClip;
@@ -128,12 +137,7 @@ namespace BladeEngine {
 
 		Physics2D::AddImpulse(rb, Vec2(impulse, 0.0f));
 
-		RaycastHitInfo hitInfo;
-		bool isGrounded =
-			Physics2D::Raycast(*(g_Ground.GetComponent<Rigidbody2D>()), pos.Value,
-				Vec2(0.0f, -1.0f), 0.55f, hitInfo);
-
-		if (isGrounded && Input::GetKeyDown(ctrl.Jump)) {
+		if (ctrl.IsGrounded && Input::GetKeyDown(ctrl.Jump)) {
 			Physics2D::AddImpulse(rb, Vec2(0.0f, 1.0f), ctrl.JumpForce);
 			audioSource->Play();
 		}
@@ -149,27 +153,29 @@ namespace BladeEngine {
 		}
 	}
 
-	void HandleOutOfMap(Position& pos) {
+	void MovePlatform(flecs::entity e, const MovingPlatform& movingPlatform, Position& pos)
+	{
+		pos.Value = movingPlatform.Anchor + 
+			sinf(Time::CurrentWorldTime() * movingPlatform.Frequency) 
+			* movingPlatform.Movement;
+	}
+
+	void HandleOutOfMap(Position& pos, OutOfMapCounter& counter)
+	{
 		if (pos.Value.Y < -10.0f)
+		{
 			pos.Value = Vec2(Utils::Random::NextFloat(-10.0f, 10.0f), 5.0f);
+			counter.Count++;
+		}
+	}
+
+	void UpdateFallCountText(TextRenderer& textRenderer, const OutOfMapCounter& counter)
+	{
+		textRenderer.Text = "Count: " + std::to_string(counter.Count);
 	}
 
 	void FocusCamera(const Player& player, const Position& pos) {
-		Camera::GetMainCamera()->SetPosition({ pos.Value.X, 0.0f, 10.0f });
-	}
-
-	void GeneratePulse(const PulseEmitter& emitter, const Position& pos) {
-		World::GetECSWorldHandle()->filter<Rigidbody2D, const Position>().each(
-			[&](Rigidbody2D& rb, const Position& p) {
-				Vec2 pulseVec = p.Value - pos.Value;
-
-				float distDiff = emitter.Radius - pulseVec.Length();
-				if (distDiff < 0)
-					return;
-
-				float pulseForce = distDiff / emitter.Radius * emitter.Strength;
-				Physics2D::AddImpulse(rb, Vec2(Normalize(pulseVec) * pulseForce));
-			});
+		Camera::GetMainCamera()->SetPosition({ pos.Value.X, 0.0f, 100.0f });
 	}
 
 	void TestGame::LoadGameResources() {
@@ -187,34 +193,99 @@ namespace BladeEngine {
 		// UnloadAudioClips();
 	}
 
+
+	class GroundedContactListener : public BaseBodyContactListener
+	{
+	public:
+		GroundedContactListener() { }
+		virtual ~GroundedContactListener() override { }
+
+		virtual void BeginContact(BaseBodyContactListener* other) override
+		{
+			m_ContactCount++;
+			GetEntity().get_mut<Controller>()->IsGrounded = m_ContactCount > 0;
+		}
+
+		virtual void EndContact(BaseBodyContactListener* other) override
+		{
+			m_ContactCount--;
+			GetEntity().get_mut<Controller>()->IsGrounded = m_ContactCount > 0;
+		}
+
+	private:
+		uint32_t m_ContactCount = 0;
+	};
+
 	void TestGame::SetupWorld() 
 	{
-
-		g_Ground = World::CreateEntity("Ground");
-		g_Ground.SetComponent<Position>({ {0.0f, -5.0f} });
-		g_Ground.SetComponent<Rotation>({ 0.0f });
-		g_Ground.SetComponent<Scale>({ {40.0f, 2.0f} });
-		g_Ground.AddComponent<Rigidbody2D>();
-		g_Ground.AddComponent<BoxCollider2D>();
-		g_Ground.GetComponent<BoxCollider2D>()->HalfExtents = { 20.0f, 1.0f };
-
-		g_Ground.SetComponent<SpriteRenderer>({ g_TexturePlatformBlock });
+		World::GetECSWorldHandle()->add<OutOfMapCounter>();
 
 		auto blockPrefab = World::GetECSWorldHandle()->prefab("Platform Block")
-			.set<Rotation>({ 0.0f })
-			.set<Scale>({ { 1.0f, 1.0f } })
-			.add<Rigidbody2D>()
+			.set_override<Position>({ { 0.0f, 0.0f } })
+			.set_override<Rotation>({ 0.0f })
+			.set_override<Scale>({ { 1.0f, 1.0f } })
+			.set_override<Rigidbody2D>({ })
 			.add<BoxCollider2D>()
 			.set<SpriteRenderer>({ g_TexturePlatformBlock });
 
 		blockPrefab.get_mut<BoxCollider2D>()->HalfExtents = { 0.5f, 0.5f };
 
-		for (int i = 0; i < 10; i++)
-		{
-			auto block = World::GetECSWorldHandle()->entity().is_a(blockPrefab);
-			block.set<Position>({ { -5.0f + i, 2.0f } });
-			block.set<Rigidbody2D>({ });
-		}
+		auto largePlatform = World::GetECSWorldHandle()->prefab("Platform Large")
+			.set_override<LocalToWorld>({ })
+			.set_override<Position>({ {0.0f, 0.0f} })
+			.set_override<Rotation>({ 0.0f })
+			.set_override<Scale>({ {1.0f, 1.0f} })
+			.set_override<Rigidbody2D>({ })
+			.add<BoxCollider2D>();
+
+		int numOfBlocks = 10;
+		largePlatform.get_mut<BoxCollider2D>()->HalfExtents = { 0.5f * numOfBlocks, 0.5f };
+
+			for (int i = 0; i < numOfBlocks; i++)
+			{
+				auto block1 = World::GetECSWorldHandle()->prefab()
+					.child_of(largePlatform)
+					.set_override<LocalToWorld>({ })
+					.set_override<Position>({ { -numOfBlocks * 0.5f + 0.5f + i, 0.0f } })
+					.set_override<Rotation>({ 0.0f })
+					.set_override<Scale>({ {1.0f, 1.0f} })
+					.set<SpriteRenderer>({ g_TexturePlatformBlock });
+			}
+
+		auto smallPlatform = World::GetECSWorldHandle()->prefab("Platform Small")
+			.set_override<LocalToWorld>({ })
+			.set_override<Position>({ {0.0f, 0.0f} })
+			.set_override<Rotation>({ 0.0f })
+			.set_override<Scale>({ {1.0f, 1.0f} })
+			.set_override<Rigidbody2D>({ })
+			.add<BoxCollider2D>();
+
+		numOfBlocks = 3;
+		smallPlatform.get_mut<BoxCollider2D>()->HalfExtents = { 0.5f * numOfBlocks, 0.5f };
+
+			for (int i = 0; i < numOfBlocks; i++)
+			{
+				auto block1 = World::GetECSWorldHandle()->prefab()
+					.child_of(smallPlatform)
+					.set_override<LocalToWorld>({ })
+					.set_override<Position>({ { -numOfBlocks * 0.5f + 0.5f + i, 0.0f } })
+					.set_override<Rotation>({ 0.0f })
+					.set_override<Scale>({ {1.0f, 1.0f} })
+					.set<SpriteRenderer>({ g_TexturePlatformBlock });
+			}
+			
+
+		World::GetECSWorldHandle()->entity().is_a(largePlatform)
+			.set<Position>({ { -3.0f, 0.0f } });
+
+		World::GetECSWorldHandle()->entity().is_a(smallPlatform)
+			.set<Position>({ { 6.0f, 1.0f } });
+
+		World::GetECSWorldHandle()->entity().is_a(smallPlatform)
+			.set<MovingPlatform>({ {10.0f, 3.0f}, {3.0f, -1.0f}, 0.5f });
+
+		World::GetECSWorldHandle()->entity().is_a(largePlatform)
+			.set<Position>({ { 0.0f, 6.0f } });
 
 		auto chickBoyPrefab = World::GetECSWorldHandle()->prefab("Chick Boy")
 			.set<Position>({ { 0.0f, 0.0f } })
@@ -232,28 +303,30 @@ namespace BladeEngine {
 		for (int i = 0; i < 6; i++)
 		{
 			auto chickBoy = World::GetECSWorldHandle()->entity().is_a(chickBoyPrefab);
+			chickBoy.add<LocalToWorld>();
 			chickBoy.set<Position>({ { -12.0f + i * 4.0f, 20.0f } });
 			chickBoy.set<Rigidbody2D>(*chickBoy.get<Rigidbody2D>());
 		}
 		
-
-		auto player = World::CreateEntity("Player");
-		player.SetComponent<Position>({ {0.0f, 5.0f} });
-		player.SetComponent<Rotation>({ 0.0f });
-		player.SetComponent<Scale>({ {1.0f, 1.0f} });
-		player.SetComponent<Controller>(
+		auto player = World::GetECSWorldHandle()->entity("Player");
+		player.add<LocalToWorld>();
+		player.set<Position>({ {0.0f, 5.0f} });
+		player.set<Rotation>({ 0.0f });
+		player.set<Scale>({ {1.0f, 1.0f} });
+		player.set<Controller>(
 			{ KeyCode::A, KeyCode::D, KeyCode::Space, 4.0f, 5.0f });
-		player.AddComponent<Player>();
-		player.AddComponent<Rigidbody2D>();
-		auto playerRB = player.GetComponent<Rigidbody2D>();
+		player.add<Player>();
+		player.add<Rigidbody2D>();
+		auto playerRB = player.get_mut<Rigidbody2D>();
 		playerRB->LockRotation = true;
 		playerRB->Type = Rigidbody2D::BodyType::Dynamic;
-		player.AddComponent<CircleCollider2D>();
+		playerRB->ContactListener = new GroundedContactListener();
+		player.add<CircleCollider2D>();
 
-		player.SetComponent<SpriteRenderer>({ g_TextureChickBoy });
+		player.set<SpriteRenderer>({ g_TextureChickBoy });
 
-		player.AddComponent<SpriteAnimator>();
-		auto anim = player.GetComponent<SpriteAnimator>();
+		player.add<SpriteAnimator>();
+		auto anim = player.get_mut<SpriteAnimator>();
 		
 		SpriteAnimation idle;
 		idle.Frames = g_SpriteSheetPlayerIdle->GetFrames();
@@ -262,15 +335,7 @@ namespace BladeEngine {
 		anim->AnimationsMap["Idle"] = idle;
 		anim->CurrentAnimation = &anim->AnimationsMap["Idle"];
 
-
-		auto someText = World::CreateEntity("My First Text");
-		someText.SetComponent<Position>({ { -10.0f, 5.0f } });
-		someText.SetComponent<Rotation>({ 0.0f });
-		someText.SetComponent<Scale>({ { 2.0f, 2.0f } });
-		someText.SetComponent<TextRenderer>({ g_OpenSansRegular, "Hello, World!" });
-
-
-		/*for (size_t i = 0; i < 6; i++) {
+		for (size_t i = 0; i < 6; i++) {
 			std::stringstream ss("Background Layer ");
 			ss << i + 1;
 
@@ -278,14 +343,36 @@ namespace BladeEngine {
 			background.SetComponent<Position>({ {0.0f, 0.0f} });
 			background.SetComponent<Rotation>({ 0.0f });
 			background.SetComponent<Scale>({ {100.0f, 50.0f} });
+			background.AddComponent<LocalToWorld>();
+			background.SetComponent<DepthSorting>({ -10.0f });
 
-			background.SetComponent<Sprite2D>({ g_BackgroundTextures[i] });
-		}*/
+			background.SetComponent<SpriteRenderer>({ g_BackgroundTextures[i] });
+		}
 
+
+		auto someText = World::CreateEntity("Out of Map Count Text");
+		someText.AddComponent<LocalToWorld>();
+		someText.SetComponent<DepthSorting>({ 10.0f });
+		someText.SetComponent<Position>({ { -15.0f, 7.0f } });
+		someText.SetComponent<Rotation>({ 0.0f });
+		someText.SetComponent<Scale>({ { 2.0f, 2.0f } });
+		someText.SetComponent<TextRenderer>({ g_OpenSansRegular, "Count: 0" });
+		someText.AddComponent<FallCountText>();
+
+		World::BindSystem<const MovingPlatform, Position>(flecs::OnUpdate, "Move Platform", MovePlatform);
 		World::BindSystem<const Controller, Rigidbody2D, const Position>(
 			flecs::OnUpdate, "Move", Move);
-		World::BindSystem<Position>(flecs::OnUpdate, "Handle out of Map",
-			HandleOutOfMap);
+
+		World::GetECSWorldHandle()->system<Position, OutOfMapCounter>("Handle out of Map")
+			.term_at(2).singleton()
+			.kind(flecs::OnUpdate)
+			.each(HandleOutOfMap);
+
+		World::GetECSWorldHandle()->system<TextRenderer, const OutOfMapCounter>("Update Count Text")
+			.term_at(2).singleton()
+			.term<FallCountText>()
+			.kind(flecs::OnUpdate)
+			.each(UpdateFallCountText);
 
 		World::BindSystem<const Player, const Position>(flecs::PostUpdate,
 			"Focus Camera", FocusCamera);

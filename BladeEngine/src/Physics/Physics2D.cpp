@@ -1,25 +1,46 @@
 #include "Physics2D.hpp"
 
-#include "../ECS/World.hpp"
 #include "../Components/Components.hpp"
 
 #include "box2d/box2d.h"
 
 namespace BladeEngine
 {
-    class BaseContactListener : public b2ContactListener
+
+    class WorldContactListener : public b2ContactListener
     {
         virtual void BeginContact(b2Contact* contact) override
         {
+            auto userDataA = &contact->GetFixtureA()->GetBody()->GetUserData();
+            auto listenerA = reinterpret_cast<BaseBodyContactListener*>(userDataA->pointer);
 
+            auto userDataB = &contact->GetFixtureB()->GetBody()->GetUserData();
+            auto listenerB = reinterpret_cast<BaseBodyContactListener*>(userDataB->pointer);
+
+            if (listenerA)
+                listenerA->BeginContact(listenerB);
+
+            if (listenerB)
+                listenerB->BeginContact(listenerA);
         }
 
         virtual void EndContact(b2Contact* contact) override
         {
+            auto userDataA = &contact->GetFixtureA()->GetBody()->GetUserData();
+            auto listenerA = reinterpret_cast<BaseBodyContactListener*>(userDataA->pointer);
 
+            auto userDataB = &contact->GetFixtureB()->GetBody()->GetUserData();
+            auto listenerB = reinterpret_cast<BaseBodyContactListener*>(userDataB->pointer);
+
+            if (listenerA)
+                listenerA->EndContact(listenerB);
+
+            if (listenerB)
+                listenerB->EndContact(listenerA);
         }
     };
 
+    static WorldContactListener* s_ContactListener;
 
     int Physics2D::s_VelocityIterations = 6;
     int Physics2D::s_PositionIterations = 2;
@@ -36,11 +57,16 @@ namespace BladeEngine
     {
         b2Vec2 gravity(0.0f, -9.8f);
         s_PhysicsWorld = new b2World(gravity);
+
+        s_ContactListener = new WorldContactListener();
+        s_PhysicsWorld->SetContactListener(s_ContactListener);
     }
     
     void Physics2D::Shutdown()
     {
         delete s_PhysicsWorld;
+
+        delete s_ContactListener;
     }
     
     void Physics2D::AddImpulse(Rigidbody2D& rb, Vec2 direction, float strength)

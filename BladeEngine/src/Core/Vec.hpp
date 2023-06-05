@@ -28,6 +28,13 @@ namespace BladeEngine
             return *this;
         }
 
+        Vec2& operator*=(const Vec2& other)
+        {
+            X *= other.X;
+            Y *= other.Y;
+            return *this;
+        }
+
         Vec2& operator*=(const float t)
         {
             X *= t;
@@ -141,6 +148,14 @@ namespace BladeEngine
             X += v.X;
             Y += v.Y;
             Z += v.Z;
+            return *this;
+        }
+
+        Vec3& operator*=(const Vec3& v)
+        {
+            X *= v.X;
+            Y *= v.Y;
+            Z *= v.Z;
             return *this;
         }
 

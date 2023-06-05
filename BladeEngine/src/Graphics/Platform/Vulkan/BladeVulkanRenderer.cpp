@@ -121,25 +121,21 @@ namespace BladeEngine::Graphics::Vulkan
 		m_UniformBufferCount = 0;
 	}
 
-	void VulkanRenderer::DrawSprite(Texture2D* texture, 
-		const glm::vec3& position, const glm::vec3& rotation, 
-		const glm::vec3& scale, const glm::vec4& uvTransform)
+	void VulkanRenderer::DrawSprite(
+		Texture2D* texture, 
+		const glm::mat4& transform,
+		const glm::vec4& uvTransform)
 	{
 		VulkanTexture* vkTexture = (VulkanTexture*)texture->GetGPUTexture();
 
 		VulkanMesh* vkMesh = (VulkanMesh*)Mesh::Quad()->GetGPUMesh();
-
-		ModelData modelData{};
-		modelData.position = position;
-		modelData.rotation = rotation;
-		modelData.scale = scale;
 
 		PushConstantData pushConstant{};
 		pushConstant.UVTransform = uvTransform;
 
 		vkTextures.push_back(vkTexture);
 		vkMeshes.push_back(vkMesh);
-		vkMeshesModelData.push_back(modelData);
+		vkMeshesModelData.push_back(transform);
 		m_PushConstantsData.push_back(pushConstant);
 	}
 
@@ -167,12 +163,7 @@ namespace BladeEngine::Graphics::Vulkan
 			MVP mvp{};
 			auto data = vkMeshesModelData[i];
 
-			mvp.model = glm::scale(
-				glm::rotate(
-					glm::translate(glm::mat4(1), data.position),
-					data.rotation.z,
-					glm::vec3(0, 0, 1)),
-				data.scale);
+			mvp.model = data;
 
 			mvp.view = camera->GetViewMatrix();
 			mvp.proj = camera->GetProjectionMatrix();
@@ -201,12 +192,7 @@ namespace BladeEngine::Graphics::Vulkan
 			MVP mvp{};
 			auto data = vkMeshesModelData[i];
 
-			mvp.model = glm::scale(
-				glm::rotate(
-					glm::translate(glm::mat4(1), data.position),
-					data.rotation.z,
-					glm::vec3(0, 0, 1)),
-				data.scale);
+			mvp.model = data;
 
 			mvp.view = camera->GetViewMatrix();
 			mvp.proj = camera->GetProjectionMatrix();
@@ -230,7 +216,7 @@ namespace BladeEngine::Graphics::Vulkan
 	}
 
 	void VulkanRenderer::DrawString(const std::string& string, Font* font, 
-		const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale)
+		const glm::mat4& transform)
 	{
 		Buffer vertexBuffer;
 		vertexBuffer.Allocate(4 * string.size() * sizeof(VertexColorTexture));
@@ -244,7 +230,7 @@ namespace BladeEngine::Graphics::Vulkan
 
 		struct TextParams
 		{
-			glm::vec4 Color{ 1.0f };
+			glm::vec4 Color{ 1.0f, 0.5f, 1.0f, 1.0f };
 			float Kerning = 0.0f;
 			float LineSpacing = 0.0f;
 		};
@@ -373,11 +359,7 @@ namespace BladeEngine::Graphics::Vulkan
 		memcpy(m_TextIndexBuffers[currentFrame][m_TextCount]->Map(), indexBufferData,
 			quadCount * 6 * sizeof(uint16_t));
 
-		ModelData modelData;
-		modelData.position = position;
-		modelData.rotation = rotation;
-		modelData.scale = scale;
-		vkMeshesModelData.push_back(modelData);
+		vkMeshesModelData.push_back(transform);
 
 		m_TextQuadCounts[m_TextCount] = quadCount;
 		m_TextCount++;

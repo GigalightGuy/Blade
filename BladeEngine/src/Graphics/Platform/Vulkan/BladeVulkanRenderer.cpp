@@ -64,7 +64,7 @@ namespace BladeEngine::Graphics::Vulkan
 			vkSwapchain->FindDepthFormat(vkDevice->physicalDevice));
 		m_RenderPasses.push_back(renderPass);
 
-		static const size_t maxQuadCount = 100;
+		static const size_t maxQuadCount = 1000;
 		static const size_t maxCharCount = 1000;
 
 		VulkanShader vkDefaultSpriteShader = VulkanShader(vkDevice->logicalDevice, defaultSpriteVertexShader->data, defaultSpriteFragmentShader->data);
